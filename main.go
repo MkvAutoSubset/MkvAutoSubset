@@ -18,9 +18,10 @@ const (
 
 type mkv struct {
 	Attachments []struct {
-		ID       int    `json:"id"`
-		FileName string `json:"file_name"`
-		Size     int    `json:"size"`
+		ID          int    `json:"id"`
+		FileName    string `json:"file_name"`
+		Size        int    `json:"size"`
+		ContentType string `json:"content_type"`
 	} `json:"attachments"`
 	Tracks []struct {
 		ID         int    `json:"id"`
@@ -34,22 +35,28 @@ type mkv struct {
 }
 
 func main() {
-	setWindowTitle("MKV Tool v2.0.5")
+	setWindowTitle("MKV Tool v2.1.0")
 	s := ""
 	c := false
 	d := false
 	m := false
 	n := false
+	q := false
 	sl, st := "", ""
 	flag.StringVar(&s, "s", "", "Source folder.")
 	flag.BoolVar(&c, "c", false, "Create mode.")
 	flag.BoolVar(&d, "d", false, "Dump mode.")
 	flag.BoolVar(&m, "m", false, "Make mode.")
+	flag.BoolVar(&q, "q", false, "Query mode.")
 	flag.BoolVar(&n, "n", false, "Not do ass font subset. (dump mode only)")
 	flag.StringVar(&sl, "sl", "chi", " Subtitle language. (create mode only)")
 	flag.StringVar(&st, "st", "", " Subtitle title. (create mode only)")
 	flag.Parse()
 	if s != "" {
+		if q {
+			queryFolder(s)
+			return
+		}
 		if c {
 			if sl != "" {
 				createMKVs(s, sl, st)
@@ -73,6 +80,15 @@ func main() {
 	flag.PrintDefaults()
 }
 
+func getMKVInfo(path string) *mkv {
+	buf := bytes.NewBufferString("")
+	p, _ := newProcess(nil, buf, nil, "", mkvmerge, "-J", path)
+	_, _ = p.Wait()
+	obj := new(mkv)
+	_ = json.Unmarshal(buf.Bytes(), obj)
+	return obj
+}
+
 func dumpMKVs(dir string, subset bool) {
 	files, _ := findPath(dir, `\.mkv$`)
 	arr := strings.Split(dir, `\`)
@@ -80,11 +96,7 @@ func dumpMKVs(dir string, subset bool) {
 	l := len(files)
 	for i, item := range files {
 		tmp := strings.Replace(item, dir, p, 1)
-		buf := bytes.NewBufferString("")
-		p, _ := newProcess(nil, buf, nil, "", mkvmerge, "-J", item)
-		_, _ = p.Wait()
-		obj := new(mkv)
-		_ = json.Unmarshal(buf.Bytes(), obj)
+		obj := getMKVInfo(item)
 		attachments := make([]string, 0)
 		tracks := make([]string, 0)
 		for _, _item := range obj.Attachments {
@@ -109,7 +121,7 @@ func dumpMKVs(dir string, subset bool) {
 		args = append(args, attachments...)
 		args = append(args, "tracks")
 		args = append(args, tracks...)
-		p, _ = newProcess(nil, nil, nil, "", mkvextract, args...)
+		p, _ := newProcess(nil, nil, nil, "", mkvextract, args...)
 		_, _ = p.Wait()
 		if subset {
 			asses := make([]string, 0)
@@ -125,7 +137,7 @@ func dumpMKVs(dir string, subset bool) {
 				}
 			}
 		}
-		fmt.Print(fmt.Sprintf("\rDump (%d/%d) done.", i+1, l))
+		fmt.Printf("\rDump (%d/%d) done.", i+1, l)
 	}
 }
 
@@ -162,7 +174,7 @@ func makeMKVs(dir, dir2 string) {
 		}
 		p, _ := newProcess(nil, nil, nil, "", mkvmerge, args...)
 		_, _ = p.Wait()
-		fmt.Print(fmt.Sprintf("\rMake (%d/%d) done.", i+1, l))
+		fmt.Printf("\rMake (%d/%d) done.", i+1, l)
 	}
 }
 
@@ -226,6 +238,45 @@ func createMKVs(dir string, slang, stitle string) {
 		}
 		_p, _ := newProcess(nil, nil, nil, "", mkvmerge, args...)
 		_, _ = _p.Wait()
-		fmt.Print(fmt.Sprintf("\rCreate (%d/%d) done.", i+1, l))
+		fmt.Printf("\rCreate (%d/%d) done.", i+1, l)
+	}
+}
+
+func checkSubset(path string) bool {
+	obj := getMKVInfo(path)
+	ass := false
+	ok := false
+	reg, _ := regexp.Compile(`\.[A-Z0-9]{8}\.\S+$`)
+	for _, track := range obj.Tracks {
+		ass = track.Type == "subtitles" && track.Codec == "SubStationAlpha"
+		if ass {
+			break
+		}
+	}
+	for _, attachment := range obj.Attachments {
+		ok = !ass || (strings.HasPrefix(attachment.ContentType, "font/") && reg.MatchString(attachment.FileName))
+		if ok {
+			break
+		}
+	}
+	return !ass || (ass && ok)
+}
+
+func queryFolder(dir string) {
+	lines := make([]string, 0)
+	files, _ := findPath(dir, `\.mkv$`)
+	l := len(files)
+	for i, file := range files {
+		if !checkSubset(file) {
+			lines = append(lines, file)
+		}
+		fmt.Printf("\rQuery (%d/%d) done.", i+1, l)
+	}
+	if len(lines) > 0 {
+		fmt.Print("\rHas item(s).")
+		data := []byte(strings.Join(lines, "\n"))
+		_ = os.WriteFile("list.txt", data, os.ModePerm)
+	} else {
+		fmt.Print("\rNo item.")
 	}
 }
