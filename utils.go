@@ -127,8 +127,12 @@ func newFile(fp string) (file *os.File, err error) {
 	return
 }
 
-func openFile(filepath string) (file *os.File, err error) {
-	file, err = os.OpenFile(filepath, os.O_RDWR, os.ModePerm)
+func openFile(filepath string, readOnly bool) (file *os.File, err error) {
+	f := os.O_RDWR
+	if readOnly {
+		f = os.O_RDONLY
+	}
+	file, err = os.OpenFile(filepath, f, os.ModePerm)
 	if err != nil {
 		file, err = newFile(filepath)
 	}
@@ -147,12 +151,12 @@ func copyFile(src, dst string) error {
 		_, n, _, _ = splitPath(src)
 		dst = fmt.Sprintf("%s/%s", dst, n)
 	}
-	sf, err := openFile(src)
+	sf, err := openFile(src, true)
 	if err != nil {
 		return err
 	}
 	defer sf.Close()
-	df, err := openFile(dst)
+	df, err := openFile(dst, false)
 	if err != nil {
 		return err
 	}

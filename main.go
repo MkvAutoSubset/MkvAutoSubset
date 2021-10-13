@@ -35,7 +35,7 @@ type mkv struct {
 }
 
 func main() {
-	setWindowTitle("MKV Tool v2.1.0")
+	setWindowTitle("MKV Tool v2.1.1")
 	s := ""
 	c := false
 	d := false
