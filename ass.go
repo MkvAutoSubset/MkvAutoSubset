@@ -240,11 +240,6 @@ func (self *ass) createFontSubset(font *fontInfo) bool {
 	if e == ".ttc" {
 		e = ".ttf"
 	}
-	err := os.RemoveAll(self.output)
-	if !(err == nil || err == os.ErrNotExist) {
-		log.Println("Failed to clean the output folder.")
-		return false
-	}
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
 		log.Println("Failed to create the output folder.")
 		return false
@@ -275,6 +270,11 @@ func (self *ass) createFontSubset(font *fontInfo) bool {
 }
 
 func (self *ass) createFontsSubset() bool {
+	err := os.RemoveAll(self.output)
+	if !(err == nil || err == os.ErrNotExist) {
+		log.Println("Failed to clean the output folder.")
+		return false
+	}
 	ok := 0
 	l := len(self.m)
 	wg := new(sync.WaitGroup)

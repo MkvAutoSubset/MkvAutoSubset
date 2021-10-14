@@ -7,7 +7,7 @@ import (
 	"runtime"
 )
 
-const pName = "MKV Tool v3.0.1"
+const pName = "MKV Tool v3.0.2"
 
 type arrayArg []string
 
