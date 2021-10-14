@@ -4,13 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"syscall"
-	"unsafe"
+	"time"
 )
 
 func newProcess(stdin io.Reader, stdout, stderr io.Writer, dir, prog string, args ...string) (p *os.Process, err error) {
@@ -32,20 +33,6 @@ func newProcess(stdin io.Reader, stdout, stderr io.Writer, dir, prog string, arg
 		p = cmd.Process
 	}
 	return
-}
-
-func setWindowTitle(title string) {
-	kernel32, err := syscall.LoadLibrary("kernel32.dll")
-	if err == nil {
-		defer syscall.FreeLibrary(kernel32)
-		setConsoleTitle, err := syscall.GetProcAddress(kernel32, "SetConsoleTitleW")
-		if err == nil {
-			ptr, err := syscall.UTF16PtrFromString(title)
-			if err == nil {
-				syscall.Syscall(setConsoleTitle, 1, uintptr(unsafe.Pointer(ptr)), 0, 0)
-			}
-		}
-	}
 }
 
 func newDir(path string) error {
@@ -127,13 +114,13 @@ func newFile(fp string) (file *os.File, err error) {
 	return
 }
 
-func openFile(filepath string, readOnly bool) (file *os.File, err error) {
-	f := os.O_RDWR
+func openFile(filepath string, readOnly, create bool) (file *os.File, err error) {
+	f := os.O_RDWR | os.O_CREATE
 	if readOnly {
 		f = os.O_RDONLY
 	}
 	file, err = os.OpenFile(filepath, f, os.ModePerm)
-	if err != nil {
+	if err != nil && create {
 		file, err = newFile(filepath)
 	}
 	return
@@ -149,14 +136,14 @@ func copyFile(src, dst string) error {
 	}
 	if _, n, _, _ := splitPath(dst); n == "" {
 		_, n, _, _ = splitPath(src)
-		dst = fmt.Sprintf("%s/%s", dst, n)
+		dst = path.Join(dst, n)
 	}
-	sf, err := openFile(src, true)
+	sf, err := openFile(src, true, false)
 	if err != nil {
 		return err
 	}
 	defer sf.Close()
-	df, err := openFile(dst, false)
+	df, err := openFile(dst, false, true)
 	if err != nil {
 		return err
 	}
@@ -194,4 +181,41 @@ func copyFileOrDir(src, dst string) error {
 		return copyFile(src, dst)
 	}
 	return copyFolder(src, dst)
+}
+
+func randomStr(l int) string {
+	str := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	bytes := []byte(str)
+	var result []byte
+	lstr := len(str) - 1
+	for i := 0; i < l; i++ {
+		n := randomNumber(0, lstr)
+		result = append(result, bytes[n])
+	}
+	return string(result)
+}
+
+var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func randomN(n int) int {
+	return r.Intn(n)
+}
+
+func randomNumber(min, max int) int {
+	sub := max - min + 1
+	if sub <= 1 {
+		return min
+	}
+	return min + randomN(sub)
+}
+
+var reg, _ = regexp.Compile(`[\*\.\?\+\$\^\[\]\(\)\{\}\|\\\/]`)
+
+func regEx(str string) string {
+	return reg.ReplaceAllString(str, `\$0`)
+}
+
+func findFonts(dir string) []string {
+	list, _ := findPath(dir, `\.((ttf)|(otf)|(ttc)|(fon))$`)
+	return list
 }
