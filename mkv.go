@@ -180,8 +180,7 @@ func createMKVs(dir string, slang, stitle string) bool {
 	_ = os.RemoveAll(t)
 	for i, item := range files {
 		_, _, _, _f := splitPath(item)
-		_tf := reg.ReplaceAllString(_f, `\$0`)
-		tmp, _ := findPath(s, fmt.Sprintf(`%s\S*\.\S+$`, _tf))
+		tmp, _ := findPath(s, fmt.Sprintf(`%s\S*\.\S+$`, regexp.QuoteMeta(_f)))
 		asses := make([]string, 0)
 		subs := make([]string, 0)
 		p := path.Join(t, _f)

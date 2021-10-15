@@ -209,12 +209,6 @@ func randomNumber(min, max int) int {
 	return min + randomN(sub)
 }
 
-var reg, _ = regexp.Compile(`[\*\.\?\+\$\^\[\]\(\)\{\}\|\\\/]`)
-
-func regEx(str string) string {
-	return reg.ReplaceAllString(str, `\$0`)
-}
-
 func findFonts(dir string) []string {
 	list, _ := findPath(dir, `\.((ttf)|(otf)|(ttc)|(fon))$`)
 	return list

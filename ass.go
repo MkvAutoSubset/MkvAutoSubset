@@ -80,6 +80,9 @@ func (self *ass) parse() bool {
 								name = arr[1]
 							}
 						}
+						if strings.HasPrefix(name, "@") && len(name) > 1 {
+							name = name[1:]
+						}
 						if m[name] == nil {
 							m[name] = make(map[rune]bool)
 						}
@@ -135,7 +138,7 @@ func (self *ass) dumpFont(file string, full bool) bool {
 	ok := false
 	count := 1
 	_, n, _, _ := splitPath(file)
-	if strings.HasSuffix(file, ".ttc") && !full {
+	if strings.HasSuffix(file, ".ttc") {
 		count = self.getTTCCount(file)
 		if count < 1 {
 			log.Printf(`Failed to get the ttc font count: "%s".`, n)
@@ -185,37 +188,66 @@ func (self *ass) dumpFonts(files []string, full bool) bool {
 	return ok == l
 }
 
+func (self *ass) getFontName(p string) []string {
+	f, err := openFile(p, true, false)
+	if err == nil {
+		defer func() { _ = f.Close() }()
+		names := make([]string, 0)
+		if xml, err := xmlquery.Parse(f); err == nil {
+			for _, v := range xml.SelectElements(`ttFont/name/namerecord[@platformID=3]`) {
+				id := v.SelectAttr("nameID")
+				name := strings.TrimSpace(v.FirstChild.Data)
+				switch id {
+				case "1":
+					names = append(names, name)
+					break
+				case "4":
+					names = append(names, name)
+					break
+				}
+			}
+		}
+		return names
+	}
+	return nil
+}
+
+func (self *ass) getFontsName() map[string][]string {
+	files, _ := findPath(self._fonts, `\.ttx$`)
+	l := len(files)
+	wg := new(sync.WaitGroup)
+	wg.Add(l)
+	m := new(sync.Mutex)
+	_m := make(map[string][]string)
+	for _, item := range files {
+		go func(_item string) {
+			names := self.getFontName(_item)
+			if len(names) > 0 {
+				m.Lock()
+				_m[_item] = names
+				m.Unlock()
+			}
+			wg.Done()
+		}(item)
+	}
+	wg.Wait()
+	return _m
+}
+
 func (self *ass) matchFonts() bool {
 	if !self.dumpFonts(self.fonts, false) {
 		return false
 	}
-	files, _ := findPath(self._fonts, `\.ttx$`)
-	reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
-	for _, item := range files {
-		f, err := openFile(item, true, false)
-		if err == nil {
-			defer f.Close()
-			names := make([]string, 0)
-			if xml, err := xmlquery.Parse(f); err == nil {
-				for _, v := range xml.SelectElements(`ttFont/name/namerecord[@platformID=3]`) {
-					id := v.SelectAttr("nameID")
-					name := strings.TrimSpace(v.FirstChild.Data)
-					switch id {
-					case "1":
-						names = append(names, name)
-						break
-					case "4":
-						names = append(names, name)
-						break
-					}
-				}
-			}
-			for k, _ := range self.m {
-				for _, v := range names {
-					if v == k {
-						self.m[k].file = reg.ReplaceAllString(item, "")
-						self.m[k].ttx = item
-						self.m[k].index = reg.FindStringSubmatch(item)[1]
+	m := self.getFontsName()
+	if len(m) > 0 {
+		reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
+		for k, _ := range self.m {
+			for _k, v := range m {
+				for _, _v := range v {
+					if _v == k {
+						self.m[k].file = reg.ReplaceAllString(_k, "")
+						self.m[k].ttx = _k
+						self.m[k].index = reg.FindStringSubmatch(_k)[1]
 						self.m[k].newName = randomStr(8)
 						break
 					}
@@ -373,16 +405,13 @@ func (self *ass) replaceFontNameInAss() bool {
 			if m[f] == nil {
 				m[f] = make(map[string]bool)
 			}
-			n := regEx(v.oldName)
-			reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\n]+),(@?)%s,`, n))
-			s = reg.ReplaceAllString(s, fmt.Sprintf("${1},${2}%s,", v.newName))
-			reg, _ = regexp.Compile(fmt.Sprintf(`\\fn(@?)%s`, n))
-			s = reg.ReplaceAllString(s, fmt.Sprintf(`\fn${1}%s`, v.newName))
-			reg, _ = regexp.Compile(fmt.Sprintf(`(\\fn)?@?%s,?`, n))
+			n := regexp.QuoteMeta(v.oldName)
+			reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\n]+,|\\fn)(@?)%s`, n))
 			if reg.MatchString(s) {
+				s = reg.ReplaceAllString(s, "${1}${2}"+v.newName)
 				m[f][v.oldName] = true
+				self.subtitles[f] = s
 			}
-			self.subtitles[f] = s
 		}
 	}
 	for f, s := range self.subtitles {
