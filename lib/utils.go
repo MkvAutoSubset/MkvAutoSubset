@@ -1,4 +1,4 @@
-package main
+package mkvlib
 
 import (
 	"errors"
@@ -207,6 +207,11 @@ func randomNumber(min, max int) int {
 		return min
 	}
 	return min + randomN(sub)
+}
+
+func findMKVs(dir string) []string {
+	list, _ := findPath(dir, `\.mkv$`)
+	return list
 }
 
 func findFonts(dir string) []string {

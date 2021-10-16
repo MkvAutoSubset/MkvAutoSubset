@@ -1,4 +1,4 @@
-package main
+package mkvlib
 
 import (
 	"encoding/binary"
@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 const (
@@ -30,7 +31,7 @@ type fontInfo struct {
 	sFont   string
 }
 
-type ass struct {
+type assProcessor struct {
 	files     []string
 	_fonts    string
 	output    string
@@ -40,7 +41,7 @@ type ass struct {
 	subtitles map[string]string
 }
 
-func (self *ass) parse() bool {
+func (self *assProcessor) parse() bool {
 	ec := 0
 	self.subtitles = make(map[string]string)
 	for _, file := range self.files {
@@ -61,7 +62,7 @@ func (self *ass) parse() bool {
 		}
 	}
 	if ec == 0 {
-		reg, _ := regexp.Compile(`\{?\\fn@?([^\\]+)[\\\}]`)
+		reg, _ := regexp.Compile(`\{?\\fn@?([^\r\n\\\}]+)[\\\}]`)
 		m := make(map[string]map[rune]bool)
 		for k, v := range self.subtitles {
 			subtitle, err := astisub.ReadFromSSA(strings.NewReader(v))
@@ -122,7 +123,7 @@ func (self *ass) parse() bool {
 	return ec == 0
 }
 
-func (self *ass) getTTCCount(file string) int {
+func (self *assProcessor) getTTCCount(file string) int {
 	f, err := openFile(file, true, false)
 	if err == nil {
 		defer func() { _ = f.Close() }()
@@ -134,7 +135,7 @@ func (self *ass) getTTCCount(file string) int {
 	return 0
 }
 
-func (self *ass) dumpFont(file string, full bool) bool {
+func (self *assProcessor) dumpFont(file string, full bool) bool {
 	ok := false
 	count := 1
 	_, n, _, _ := splitPath(file)
@@ -167,7 +168,7 @@ func (self *ass) dumpFont(file string, full bool) bool {
 	return ok
 }
 
-func (self *ass) dumpFonts(files []string, full bool) bool {
+func (self *assProcessor) dumpFonts(files []string, full bool) bool {
 	ok := 0
 	l := len(files)
 	wg := new(sync.WaitGroup)
@@ -188,7 +189,7 @@ func (self *ass) dumpFonts(files []string, full bool) bool {
 	return ok == l
 }
 
-func (self *ass) getFontName(p string) []string {
+func (self *assProcessor) getFontName(p string) []string {
 	f, err := openFile(p, true, false)
 	if err == nil {
 		defer func() { _ = f.Close() }()
@@ -212,7 +213,7 @@ func (self *ass) getFontName(p string) []string {
 	return nil
 }
 
-func (self *ass) getFontsName() map[string][]string {
+func (self *assProcessor) getFontsName() map[string][]string {
 	files, _ := findPath(self._fonts, `\.ttx$`)
 	l := len(files)
 	wg := new(sync.WaitGroup)
@@ -234,7 +235,7 @@ func (self *ass) getFontsName() map[string][]string {
 	return _m
 }
 
-func (self *ass) matchFonts() bool {
+func (self *assProcessor) matchFonts() bool {
 	if !self.dumpFonts(self.fonts, false) {
 		return false
 	}
@@ -265,7 +266,7 @@ func (self *ass) matchFonts() bool {
 	return ok
 }
 
-func (self *ass) createFontSubset(font *fontInfo) bool {
+func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
 	fn := fmt.Sprintf(`%s.txt`, font.file)
 	_, n, e, ne := splitPath(font.file)
@@ -301,7 +302,7 @@ func (self *ass) createFontSubset(font *fontInfo) bool {
 	return ok
 }
 
-func (self *ass) createFontsSubset() bool {
+func (self *assProcessor) createFontsSubset() bool {
 	err := os.RemoveAll(self.output)
 	if !(err == nil || err == os.ErrNotExist) {
 		log.Println("Failed to clean the output folder.")
@@ -327,7 +328,7 @@ func (self *ass) createFontsSubset() bool {
 	return ok == l
 }
 
-func (self *ass) changeFontName(font *fontInfo) bool {
+func (self *assProcessor) changeFontName(font *fontInfo) bool {
 	ec := 0
 	if self.dumpFont(font.sFont, true) {
 		fn := fmt.Sprintf("%s_0.ttx", font.sFont)
@@ -342,7 +343,7 @@ func (self *ass) changeFontName(font *fontInfo) bool {
 					id := v.SelectAttr("nameID")
 					switch id {
 					case "0":
-						v.FirstChild.Data = "Processed by " + pName
+						v.FirstChild.Data = "Processed by " + LibFName + " at " + time.Now().Format("2006-01-02 15:04:05")
 						break
 					case "1", "3", "4", "6":
 						v.FirstChild.Data = font.newName
@@ -376,7 +377,7 @@ func (self *ass) changeFontName(font *fontInfo) bool {
 	return ec == 0
 }
 
-func (self *ass) changeFontsName() bool {
+func (self *assProcessor) changeFontsName() bool {
 	ok := 0
 	l := len(self.m)
 	wg := new(sync.WaitGroup)
@@ -397,7 +398,7 @@ func (self *ass) changeFontsName() bool {
 	return ok == l
 }
 
-func (self *ass) replaceFontNameInAss() bool {
+func (self *assProcessor) replaceFontNameInAss() bool {
 	ec := 0
 	m := make(map[string]map[string]bool)
 	for _, v := range self.m {
@@ -406,9 +407,10 @@ func (self *ass) replaceFontNameInAss() bool {
 				m[f] = make(map[string]bool)
 			}
 			n := regexp.QuoteMeta(v.oldName)
-			reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\n]+,|\\fn)(@?)%s`, n))
+			reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, n))
 			if reg.MatchString(s) {
-				s = reg.ReplaceAllString(s, "${1}${2}"+v.newName)
+				r := fmt.Sprintf("${1}${2}%s${3}", v.newName)
+				s = reg.ReplaceAllString(s, r)
 				m[f][v.oldName] = true
 				self.subtitles[f] = s
 			}
@@ -416,13 +418,14 @@ func (self *ass) replaceFontNameInAss() bool {
 	}
 	for f, s := range self.subtitles {
 		comments := make([]string, 0)
-		comments = append(comments, "[script info]")
+		comments = append(comments, "[Script Info]")
 		comments = append(comments, "; ----- Font subset begin -----")
 		for k, _ := range m[f] {
 			comments = append(comments, fmt.Sprintf("; Font subset: %s - %s", self.m[k].newName, k))
 		}
 		if len(comments) > 2 {
-			comments = append(comments, "; Processed by "+pName)
+			comments = append(comments, "")
+			comments = append(comments, "; Processed by "+LibFName+" at "+time.Now().Format("2006-01-02 15:04:05"))
 			comments = append(comments, "; -----  Font subset end  -----")
 			comments = append(comments, "")
 			s = strings.Replace(s, "[Script Info]\r\n", strings.Join(comments, "\r\n"), 1)
@@ -440,26 +443,4 @@ func (self *ass) replaceFontNameInAss() bool {
 		}
 	}
 	return ec == 0
-}
-
-func genASSes(files []string, fonts, output string) bool {
-	if len(files) == 0 {
-		return false
-	}
-	obj := new(ass)
-	obj.files = files
-	obj._fonts = fonts
-	obj.output = output
-
-	d, _, _, _ := splitPath(obj.files[0])
-	if obj._fonts == "" {
-		obj._fonts += path.Join(d, "fonts")
-	}
-	if obj.output == "" {
-		obj.output += path.Join(d, "output")
-	}
-
-	obj.fonts = findFonts(obj._fonts)
-
-	return obj.parse() && obj.matchFonts() && obj.createFontsSubset() && obj.changeFontsName() && obj.replaceFontNameInAss()
 }
