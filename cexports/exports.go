@@ -3,7 +3,7 @@ package main
 import (
 	"C"
 	"encoding/json"
-	"mkvlib"
+	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
 )
 
 var _instance = mkvlib.GetInstance()

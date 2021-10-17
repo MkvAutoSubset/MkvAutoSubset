@@ -1,8 +1,8 @@
-module mkvlib/c
+module github.com/KurenaiRyu/MkvAutoSubset/cexports
 
 go 1.17
 
-require mkvlib v0.0.0
+require github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20211017160923-113fd8f70001
 
 require (
 	github.com/antchfx/xmlquery v1.3.8 // indirect
@@ -14,5 +14,3 @@ require (
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	golang.org/x/text v0.3.2 // indirect
 )
-
-replace mkvlib => ./../mkvlib
