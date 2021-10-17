@@ -103,14 +103,14 @@ func (self *assProcessor) parse() bool {
 				str += string(_k)
 			}
 			str = strings.TrimSpace(str)
-			str = reg.ReplaceAllString(str, "")
-			str += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-			reg, _ = regexp.Compile("[１２３４５６７８９０]")
-			if reg.MatchString(str) {
-				str = reg.ReplaceAllString(str, "")
-				str += "１２３４５６７８９０"
-			}
 			if str != "" {
+				str = reg.ReplaceAllString(str, "")
+				str += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+				reg, _ = regexp.Compile("[１２３４５６７８９０]")
+				if reg.MatchString(str) {
+					str = reg.ReplaceAllString(str, "")
+					str += "１２３４５６７８９０"
+				}
 				self.m[k] = new(fontInfo)
 				self.m[k].str = str
 				self.m[k].oldName = k

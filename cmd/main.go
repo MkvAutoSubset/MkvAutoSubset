@@ -12,7 +12,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "3.1.1"
+const appVer = "v3.1.3"
 const tTitle = appName + " " + appVer
 
 var processer = mkvlib.GetInstance()
@@ -43,6 +43,7 @@ func main() {
 	q := false
 	v := false
 	clean := false
+	ans := false
 	sl, st := "", ""
 	af, ao := "", ""
 	asses := new(arrayArg)
@@ -55,10 +56,11 @@ func main() {
 	flag.Var(asses, "a", "ASS files. (multiple & join ass mode)")
 	flag.BoolVar(&n, "n", false, "Not do ass font subset. (dump mode only)")
 	flag.BoolVar(&clean, "clean", false, "Clean original file subtitles and fonts. (create mode only)")
-	flag.StringVar(&sl, "sl", "chi", " Subtitle language. (create & make mode only)")
-	flag.StringVar(&st, "st", "", " Subtitle title. (create & make mode only)")
-	flag.StringVar(&af, "af", "", " ASS fonts folder. (ASS mode only)")
-	flag.StringVar(&ao, "ao", "", " ASS output folder. (ASS mode only)")
+	flag.StringVar(&sl, "sl", "chi", "Subtitle language. (create & make mode only)")
+	flag.StringVar(&st, "st", "", "Subtitle title. (create & make mode only)")
+	flag.StringVar(&af, "af", "", "ASS fonts folder. (ass mode only)")
+	flag.StringVar(&ao, "ao", "", "ASS output folder. (ass mode only)")
+	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subseted" folder. (ass mode only)`)
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
 	flag.StringVar(&dist, "dist", "dist", "Results output folder (make mode only)")
 
@@ -77,7 +79,7 @@ func main() {
 	}
 
 	if len(*asses) > 0 {
-		if !processer.ASSFontSubset(*asses, af, ao) {
+		if !processer.ASSFontSubset(*asses, af, ao, !ans) {
 			ec++
 		}
 		return

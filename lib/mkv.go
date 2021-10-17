@@ -90,7 +90,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool) bool {
 						asses = append(asses, f)
 					}
 					if len(asses) > 0 {
-						if !self.ASSFontSubset(asses, "", "") {
+						if !self.ASSFontSubset(asses, "", "", false) {
 							ec++
 						}
 					}
@@ -227,7 +227,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir string, slang,
 		tracks := make([]string, 0)
 		if len(asses) > 0 {
 			_ = os.RemoveAll(tDir)
-			if !self.ASSFontSubset(asses, fDir, "") {
+			if !self.ASSFontSubset(asses, fDir, "", false) {
 				ec++
 			} else {
 				__p := path.Join(p, "subsetted")
@@ -272,7 +272,7 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, sttlte string) bool
 	return ec == 0
 }
 
-func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string) bool {
+func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, dirSafe bool) bool {
 	if len(files) == 0 {
 		return false
 	}
@@ -280,15 +280,17 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string) bo
 	obj.files = files
 	obj._fonts = fonts
 	obj.output = output
-
 	d, _, _, _ := splitPath(obj.files[0])
 	if obj._fonts == "" {
 		obj._fonts += path.Join(d, "fonts")
 	}
 	if obj.output == "" {
-		obj.output += path.Join(d, "subsetted")
+		obj.output = d
+		dirSafe = true
 	}
-
+	if dirSafe {
+		obj.output = path.Join(obj.output, "subseted")
+	}
 	obj.fonts = findFonts(obj._fonts)
 
 	return obj.parse() && obj.matchFonts() && obj.createFontsSubset() && obj.changeFontsName() && obj.replaceFontNameInAss()
