@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
 	"log"
-	"mkvlib"
 	"os"
 	"path"
 	"runtime"
