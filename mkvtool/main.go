@@ -12,7 +12,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.1.3"
+const appVer = "v3.1.4"
 const tTitle = appName + " " + appVer
 
 var processer = mkvlib.GetInstance()
@@ -60,7 +60,7 @@ func main() {
 	flag.StringVar(&st, "st", "", "Subtitle title. (create & make mode only)")
 	flag.StringVar(&af, "af", "", "ASS fonts folder. (ass mode only)")
 	flag.StringVar(&ao, "ao", "", "ASS output folder. (ass mode only)")
-	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subseted" folder. (ass mode only)`)
+	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subsetted" folder. (ass mode only)`)
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
 	flag.StringVar(&dist, "dist", "dist", "Results output folder (make mode only)")
 

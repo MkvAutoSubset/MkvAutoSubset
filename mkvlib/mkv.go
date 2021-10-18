@@ -289,7 +289,7 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 		dirSafe = true
 	}
 	if dirSafe {
-		obj.output = path.Join(obj.output, "subseted")
+		obj.output = path.Join(obj.output, "subsetted")
 	}
 	obj.fonts = findFonts(obj._fonts)
 

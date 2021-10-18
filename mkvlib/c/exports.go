@@ -32,8 +32,8 @@ func DumpMKV(file, output *C.char, subset bool) bool {
 }
 
 type checkSubset_R struct {
-	Subseted bool `json:"subseted"`
-	Error    bool `json:"error"`
+	Subsetted bool `json:"subsetted"`
+	Error     bool `json:"error"`
 }
 
 //export CheckSubset
