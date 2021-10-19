@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.1.5"
+const appVer = "v3.1.6"
 const tTitle = appName + " " + appVer
 
 var processer = mkvlib.GetInstance()
@@ -71,7 +71,7 @@ func main() {
 	flag.Parse()
 
 	if flog != "" {
-		lf, err := os.OpenFile(flog, os.O_CREATE|os.O_RDWR, os.ModePerm)
+		lf, err := os.Create(flog)
 		if err != nil {
 			log.Printf(`Failed to create log file: "%s"`, flog)
 		}
