@@ -9,8 +9,8 @@
 - fonttools
   ```shell
   apt install python3-fonttools #Debian/Ubuntu
-  apk add py3-fonttools #alpine
-  pip install fonttools #使用pip
+  apk add py3-fonttools #Alpine
+  pip install fonttools #Use pip
   ```
 - mkvtoolnix
   ```shell
