@@ -65,8 +65,8 @@ ASS字幕字体子集化 MKV批量提取/生成
   ```shell
   mkvtool -m -s bangumi -data data -dist dist
   
-  #-data参数默认值为"${workdir}/data"
-  #-dist参数默认值为"${workdir}/dist"
+  #-data参数默认值为"${workdir}/data",字幕和字体的数据文件夹.
+  #-dist参数默认值为"${workdir}/dist",重组后mkv的输出文件夹.
   #假设bangumi文件夹里的目录结构如下所示:
   #bangumi
   # |-- S01
