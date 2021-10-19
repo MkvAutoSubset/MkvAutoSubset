@@ -4,6 +4,26 @@
 
 自动字体子集化工具
 
+## mkvtool 安装
+###依赖
+- fonttools
+  ```shell
+  pip install fonttools
+  ```
+- mkvtoolnix
+  ```shell
+  apt install mkvtoolnix #Debian/Ubuntu
+  apk add mkvtoolnix #Alpine
+  ```
+###本体
+- 有安装Go的情况:
+  ```shell
+  go install https://github.com/KurenaiRyu/MkvAutoSubset/mkvtool@latest #安装和更新
+  ```
+- 手动安装:
+
+  [点此下载](https://github.com/KurenaiRyu/MkvAutoSubset/releases/latest)
+
 ## mkvtool 功能及使用示例
 
 - 从单个(或文件夹的)mkv文件里抽取字幕和字体*并创建子集化后的版本(可选)*
@@ -41,14 +61,17 @@
   # |||-- ...
   # |||-- subsetted
   # |||-- xxx.sub
+  # |||-- ...
   # |-- SP
   # |||-- ...
   # |||-- subsetted
   # |||-- xxx.sub
+  # |||-- ...
   # |-- xx
   # |||-- ...
   # |||-- subsetted
   # |||-- xxx.sub
+  # |||-- ...
   
   #*奇淫巧技:指定一个没有任何内容的data目录,将输出一个"干净的"mkv文件.
    ```
