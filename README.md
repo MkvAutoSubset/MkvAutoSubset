@@ -23,8 +23,9 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 - 从 [这里](https://www.python.org/downloads) 下载并安装Python
 - 从 [这里](https://www.fosshub.com/MKVToolNix.html) 下载并安装MKVToolNix
-- 保证以上两者的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_)在 **path** 环境变量里
 - 命令提示符(CMD)里参考上面使用pip的方式安装FontTools依赖
+- 保证以上两者的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_)在 **path** 环境变量里
+
 ### 本体
 
 - 有安装Go的情况:
