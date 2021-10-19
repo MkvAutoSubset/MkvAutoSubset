@@ -19,6 +19,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   apt install mkvtoolnix #Debian/Ubuntu
   apk add mkvtoolnix #Alpine
   ```
+
 #### 关于Windows用户
 
 - 从 [这里](https://www.python.org/downloads) 下载并安装Python
@@ -38,6 +39,15 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 ## mkvtool 功能及使用示例
 
+- 标准工作流
+  ```shell
+  mkvtool -s bangumi 
+  #从${bangumi}文件夹抽取所有mkv文件的字幕和字体,
+  #遇到ass字幕就自动进行子集化,
+  #输出替换字幕和字体后的新mkv文件.
+  #-data参数默认值为"${workdir}/data",指定提取mkv的输出文件夹.
+  #-dist参数默认值为"${workdir}/dist",指定重组后mkv的输出文件夹.
+  ```
 - 从单个(或文件夹的)mkv文件里抽取字幕和字体*并创建子集化后的版本(可选)*
   ```shell
   mkvtool -d -f file.mkv #单个文件
@@ -129,6 +139,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 ### 一些碎碎念
 
+- "-log"参数:输出终端输出到指定文件,空为不输出,默认为空.
 - "-m","-c"模式下的"-sl","-st"参数:
    ```
    -sl:字幕语言.格式为语言缩写如"chi","jpn","eng"等,默认值为"chi".

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -12,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.1.4"
+const appVer = "v3.1.5"
 const tTitle = appName + " " + appVer
 
 var processer = mkvlib.GetInstance()
@@ -46,6 +47,7 @@ func main() {
 	ans := false
 	sl, st := "", ""
 	af, ao := "", ""
+	flog := ""
 	asses := new(arrayArg)
 	flag.StringVar(&s, "s", "", "Source folder.")
 	flag.StringVar(&f, "f", "", "MKV file. (join single mode)")
@@ -63,13 +65,23 @@ func main() {
 	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subsetted" folder. (ass mode only)`)
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
 	flag.StringVar(&dist, "dist", "dist", "Results output folder (make mode only)")
+	flag.StringVar(&flog, "log", "", "Log file path")
 
 	flag.BoolVar(&v, "v", false, "Show app info.")
 	flag.Parse()
 
+	if flog != "" {
+		lf, err := os.OpenFile(flog, os.O_CREATE|os.O_RDWR, os.ModePerm)
+		if err != nil {
+			log.Printf(`Failed to create log file: "%s"`, flog)
+		}
+		mw := io.MultiWriter(os.Stdout, lf)
+		log.SetOutput(mw)
+	}
+
 	ec := 0
 	if v {
-		fmt.Println(appFN + " (powered by " + mkvlib.LibFName + ")")
+		log.Printf("%s (powered by %s)", appFN, mkvlib.LibFName)
 		return
 	}
 
