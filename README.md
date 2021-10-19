@@ -5,7 +5,9 @@
 自动字体子集化工具
 
 ## mkvtool 安装
+
 ### 依赖
+
 - fonttools
   ```shell
   apt install python3-fonttools #Debian/Ubuntu
@@ -17,7 +19,9 @@
   apt install mkvtoolnix #Debian/Ubuntu
   apk add mkvtoolnix #Alpine
   ```
+
 ### 本体
+
 - 有安装Go的情况:
   ```shell
   go install https://github.com/KurenaiRyu/MkvAutoSubset/mkvtool@latest #安装和更新
@@ -111,11 +115,12 @@
   mkvtool -a aaa.ass -bbb.ass -af fonts -ao output
   
   #"-a"参数为ass字幕文件路径,可复用.
-  #"-af"参数为字体文件夹路径,默认值为"fonts".
-  #"-ao"参数为子集化成品输出路径
+  #"-af"参数为字体文件夹路径,默认值为"${workdir}/fonts".
+  #"-ao"参数为子集化成品输出路径,默认值为"${workdir}/subsetted".
   #在默认情况下,子集化后的成品输出于"${output}/subsetted"文件夹;
   #使用参数"-ans"可使其直接输出于"${output}",但会预先清空该文件夹,慎用.
   ```
+
 ### 一些Tips
 
 - "-m","-c"模式下的"-sl","-st"参数:
