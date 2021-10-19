@@ -2,24 +2,29 @@
 
 ![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/KurenaiRyu/MkvAutoSubset?include_prereleases)
 
-自动字体子集化工具
+ASS字幕字体子集化 MKV批量提取/生成
 
 ## mkvtool 安装
 
 ### 依赖
 
-- fonttools
+- FontTools
   ```shell
   apt install python3-fonttools #Debian/Ubuntu
   apk add py3-fonttools #Alpine
   pip install fonttools #Use pip
   ```
-- mkvtoolnix
+- MKVToolNix
   ```shell
   apt install mkvtoolnix #Debian/Ubuntu
   apk add mkvtoolnix #Alpine
   ```
+#### 关于Windows用户
 
+- 从 [这里](https://www.python.org/downloads) 下载并安装Python
+- 从 [这里](https://www.fosshub.com/MKVToolNix.html) 下载并安装MKVToolNix
+- 保证以上两者的相关可执行文件在 **path** 环境变量里
+- 命令提示符(CMD)里参考上面使用pip的方式安装FontTools依赖
 ### 本体
 
 - 有安装Go的情况:
