@@ -104,7 +104,7 @@
   #若遇到ass字幕会自动进行子集化操作.
   #成品会放在"${bangumi}/o"文件夹中.
   ```
-- 单独对一个(或多个)ass字幕进行字体子集化
+- 对一个(或多个)ass字幕进行字体子集化
   ```shell
   mkvtool -a aaa.ass -bbb.ass -af fonts -ao output
   
