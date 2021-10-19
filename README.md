@@ -125,7 +125,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   #"-ao"参数为子集化成品输出路径,默认值为"${workdir}/subsetted".
   #在默认情况下,子集化后的成品输出于"${output}/subsetted"文件夹;
   #使用参数"-ans"可使其直接输出于"${output}",但会预先清空该文件夹,慎用.
-  #*即:当"-ans"参数存在时输出目录为"{output}",否则为${output}/subsetted".
+  #*即:当"-ans"参数存在时输出目录为"${output}",否则为${output}/subsetted".
   ```
 
 ### 一些碎碎念
