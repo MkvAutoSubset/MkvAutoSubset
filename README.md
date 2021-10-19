@@ -73,5 +73,31 @@
   # |||-- xxx.sub
   # |||-- ...
   
-  #*奇淫巧技:指定一个没有任何内容的data目录,将输出一个"干净的"mkv文件.
+  #*奇淫巧技:指定一个没有任何内容的data目录,将输出一个"干净"的mkv文件.
    ```
+- 从一组文件夹获得情报并生成一组mkv
+  ```shell
+  mkvtool -c -s bangumi
+  #可选"-clean"参数:当"-clean"存在时,将清空原有的字幕和字体(默认为追加).
+  #bangumi文件夹里的目录结构应如下所示:
+  #bangumi
+  # |-- v
+  # ||-- aaa.mkv
+  # ||-- bbb.mp4
+  # ||-- ccc.avi
+  # |-- s
+  # ||-- aaa.ass
+  # ||-- aaa.srt
+  # ||-- aaa.sup
+  # ||-- aaa.xxx
+  # ||-- bbb.xxx
+  # ||-- ccc.xxx
+  # |-- f
+  # ||-- abc.ttf
+  # ||-- def.ttc
+  # ||-- ghi.otf
+  # ||-- ...
+  
+  #诺遇到ass字幕会自动进行子集化操作.
+  #成品会放在"${bangumi}/v"文件夹中.
+  ```
