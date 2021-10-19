@@ -112,7 +112,7 @@
   ```
 - 对一个(或多个)ass字幕进行字体子集化
   ```shell
-  mkvtool -a aaa.ass -bbb.ass -af fonts -ao output
+  mkvtool -a aaa.ass -a bbb.ass -af fonts -ao output
   
   #"-a"参数为ass字幕文件路径,可复用.
   #"-af"参数为字体文件夹路径,默认值为"${workdir}/fonts".
