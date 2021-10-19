@@ -30,6 +30,7 @@
   ```shell
   mkvtool -d -f file.mkv #单个文件
   mkvtool -d -s bangumi #文件夹
+  
   #可选"-n"参数:当"-n"存在时,只抽取内容,不进行子集化操作.
   #可选"-data"参数,指定输出目录,默认输出到"${workdir}/data".
   ```
@@ -41,6 +42,7 @@
 - 将子集化后的字幕与字体替代原有的内容
   ```shell
   mkvtool -m -s bangumi -data data -dist dist
+  
   #-data参数默认值为"${workdir}/data"
   #-dist参数默认值为"${workdir}/dist"
   #假设bangumi文件夹里的目录结构如下所示:
@@ -78,6 +80,7 @@
 - 从一组文件夹获得情报并生成一组mkv
   ```shell
   mkvtool -c -s bangumi
+  
   #可选"-clean"参数:当"-clean"存在时,将清空原有的字幕和字体(默认为追加).
   #bangumi文件夹里的目录结构应如下所示:
   #bangumi
@@ -104,6 +107,7 @@
 - 字体子集化
   ```shell
   mkvtool -a aaa.ass -bbb.ass -af fonts -ao output
+  
   #"-a"参数为ass字幕文件路径,可复用.
   #"-af"参数为字体文件夹路径,默认值为"fonts".
   #"-ao"参数为子集化成品输出路径
@@ -115,7 +119,7 @@
 - "-m","-c"模式下的"-sl","-st"参数:
    ```
    -sl:字幕语言.格式为语言缩写如"chi","jpn","eng"等,默认值为"chi".
-   -st:字幕标题.该字幕在播放器里显示的标题,默认为空.
+   -st:字幕标题.该字幕在播放器里显示的标题,默认值为空.
    ```
 - 字幕文件名规范:
   ```
@@ -127,14 +131,14 @@
   d:字幕文件后缀名
   
   那么,请体会在"-c"模式中,以下的命名方式所带来的便利:
-  # |-- v
-  # ||-- aaa.mp4
-  # |-- s
-  # ||-- aaa_chi_简体中文.ass
-  # ||-- aaa_chi_繁體中文.srt
-  # ||-- aaa_jpn_日本語.sup
-  # ||-- aaa_eng_English.srt
+  |-- v
+  ||-- aaa.mp4
+  |-- s
+  ||-- aaa_chi_简体中文.ass
+  ||-- aaa_chi_繁體中文.srt
+  ||-- aaa_jpn_日本語.sup
+  ||-- aaa_eng_English.srt
   ```
-- 字幕语言代码表
+- 字幕语言代码表:
 
   [点此获取](https://www.science.co.il/language/Codes.php)
