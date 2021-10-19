@@ -5,7 +5,7 @@
 自动字体子集化工具
 
 ## mkvtool 安装
-###依赖
+### 依赖
 - fonttools
   ```shell
   pip install fonttools
@@ -15,7 +15,7 @@
   apt install mkvtoolnix #Debian/Ubuntu
   apk add mkvtoolnix #Alpine
   ```
-###本体
+### 本体
 - 有安装Go的情况:
   ```shell
   go install https://github.com/KurenaiRyu/MkvAutoSubset/mkvtool@latest #安装和更新
