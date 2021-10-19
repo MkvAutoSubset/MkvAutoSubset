@@ -8,7 +8,9 @@
 ### 依赖
 - fonttools
   ```shell
-  pip install fonttools
+  apt install python3-fonttools #Debian/Ubuntu
+  apk add py3-fonttools #alpine
+  pip install fonttools #使用pip
   ```
 - mkvtoolnix
   ```shell
