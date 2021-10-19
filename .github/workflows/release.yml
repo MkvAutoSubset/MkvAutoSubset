@@ -10,17 +10,25 @@ jobs:
     name: Release on GitHub
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v1
-
-      - name: Validates GO releaser config
-        uses: docker://goreleaser/goreleaser:latest
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          args: check
+          fetch-depth: 0
 
-      - name: Create release on GitHub
-        uses: docker://goreleaser/goreleaser:latest
+      - name: Set up Go
+        uses: actions/setup-go@v2
         with:
-          args: release
+          go-version: 1.17
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist
+          workdir: mkvtool
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution
+          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
