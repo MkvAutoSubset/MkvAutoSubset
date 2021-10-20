@@ -43,6 +43,14 @@ ASS字幕字体子集化 MKV批量提取/生成
   ```shell
   go install https://github.com/KurenaiRyu/MkvAutoSubset/mkvtool@latest #安装和更新
   ```
+
+- Arch Linux用户(通过Arch User Repository):
+    - 点击[这里](https://aur.archlinux.org/packages/mkvautosubset/) 查看具体信息或使用AUR Helper
+  ```shell
+  yay -S mkvautosubset #yay
+  paru -S mkvautosubset #paru
+  ```
+
 - 手动安装:
 
   [点此下载](https://github.com/KurenaiRyu/MkvAutoSubset/releases/latest)
