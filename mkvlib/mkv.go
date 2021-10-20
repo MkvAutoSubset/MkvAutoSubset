@@ -71,36 +71,46 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool) bool {
 			tracks = append(tracks, fmt.Sprintf(`%d:%s`, _item.ID, path.Join(output, s)))
 		}
 	}
-	args := make([]string, 0)
-	args = append(args, file)
-	args = append(args, "attachments")
-	args = append(args, attachments...)
-	args = append(args, "tracks")
-	args = append(args, tracks...)
-	if p, err := newProcess(nil, nil, nil, "", mkvextract, args...); err == nil {
-		s, err := p.Wait()
-		ok := err == nil && s.ExitCode() == 0
-		if ok {
-			if subset {
-				asses := make([]string, 0)
-				for _, _item := range tracks {
-					_arr := strings.Split(_item, ":")
-					f := _arr[len(_arr)-1]
-					if strings.HasSuffix(f, ".ass") {
-						asses = append(asses, f)
-					}
-					if len(asses) > 0 {
-						if !self.ASSFontSubset(asses, "", "", false) {
-							ec++
+	la := len(attachments)
+	lt := len(tracks)
+	if la > 0 || lt > 0 {
+		args := make([]string, 0)
+		args = append(args, file)
+		if la > 0 {
+			args = append(args, "attachments")
+			args = append(args, attachments...)
+		}
+		if lt > 0 {
+			args = append(args, "tracks")
+			args = append(args, tracks...)
+		}
+		if p, err := newProcess(nil, nil, nil, "", mkvextract, args...); err == nil {
+			s, err := p.Wait()
+			ok := err == nil && s.ExitCode() == 0
+			if ok {
+				if subset {
+					asses := make([]string, 0)
+					for _, _item := range tracks {
+						_arr := strings.Split(_item, ":")
+						f := _arr[len(_arr)-1]
+						if strings.HasSuffix(f, ".ass") {
+							asses = append(asses, f)
+						}
+						if len(asses) > 0 {
+							if !self.ASSFontSubset(asses, "", "", false) {
+								ec++
+							}
 						}
 					}
 				}
+			} else {
+				ec++
 			}
 		} else {
 			ec++
 		}
 	} else {
-		ec++
+		log.Printf(`This mkv file is not has the subtitles & attachments: "%s"`, file)
 	}
 	return ec == 0
 }
