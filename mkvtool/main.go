@@ -13,10 +13,8 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.1.7"
+const appVer = "v3.1.8"
 const tTitle = appName + " " + appVer
-
-var processer = mkvlib.GetInstance()
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
 
@@ -84,27 +82,29 @@ func main() {
 		log.Printf("%s (powered by %s)", appFN, mkvlib.LibFName)
 		return
 	}
-
-	if processer == nil {
+	getter := mkvlib.GetProcessorGetterInstance()
+	if !getter.InitProcessorInstance(nil) {
 		ec++
 		return
 	}
 
+	processer := getter.GetProcessorInstance()
+
 	if len(*asses) > 0 {
-		if !processer.ASSFontSubset(*asses, af, ao, !ans) {
+		if !processer.ASSFontSubset(*asses, af, ao, !ans, nil) {
 			ec++
 		}
 		return
 	}
 	if f != "" {
 		if d {
-			if !processer.DumpMKV(f, data, !n) {
+			if !processer.DumpMKV(f, data, !n, nil) {
 				ec++
 			}
 			return
 		}
 		if q {
-			r, err := processer.CheckSubset(f)
+			r, err := processer.CheckSubset(f, nil)
 			if err {
 				ec++
 			} else {
@@ -116,7 +116,7 @@ func main() {
 	}
 	if s != "" {
 		if q {
-			lines := processer.QueryFolder(s)
+			lines := processer.QueryFolder(s, nil)
 			if len(lines) > 0 {
 				log.Printf("Has item(s).")
 				data := []byte(strings.Join(lines, "\n"))
@@ -134,26 +134,26 @@ func main() {
 			s := path.Join(s, "s")
 			f := path.Join(s, "f")
 			o := path.Join(s, "o")
-			if !processer.CreateMKVs(v, s, f, "", o, sl, st, clean) {
+			if !processer.CreateMKVs(v, s, f, "", o, sl, st, clean, nil) {
 				ec++
 			}
 			return
 		}
 		if d {
-			if !processer.DumpMKVs(s, data, !n) {
+			if !processer.DumpMKVs(s, data, !n, nil) {
 				ec++
 			}
 			return
 		}
 		if m {
-			if !processer.MakeMKVs(s, data, dist, sl, st) {
+			if !processer.MakeMKVs(s, data, dist, sl, st, nil) {
 				ec++
 			}
 			return
 		}
-		if !processer.DumpMKVs(s, data, true) {
+		if !processer.DumpMKVs(s, data, true, nil) {
 			ec++
-		} else if !processer.MakeMKVs(s, data, dist, sl, st) {
+		} else if !processer.MakeMKVs(s, data, dist, sl, st, nil) {
 			ec++
 		}
 		return
