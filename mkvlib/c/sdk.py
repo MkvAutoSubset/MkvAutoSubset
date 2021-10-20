@@ -40,5 +40,3 @@ def assFontSubset(files,fonts,output,dirSafe,lcb):
     call=lib.ASSFontSubset
     _files=dumps(files)
     return call(_files.encode(),fonts.encode(),output.encode(),dirSafe,lcb)
-
-print(initInstance(None))
