@@ -7,7 +7,7 @@ import (
 	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
 )
 
-var processor = mkvlib.GetProcessorGetterInstance()
+var getter = mkvlib.GetProcessorGetterInstance()
 
 func _lcb(lcb C.logCallback) func(string) {
 	return func(str string) {
@@ -15,9 +15,14 @@ func _lcb(lcb C.logCallback) func(string) {
 	}
 }
 
+//export InitInstance
+func InitInstance(lcb C.logCallback) bool {
+	return getter.InitProcessorInstance(_lcb(lcb))
+}
+
 //export CheckInstance
 func CheckInstance() bool {
-	return processor.GetProcessorInstance() != nil
+	return getter.GetProcessorInstance() != nil
 }
 
 //export GetMKVInfo
@@ -25,7 +30,7 @@ func GetMKVInfo(file *C.char) *C.char {
 	if !CheckInstance() {
 		return cs("")
 	}
-	obj := processor.GetProcessorInstance().GetMKVInfo(gs(file))
+	obj := getter.GetProcessorInstance().GetMKVInfo(gs(file))
 	data, _ := json.Marshal(obj)
 	return cs(string(data))
 }
@@ -35,7 +40,7 @@ func DumpMKV(file, output *C.char, subset bool, lcb C.logCallback) bool {
 	if !CheckInstance() {
 		return false
 	}
-	return processor.GetProcessorInstance().DumpMKV(gs(file), gs(output), subset, _lcb(lcb))
+	return getter.GetProcessorInstance().DumpMKV(gs(file), gs(output), subset, _lcb(lcb))
 }
 
 type checkSubset_R struct {
@@ -48,7 +53,7 @@ func CheckSubset(file *C.char, lcb C.logCallback) *C.char {
 	if !CheckInstance() {
 		return cs("")
 	}
-	a, b := processor.GetProcessorInstance().CheckSubset(gs(file), _lcb(lcb))
+	a, b := getter.GetProcessorInstance().CheckSubset(gs(file), _lcb(lcb))
 	data, _ := json.Marshal(checkSubset_R{a, b})
 	return cs(string(data))
 }
@@ -66,7 +71,7 @@ func CreateMKV(file, tracks, attachments, output, slang, stitle *C.char, clean b
 		err = json.Unmarshal([]byte(gs(attachments)), &b)
 		if err == nil {
 			_attachments := b
-			return processor.GetProcessorInstance().CreateMKV(gs(file), _tracks, _attachments, gs(output), gs(slang), gs(stitle), clean)
+			return getter.GetProcessorInstance().CreateMKV(gs(file), _tracks, _attachments, gs(output), gs(slang), gs(stitle), clean)
 		}
 	}
 	return false
@@ -80,7 +85,7 @@ func ASSFontSubset(files, fonts, output *C.char, dirSafe bool, lcb C.logCallback
 	obj := make([]string, 0)
 	if json.Unmarshal([]byte(gs(files)), &obj) == nil {
 		_files := obj
-		return processor.GetProcessorInstance().ASSFontSubset(_files, gs(fonts), gs(output), dirSafe, _lcb(lcb))
+		return getter.GetProcessorInstance().ASSFontSubset(_files, gs(fonts), gs(output), dirSafe, _lcb(lcb))
 	}
 	return false
 }
