@@ -6,7 +6,6 @@ import (
 	"github.com/antchfx/xmlquery"
 	"github.com/asticode/go-astisub"
 	"io"
-	"log"
 	"os"
 	"path"
 	"regexp"
@@ -39,6 +38,7 @@ type assProcessor struct {
 	fonts     []string
 	sFonts    []string
 	subtitles map[string]string
+	lcb       logCallback
 }
 
 func (self *assProcessor) parse() bool {
@@ -58,7 +58,7 @@ func (self *assProcessor) parse() bool {
 			}
 		}
 		if ec > 0 {
-			log.Printf(`Failed to read the ass file: "%s"`, file)
+			printLog(self.lcb, `Failed to read the ass file: "%s"`, file)
 		}
 	}
 	if ec == 0 {
@@ -68,7 +68,7 @@ func (self *assProcessor) parse() bool {
 			subtitle, err := astisub.ReadFromSSA(strings.NewReader(v))
 			if err != nil {
 				ec++
-				log.Printf(`Failed to read the ass file: "%s"`, k)
+				printLog(self.lcb, `Failed to read the ass file: "%s"`, k)
 				continue
 			}
 			for _, item := range subtitle.Items {
@@ -118,7 +118,7 @@ func (self *assProcessor) parse() bool {
 		}
 	}
 	if len(self.m) == 0 {
-		log.Printf(`Not Found item in the ass file(s): "%d"`, len(self.files))
+		printLog(self.lcb, `Not Found item in the ass file(s): "%d"`, len(self.files))
 	}
 	return ec == 0
 }
@@ -142,7 +142,7 @@ func (self *assProcessor) dumpFont(file string, full bool) bool {
 	if strings.HasSuffix(file, ".ttc") {
 		count = self.getTTCCount(file)
 		if count < 1 {
-			log.Printf(`Failed to get the ttc font count: "%s".`, n)
+			printLog(self.lcb, `Failed to get the ttc font count: "%s".`, n)
 			return ok
 		}
 	}
@@ -162,7 +162,7 @@ func (self *assProcessor) dumpFont(file string, full bool) bool {
 			ok = err == nil && s.ExitCode() == 0
 		}
 		if !ok {
-			log.Printf(`Failed to dump font(%t): "%s"[%d].`, full, n, i)
+			printLog(self.lcb, `Failed to dump font(%t): "%s"[%d].`, full, n, i)
 		}
 	}
 	return ok
@@ -260,7 +260,7 @@ func (self *assProcessor) matchFonts() bool {
 	for _, v := range self.m {
 		if v.file == "" {
 			ok = false
-			log.Printf(`Missing the font: "%s".`, v.oldName)
+			printLog(self.lcb, `Missing the font: "%s".`, v.oldName)
 		}
 	}
 	return ok
@@ -274,7 +274,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		e = ".ttf"
 	}
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
-		log.Println("Failed to create the output folder.")
+		printLog(self.lcb, "Failed to create the output folder.")
 		return false
 	}
 	if os.WriteFile(fn, []byte(font.str), os.ModePerm) == nil {
@@ -291,13 +291,13 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 			ok = err == nil && s.ExitCode() == 0
 		}
 		if !ok {
-			log.Printf(`Failed to subset font: "%s"[%s].`, n, font.index)
+			printLog(self.lcb, `Failed to subset font: "%s"[%s].`, n, font.index)
 		} else {
 			font.sFont = _fn
 		}
 
 	} else {
-		log.Printf(`Failed to write the font text: "%s".`, n)
+		printLog(self.lcb, `Failed to write the font text: "%s".`, n)
 	}
 	return ok
 }
@@ -305,7 +305,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 func (self *assProcessor) createFontsSubset() bool {
 	err := os.RemoveAll(self.output)
 	if !(err == nil || err == os.ErrNotExist) {
-		log.Println("Failed to clean the output folder.")
+		printLog(self.lcb, "Failed to clean the output folder.")
 		return false
 	}
 	ok := 0
@@ -366,11 +366,11 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 					if !ok {
 						ec++
 						_, n, _, _ := splitPath(font.sFont)
-						log.Printf(`Failed to compile the font: "%s".`, n)
+						printLog(self.lcb, `Failed to compile the font: "%s".`, n)
 					}
 				}
 			} else {
-				log.Printf(`Faild to change the font name: "%s".`, font.oldName)
+				printLog(self.lcb, `Faild to change the font name: "%s".`, font.oldName)
 			}
 		}
 	}
@@ -438,7 +438,7 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 				ec++
 			}
 			if !ok {
-				log.Printf(`Failed to write the new ass file: "%s".`, fn)
+				printLog(self.lcb, `Failed to write the new ass file: "%s".`, fn)
 			}
 		}
 	}

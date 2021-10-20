@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"regexp"
@@ -48,11 +47,11 @@ func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
 	return nil
 }
 
-func (self *mkvProcessor) DumpMKV(file, output string, subset bool) bool {
+func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallback) bool {
 	ec := 0
 	obj := self.GetMKVInfo(file)
 	if obj == nil {
-		log.Printf(`Failed to get the mkv file info: "%s".`, file)
+		printLog(lcb, `Failed to get the mkv file info: "%s".`, file)
 		return false
 	}
 	attachments := make([]string, 0)
@@ -97,7 +96,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool) bool {
 							asses = append(asses, f)
 						}
 						if len(asses) > 0 {
-							if !self.ASSFontSubset(asses, "", "", false) {
+							if !self.ASSFontSubset(asses, "", "", false, lcb) {
 								ec++
 							}
 						}
@@ -110,15 +109,15 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool) bool {
 			ec++
 		}
 	} else {
-		log.Printf(`This mkv file is not has the subtitles & attachments: "%s"`, file)
+		printLog(lcb, `This mkv file is not has the subtitles & attachments: "%s"`, file)
 	}
 	return ec == 0
 }
 
-func (self *mkvProcessor) CheckSubset(file string) (bool, bool) {
+func (self *mkvProcessor) CheckSubset(file string, lcb logCallback) (bool, bool) {
 	obj := self.GetMKVInfo(file)
 	if obj == nil {
-		log.Printf(`Failed to get the mkv file info: "%s".`, file)
+		printLog(lcb, `Failed to get the mkv file info: "%s".`, file)
 		return false, true
 	}
 	ass := false
@@ -175,7 +174,7 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 	return false
 }
 
-func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool) bool {
+func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallback) bool {
 	ec := 0
 	files := findMKVs(dir)
 	l := len(files)
@@ -183,33 +182,33 @@ func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool) bool {
 		p := strings.TrimPrefix(item, dir)
 		d, _, _, f := splitPath(p)
 		p = path.Join(output, d, f)
-		if !self.DumpMKV(item, p, subset) {
+		if !self.DumpMKV(item, p, subset, lcb) {
 			ec++
-			log.Printf(`Failed to dump the mkv file "%s".`, item)
+			printLog(lcb, `Failed to dump the mkv file "%s".`, item)
 		}
-		log.Printf("Dump (%d/%d) done.", i+1, l)
+		printLog(lcb, "Dump (%d/%d) done.", i+1, l)
 	}
 	return ec == 0
 }
 
-func (self *mkvProcessor) QueryFolder(dir string) []string {
+func (self *mkvProcessor) QueryFolder(dir string, lcb logCallback) []string {
 	ec := 0
 	lines := make([]string, 0)
 	files := findMKVs(dir)
 	l := len(files)
 	for i, file := range files {
-		a, b := self.CheckSubset(file)
+		a, b := self.CheckSubset(file, lcb)
 		if b {
 			ec++
 		} else if !a {
 			lines = append(lines, file)
 		}
-		log.Printf("Query (%d/%d) done.", i+1, l)
+		printLog(lcb, "Query (%d/%d) done.", i+1, l)
 	}
 	return lines
 }
 
-func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir string, slang, stitle string, clean bool) bool {
+func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir string, slang, stitle string, clean bool, lcb logCallback) bool {
 	ec := 0
 	if tDir == "" {
 		tDir = os.TempDir()
@@ -237,7 +236,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir string, slang,
 		tracks := make([]string, 0)
 		if len(asses) > 0 {
 			_ = os.RemoveAll(tDir)
-			if !self.ASSFontSubset(asses, fDir, "", false) {
+			if !self.ASSFontSubset(asses, fDir, "", false, lcb) {
 				ec++
 			} else {
 				__p := path.Join(p, "subsetted")
@@ -251,15 +250,15 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir string, slang,
 			ec++
 		}
 		if ec > 0 {
-			log.Printf(`Failed to create the mkv file: "%s".`, item)
+			printLog(lcb, `Failed to create the mkv file: "%s".`, item)
 		}
-		log.Printf("Create (%d/%d) done.", i+1, l)
+		printLog(lcb, "Create (%d/%d) done.", i+1, l)
 	}
 	_ = os.RemoveAll(tDir)
 	return ec == 0
 }
 
-func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, sttlte string) bool {
+func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, sttlte string, lcb logCallback) bool {
 	ec := 0
 	files := findMKVs(dir)
 	l := len(files)
@@ -275,14 +274,14 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, sttlte string) bool
 		fn := path.Join(output, d, n)
 		if !self.CreateMKV(item, tracks, attachments, fn, slang, sttlte, true) {
 			ec++
-			log.Printf(`Faild to make the mkv file: "%s".`, item)
+			printLog(lcb, `Faild to make the mkv file: "%s".`, item)
 		}
-		log.Printf("Make (%d/%d) done.", i+1, l)
+		printLog(lcb, "Make (%d/%d) done.", i+1, l)
 	}
 	return ec == 0
 }
 
-func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, dirSafe bool) bool {
+func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, dirSafe bool, lcb logCallback) bool {
 	if len(files) == 0 {
 		return false
 	}
@@ -290,6 +289,7 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 	obj.files = files
 	obj._fonts = fonts
 	obj.output = output
+	obj.lcb = lcb
 	d, _, _, _ := splitPath(obj.files[0])
 	if obj._fonts == "" {
 		obj._fonts += path.Join(d, "fonts")

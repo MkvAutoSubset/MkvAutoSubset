@@ -1,6 +1,7 @@
 package mkvlib
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -10,13 +11,27 @@ import (
 )
 
 const libName = "mkvlib"
-const libVer = "v1.0.4"
+const libVer = "v1.1.0"
 
 const LibFName = libName + " " + libVer
 
-var _instance *mkvProcessor
+type logCallback func(string)
 
-func GetInstance() *mkvProcessor {
+type processorGetter struct {
+	checked  bool
+	instance *mkvProcessor
+}
+
+var _instance = new(processorGetter)
+
+func GetProcessorGetterInstance() *processorGetter {
+	return _instance
+}
+
+func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
+	self.checked = false
+	self.instance = nil
+
 	ec := 0
 	n := "PATH"
 	s := ":"
@@ -37,18 +52,34 @@ func GetInstance() *mkvProcessor {
 	_, _mkvextract := exec.LookPath(mkvextract)
 	_, _mkvmerge := exec.LookPath(mkvmerge)
 	if _ttx != nil || _pyftsubset != nil {
-		log.Printf(`Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
+		printLog(lcb, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
 		ec++
 	}
 	if _mkvextract != nil || _mkvmerge != nil {
-		log.Printf(`Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
+		printLog(lcb, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
 		ec++
 	}
-	if ec > 0 {
-		return nil
+
+	r := ec == 0
+	if r {
+		self.checked = true
+		self.instance = new(mkvProcessor)
 	}
-	if _instance == nil {
-		_instance = new(mkvProcessor)
+
+	return r
+}
+
+func (self *processorGetter) GetProcessorInstance() *mkvProcessor {
+	if self.checked {
+		return self.instance
 	}
-	return _instance
+	return nil
+}
+
+func printLog(lcb logCallback, f string, v ...interface{}) {
+	if lcb != nil {
+		lcb(fmt.Sprintf(f, v...))
+	} else {
+		log.Printf(f, v...)
+	}
 }
