@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.1.6"
+const appVer = "v3.1.7"
 const tTitle = appName + " " + appVer
 
 var processer = mkvlib.GetInstance()
