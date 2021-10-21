@@ -20,7 +20,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 - FontTools
   ```shell
-  apt install python3-fonttools #Debian/Ubuntu
+  apt install fonttools #Debian/Ubuntu
   apk add py3-fonttools #Alpine
   pip install fonttools #Use pip
   ```
