@@ -17,9 +17,9 @@ def getMKVInfo(file):
     call.restype=c_char_p
     return call(file.encode())
 
-def dumpMKV(file,output,subset,dirSafe,lcb):
+def dumpMKV(file,output,subset,lcb):
     call=lib.DumpMKV
-    return call(file.encode(),output.encode(),subset,dirSafe,lcb)
+    return call(file.encode(),output.encode(),subset,lcb)
 
 def checkSubset(file,lcb):
     call=lib.CheckSubset
