@@ -3,7 +3,7 @@
 ## 日志回调
 - 原型
     ```c
-    void (*logCallbac)(char* str); 
+    void (*logCallback)(char* str); 
     //str: UTF-8编码的指针,并约定所有"char*"数据类型的参数或返回值都为此.
     ```
 - 一些说明
