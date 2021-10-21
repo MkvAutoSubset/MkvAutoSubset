@@ -15,7 +15,7 @@ def initInstance(lcb):
 def getMKVInfo(file):
     call=lib.GetMKVInfo
     call.restype=c_char_p
-    return call(file.encode())
+    return loads()call(file.encode()).decode())
 
 def dumpMKV(file,output,subset,lcb):
     call=lib.DumpMKV
@@ -24,7 +24,7 @@ def dumpMKV(file,output,subset,lcb):
 def checkSubset(file,lcb):
     call=lib.CheckSubset
     call.restype=c_char_p
-    return call(file.encode(),lcb)
+    return loads(call(file.encode(),lcb).decode())
 
 def createMKV(file,tracks,attachments,output,slang,stitle,clean):
     call=lib.CreateMKV
