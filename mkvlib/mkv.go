@@ -208,7 +208,7 @@ func (self *mkvProcessor) QueryFolder(dir string, lcb logCallback) []string {
 	return lines
 }
 
-func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir string, slang, stitle string, clean bool, lcb logCallback) bool {
+func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle string, clean bool, lcb logCallback) bool {
 	ec := 0
 	if tDir == "" {
 		tDir = os.TempDir()
@@ -258,7 +258,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir string, slang,
 	return ec == 0
 }
 
-func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, sttlte string, lcb logCallback) bool {
+func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb logCallback) bool {
 	ec := 0
 	files := findMKVs(dir)
 	l := len(files)
@@ -272,7 +272,7 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, sttlte string, lcb 
 		attachments := findFonts(_p)
 		tracks := append(subs, asses...)
 		fn := path.Join(output, d, n)
-		if !self.CreateMKV(item, tracks, attachments, fn, slang, sttlte, true) {
+		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, true) {
 			ec++
 			printLog(lcb, `Faild to make the mkv file: "%s".`, item)
 		}

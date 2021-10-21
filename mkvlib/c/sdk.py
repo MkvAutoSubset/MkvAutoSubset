@@ -12,10 +12,6 @@ def initInstance(lcb):
     call=lib.InitInstance
     return call(lcb)
 
-def checkInstance():
-    call=lib.CheckInstance
-    return call()
-
 def getMKVInfo(file):
     call=lib.GetMKVInfo
     call.restype=c_char_p
@@ -40,3 +36,20 @@ def assFontSubset(files,fonts,output,dirSafe,lcb):
     call=lib.ASSFontSubset
     _files=dumps(files)
     return call(_files.encode(),fonts.encode(),output.encode(),dirSafe,lcb)
+
+def queryFolder(dir,lcb):
+    call=lib.QueryFolder
+    call.restype=c_char_p
+    return call(dir.encode(),lcb)
+
+def dumpMKVs(dir,output,subset,lcb):
+    call=lib.DumpMKVs
+    return call(dir.encode(),output.encode(),subset,lcb)
+
+def createMKVs(vDir,sDir,fDir,tDir,oDir,slang,stitle, clean ,lcb):
+    call=lib.CreateMKVs
+    return call(vDir.encode(),sDir.encode(),fDir.encode(),tDir.encode(),oDir.encode(),slang.encode(),stitle.encode(),clean,lcb)
+
+def makeMKVs(dir,data,output,slang,stitle,lcb):
+    call=lib.MakeMKVs
+    return call(dir.encode(),data.encode(),output.encode(),slang.encode(),stitle.encode(),lcb)

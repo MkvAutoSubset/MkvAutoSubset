@@ -9,6 +9,10 @@ import (
 
 var getter = mkvlib.GetProcessorGetterInstance()
 
+func checkInstance() bool {
+	return getter.GetProcessorInstance() != nil
+}
+
 func _lcb(lcb C.logCallback) func(string) {
 	return func(str string) {
 		C.makeLogCallback(cs(str), lcb)
@@ -20,14 +24,9 @@ func InitInstance(lcb C.logCallback) bool {
 	return getter.InitProcessorInstance(_lcb(lcb))
 }
 
-//export CheckInstance
-func CheckInstance() bool {
-	return getter.GetProcessorInstance() != nil
-}
-
 //export GetMKVInfo
 func GetMKVInfo(file *C.char) *C.char {
-	if !CheckInstance() {
+	if !checkInstance() {
 		return cs("")
 	}
 	obj := getter.GetProcessorInstance().GetMKVInfo(gs(file))
@@ -37,7 +36,7 @@ func GetMKVInfo(file *C.char) *C.char {
 
 //export DumpMKV
 func DumpMKV(file, output *C.char, subset bool, lcb C.logCallback) bool {
-	if !CheckInstance() {
+	if !checkInstance() {
 		return false
 	}
 	return getter.GetProcessorInstance().DumpMKV(gs(file), gs(output), subset, _lcb(lcb))
@@ -50,7 +49,7 @@ type checkSubset_R struct {
 
 //export CheckSubset
 func CheckSubset(file *C.char, lcb C.logCallback) *C.char {
-	if !CheckInstance() {
+	if !checkInstance() {
 		return cs("")
 	}
 	a, b := getter.GetProcessorInstance().CheckSubset(gs(file), _lcb(lcb))
@@ -60,7 +59,7 @@ func CheckSubset(file *C.char, lcb C.logCallback) *C.char {
 
 //export CreateMKV
 func CreateMKV(file, tracks, attachments, output, slang, stitle *C.char, clean bool) bool {
-	if !CheckInstance() {
+	if !checkInstance() {
 		return false
 	}
 	a := make([]string, 0)
@@ -79,7 +78,7 @@ func CreateMKV(file, tracks, attachments, output, slang, stitle *C.char, clean b
 
 //export ASSFontSubset
 func ASSFontSubset(files, fonts, output *C.char, dirSafe bool, lcb C.logCallback) bool {
-	if !CheckInstance() {
+	if !checkInstance() {
 		return false
 	}
 	obj := make([]string, 0)
@@ -88,6 +87,40 @@ func ASSFontSubset(files, fonts, output *C.char, dirSafe bool, lcb C.logCallback
 		return getter.GetProcessorInstance().ASSFontSubset(_files, gs(fonts), gs(output), dirSafe, _lcb(lcb))
 	}
 	return false
+}
+
+//export QueryFolder
+func QueryFolder(dir *C.char, lcb C.logCallback) *C.char {
+	if !checkInstance() {
+		return cs("")
+	}
+	list := getter.GetProcessorInstance().QueryFolder(gs(dir), _lcb(lcb))
+	data, _ := json.Marshal(list)
+	return cs(string(data))
+}
+
+//export DumpMKVs
+func DumpMKVs(dir, output *C.char, subset bool, lcb C.logCallback) bool {
+	if !checkInstance() {
+		return false
+	}
+	return getter.GetProcessorInstance().DumpMKVs(gs(dir), gs(output), subset, _lcb(lcb))
+}
+
+//export CreateMKVs
+func CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle *C.char, clean bool, lcb C.logCallback) bool {
+	if !checkInstance() {
+		return false
+	}
+	return getter.GetProcessorInstance().CreateMKVs(gs(vDir), gs(sDir), gs(fDir), gs(tDir), gs(oDir), gs(slang), gs(stitle), clean, _lcb(lcb))
+}
+
+//export MakeMKVs
+func MakeMKVs(dir, data, output, slang, stitle *C.char, lcb C.logCallback) bool {
+	if !checkInstance() {
+		return false
+	}
+	return getter.GetProcessorInstance().MakeMKVs(gs(dir), gs(data), gs(output), gs(slang), gs(stitle), _lcb(lcb))
 }
 
 func cs(gs string) *C.char {
