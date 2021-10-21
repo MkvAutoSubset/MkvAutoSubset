@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.1.8"
+const appVer = "v3.1.9"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -130,11 +130,11 @@ func main() {
 			return
 		}
 		if c {
-			v := path.Join(s, "v")
-			s := path.Join(s, "s")
-			f := path.Join(s, "f")
-			o := path.Join(s, "o")
-			if !processer.CreateMKVs(v, s, f, "", o, sl, st, clean, nil) {
+			_v := path.Join(s, "v")
+			_s := path.Join(s, "s")
+			_f := path.Join(s, "f")
+			_o := path.Join(s, "o")
+			if !processer.CreateMKVs(_v, _s, _f, "", _o, sl, st, clean, nil) {
 				ec++
 			}
 			return

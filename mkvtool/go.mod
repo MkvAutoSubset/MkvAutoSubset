@@ -2,7 +2,7 @@ module github.com/KurenaiRyu/MkvAutoSubset/mkvtool
 
 go 1.17
 
-require github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20211020115844-9d9068cf4a6e
+require github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20211021081750-4c13c99f77e4
 
 require (
 	github.com/antchfx/xmlquery v1.3.8 // indirect
