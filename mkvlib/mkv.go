@@ -235,7 +235,6 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		attachments := make([]string, 0)
 		tracks := make([]string, 0)
 		if len(asses) > 0 {
-			_ = os.RemoveAll(tDir)
 			if !self.ASSFontSubset(asses, fDir, "", false, lcb) {
 				ec++
 			} else {
