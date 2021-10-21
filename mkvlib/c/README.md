@@ -11,7 +11,10 @@
   - 以下名为"lcb"的参数均为日志回调,不再赘述.
 
 ## 初始化实例
-- *InitInstance(logCallbac lcb)*
+- ```c
+  bool InitInstance(logCallbac lcb)
+  //return: 是否初始化成功
+  ```
 - 应该被最先调用.
 - 会检测依赖,如果不满足会返回false.
 - 如果在**未**或**未成功**调用本函数的情况下调用其他函数会永远返回失败状态.
