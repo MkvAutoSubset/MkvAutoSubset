@@ -12,7 +12,7 @@
 
 ## 初始化实例
 - ```c
-  bool InitInstance(logCallbac lcb)
+  bool InitInstance(logCallbac lcb);
   //return: 是否初始化成功
   ```
 - 应该被最先调用.
