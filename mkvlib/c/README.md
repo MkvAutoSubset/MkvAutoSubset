@@ -60,7 +60,7 @@
 - ```c
   bool CreateMKV(char* file, char* tracks, char* attachments, char* output, char* slang, char* stitle, bool clean);
   //将字幕和字体封进mkv文件
-  //file: 源mkv文件路径
+  //file: 源文件路径(并非一定要是mkv文件,其他视频文件也可.)
   //tracks: 字幕文件路径数组的json化文本
   //attachments: 字体文件路径数组的json化文本
   //output: 输出文件路径
