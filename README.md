@@ -45,10 +45,10 @@ ASS字幕字体子集化 MKV批量提取/生成
   ```
 
 - Arch Linux用户(通过Arch User Repository):
-    - 点击[这里](https://aur.archlinux.org/packages/mkvautosubset/) 查看具体信息或使用AUR Helper
+    - 点击[这里](https://aur.archlinux.org/packages/mkvtool/) 查看具体信息或使用AUR Helper
   ```shell
-  yay -S mkvautosubset #yay
-  paru -S mkvautosubset #paru
+  yay -S mkvtool #yay
+  paru -S mkvtool #paru
   ```
 
 - 手动安装:
