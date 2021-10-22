@@ -56,7 +56,7 @@ namespace mkvtool
                     lcb(" -----  End  ----- ");
                 }
                 else
-                    lcb("All files are subseted.");
+                    lcb("All files are subsetted.");
             }
         }
 

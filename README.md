@@ -22,12 +22,14 @@ ASS字幕字体子集化 MKV批量提取/生成
   ```shell
   apt install fonttools #Debian/Ubuntu
   apk add py3-fonttools #Alpine
+  brew install fonttools #macOS
   pip install fonttools #Use pip
   ```
 - MKVToolNix
   ```shell
   apt install mkvtoolnix #Debian/Ubuntu
   apk add mkvtoolnix #Alpine
+  brew install mkvtoolnix #macOS
   ```
 
 #### 关于Windows用户
