@@ -43,7 +43,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 - 有安装Go的情况:
   ```shell
-  go install https://github.com/KurenaiRyu/MkvAutoSubset/mkvtool@latest #安装和更新
+  go install github.com/KurenaiRyu/MkvAutoSubset/mkvtool@latest #安装和更新
   ```
 
 - Arch Linux用户(通过Arch User Repository):
