@@ -1,11 +1,12 @@
 using System;
-using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.ExtendedToolkit.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using MessageBox.Avalonia;
-using MEnums = MessageBox.Avalonia.Enums;
+using Avalonia.Threading;
+using ToggleSwitch = Avalonia.ExtendedToolkit.Controls.ToggleSwitch;
 
 namespace mkvtool
 {
@@ -26,19 +27,18 @@ namespace mkvtool
             string[] files = await ShowSelectFileDialog("MKV file", new string[] {"mkv"}, false);
             if (files != null)
             {
-                bool[] result = mkvlib.CheckSubset(files[0], lcb);
-                if (result[1])
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Check result",
-                        "Has error.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Error, WindowStartupLocation.CenterOwner).Show();
-                else if (result[0])
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Check result",
-                        "This mkv file are subsetted.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
-                else
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Check result",
-                        "This mkv file are not subsetted.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Warning, WindowStartupLocation.CenterOwner).Show();
+                SetBusy(true);
+                new Thread(() =>
+                {
+                    bool[] result = mkvlib.CheckSubset(files[0], lcb);
+                    if (result[1])
+                        PrintResult("Check", "Has error.");
+                    else if (result[0])
+                        PrintResult("Check", "This mkv file are subsetted.");
+                    else
+                        PrintResult("Check", "This mkv file are not subsetted.");
+                    SetBusy(false);
+                }).Start();
             }
         }
 
@@ -47,33 +47,56 @@ namespace mkvtool
             string dir = await new OpenFolderDialog().ShowAsync(this);
             if (!string.IsNullOrEmpty(dir))
             {
-                string[] list = mkvlib.QueryFolder(dir, lcb);
-                if (list != null && list.Length > 0)
+                SetBusy(true);
+                new Thread(() =>
                 {
-                    lcb("Not subsetted file list:");
-                    lcb(" ----- Begin ----- ");
-                    lcb(string.Join(Environment.NewLine, list));
-                    lcb(" -----  End  ----- ");
-                }
-                else
-                    lcb("All files are subsetted.");
+                    string[] list = mkvlib.QueryFolder(dir, lcb);
+                    if (list != null && list.Length > 0)
+                    {
+                        lcb("Not subsetted file list:");
+                        lcb(" ----- Begin ----- ");
+                        lcb(string.Join(Environment.NewLine, list));
+                        lcb(" -----  End  ----- ");
+                    }
+                    else
+                        lcb("All files are subsetted.");
+
+                    SetBusy(false);
+                }).Start();
             }
         }
 
         void lcb(string str)
         {
-            this.FindControl<TextBox>("logBox").Text += str + Environment.NewLine;
+            DoUIThread(() =>
+                this.FindControl<TextBox>("logBox").Text += str + Environment.NewLine);
         }
 
         private async void TopLevel_OnOpened(object? sender, EventArgs e)
         {
-            if (!mkvlib.InitInstance(lcb))
+            this.Closing += (_, __) => Environment.Exit(0);
+            SetBusy(true);
+            new Thread(() =>
             {
-                await MessageBoxManager.GetMessageBoxStandardWindow("Check result",
-                    "Failed to init mkvlib.", MEnums.ButtonEnum.Ok,
-                    MEnums.Icon.Error, WindowStartupLocation.CenterOwner).Show();
-                this.IsEnabled = false;
-            }
+                try
+                {
+                    if (!mkvlib.InitInstance(lcb))
+                    {
+                        PrintResult("Init", "Failed to init mkvlib.");
+                    }
+                    else
+                    {
+                        PrintResult("Init", "Init successfully.");
+                        DoUIThread(() => this.FindControl<Grid>("mainBox").IsEnabled = true);
+                    }
+                }
+                catch
+                {
+                    PrintResult("Init", "Missing mkvlib.");
+                }
+
+                SetBusy(false);
+            }).Start();
         }
 
         class SubsetArg
@@ -143,24 +166,30 @@ namespace mkvtool
             if (SubsetArg.Asses != null && SubsetArg.Asses.Length > 0 && !string.IsNullOrEmpty(SubsetArg.Fonts) &&
                 !string.IsNullOrEmpty(SubsetArg.Output))
             {
-                SubsetArg.DirSafe = this.FindControl<CheckBox>("sa4").IsChecked == true;
-                if (mkvlib.ASSFontSubset(SubsetArg.Asses, SubsetArg.Fonts, SubsetArg.Output, SubsetArg.DirSafe, lcb))
+                SetBusy(true);
+                SubsetArg.DirSafe = this.FindControl<ToggleSwitch>("sa4").IsChecked == true;
+                new Thread(() =>
                 {
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Subset result",
-                        "Subset successfully.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
-                    SubsetArg.Asses = null;
-                    SubsetArg.Fonts = string.Empty;
-                    SubsetArg.Output = string.Empty;
-                    this.FindControl<TextBlock>("sa1").Text = string.Empty;
-                    this.FindControl<TextBlock>("sa2").Text = string.Empty;
-                    this.FindControl<TextBlock>("sa3").Text = string.Empty;
-                    this.FindControl<CheckBox>("sa4").IsCancel = true;
-                }
-                else
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Subset result",
-                        "Failed to subset.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
+                    if (mkvlib.ASSFontSubset(SubsetArg.Asses, SubsetArg.Fonts, SubsetArg.Output, SubsetArg.DirSafe,
+                        lcb))
+                    {
+                        PrintResult("Subset", "Subset successfully.");
+                        SubsetArg.Asses = null;
+                        SubsetArg.Fonts = string.Empty;
+                        SubsetArg.Output = string.Empty;
+                        DoUIThread(() =>
+                        {
+                            this.FindControl<TextBlock>("sa1").Text = string.Empty;
+                            this.FindControl<TextBlock>("sa2").Text = string.Empty;
+                            this.FindControl<TextBlock>("sa3").Text = string.Empty;
+                            this.FindControl<ToggleSwitch>("sa4").IsChecked = true;
+                        });
+                    }
+                    else
+                        PrintResult("Subset", "Failed to subset.");
+
+                    SetBusy(false);
+                }).Start();
             }
         }
 
@@ -223,26 +252,31 @@ namespace mkvtool
             if (!string.IsNullOrEmpty(DumpArg.Path) &&
                 !string.IsNullOrEmpty(DumpArg.Output))
             {
-                DumpArg.Subset = this.FindControl<CheckBox>("da3").IsChecked == true;
-                bool r = !DumpArg.Dir
-                    ? mkvlib.DumpMKV(DumpArg.Path, DumpArg.Output, DumpArg.Subset, lcb)
-                    : mkvlib.DumpMKVs(DumpArg.Path, DumpArg.Output, DumpArg.Subset, lcb);
-                if (r)
+                DumpArg.Subset = this.FindControl<ToggleSwitch>("da3").IsChecked == true;
+                SetBusy(true);
+                new Thread(() =>
                 {
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Dump result",
-                        "Dump successfully.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
-                    DumpArg.Path = string.Empty;
-                    DumpArg.Output = string.Empty;
-                    DumpArg.Dir = false;
-                    this.FindControl<TextBlock>("da1").Text = string.Empty;
-                    this.FindControl<TextBlock>("da2").Text = string.Empty;
-                    this.FindControl<CheckBox>("da3").IsCancel = true;
-                }
-                else
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Dump result",
-                        "Failed to dump.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
+                    bool r = !DumpArg.Dir
+                        ? mkvlib.DumpMKV(DumpArg.Path, DumpArg.Output, DumpArg.Subset, lcb)
+                        : mkvlib.DumpMKVs(DumpArg.Path, DumpArg.Output, DumpArg.Subset, lcb);
+                    if (r)
+                    {
+                        PrintResult("Dump", "Dump successfully.");
+                        DumpArg.Path = string.Empty;
+                        DumpArg.Output = string.Empty;
+                        DumpArg.Dir = false;
+                        DoUIThread(() =>
+                        {
+                            this.FindControl<TextBlock>("da1").Text = string.Empty;
+                            this.FindControl<TextBlock>("da2").Text = string.Empty;
+                            this.FindControl<ToggleSwitch>("da3").IsChecked = true;
+                        });
+                    }
+                    else
+                        PrintResult("Dump", "Failed to dump.");
+
+                    SetBusy(false);
+                }).Start();
             }
         }
 
@@ -304,26 +338,31 @@ namespace mkvtool
             {
                 MakeArg.slang = this.FindControl<TextBox>("ma4").Text;
                 MakeArg.stitle = this.FindControl<TextBox>("ma5").Text;
-                if (mkvlib.MakeMKVs(MakeArg.Dir, MakeArg.Data, MakeArg.Output, MakeArg.slang, MakeArg.stitle, lcb))
+                SetBusy(true);
+                new Thread(() =>
                 {
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Make result",
-                        "Make successfully.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
-                    MakeArg.Dir = string.Empty;
-                    MakeArg.Data = string.Empty;
-                    MakeArg.Output = string.Empty;
-                    MakeArg.slang = string.Empty;
-                    MakeArg.stitle = string.Empty;
-                    this.FindControl<TextBlock>("ma1").Text = string.Empty;
-                    this.FindControl<TextBlock>("ma2").Text = string.Empty;
-                    this.FindControl<TextBlock>("ma3").Text = string.Empty;
-                    this.FindControl<TextBox>("ma4").Text = string.Empty;
-                    this.FindControl<TextBox>("ma5").Text = string.Empty;
-                }
-                else
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Make result",
-                        "Failed to make.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
+                    if (mkvlib.MakeMKVs(MakeArg.Dir, MakeArg.Data, MakeArg.Output, MakeArg.slang, MakeArg.stitle, lcb))
+                    {
+                        PrintResult("Make", "Make successfully.");
+                        MakeArg.Dir = string.Empty;
+                        MakeArg.Data = string.Empty;
+                        MakeArg.Output = string.Empty;
+                        MakeArg.slang = string.Empty;
+                        MakeArg.stitle = string.Empty;
+                        DoUIThread(() =>
+                        {
+                            this.FindControl<TextBlock>("ma1").Text = string.Empty;
+                            this.FindControl<TextBlock>("ma2").Text = string.Empty;
+                            this.FindControl<TextBlock>("ma3").Text = string.Empty;
+                            this.FindControl<TextBox>("ma4").Text = string.Empty;
+                            this.FindControl<TextBox>("ma5").Text = string.Empty;
+                        });
+                    }
+                    else
+                        PrintResult("Make", "Failed to make.");
+
+                    SetBusy(false);
+                }).Start();
             }
         }
 
@@ -391,38 +430,138 @@ namespace mkvtool
             }
         }
 
-        private async void DoCreatetn_OnClick(object? sender, RoutedEventArgs e)
+        private async void DoCreateBtn_OnClick(object? sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(CreateArg.vDir) && !string.IsNullOrEmpty(CreateArg.sDir) &&
                 !string.IsNullOrEmpty(CreateArg.fDir) && !string.IsNullOrEmpty(CreateArg.oDir))
             {
                 CreateArg.slang = this.FindControl<TextBox>("ca5").Text;
                 CreateArg.stitle = this.FindControl<TextBox>("ca6").Text;
-                CreateArg.clean = this.FindControl<CheckBox>("ca7").IsChecked == true;
-                if (mkvlib.CreateMKVs(CreateArg.vDir, CreateArg.sDir, CreateArg.fDir, string.Empty, CreateArg.oDir,
-                    CreateArg.slang, CreateArg.stitle, CreateArg.clean, lcb))
+                CreateArg.clean = this.FindControl<ToggleSwitch>("ca7").IsChecked == true;
+                SetBusy(true);
+                new Thread(() =>
                 {
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Create result",
-                        "Create successfully.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
-                    CreateArg.vDir = string.Empty;
-                    CreateArg.sDir = string.Empty;
-                    CreateArg.fDir = string.Empty;
-                    CreateArg.oDir = string.Empty;
-                    CreateArg.clean = false;
-                    this.FindControl<TextBlock>("ca1").Text = string.Empty;
-                    this.FindControl<TextBlock>("ca2").Text = string.Empty;
-                    this.FindControl<TextBlock>("ca3").Text = string.Empty;
-                    this.FindControl<TextBlock>("ca4").Text = string.Empty;
-                    this.FindControl<TextBox>("ca5").Text = string.Empty;
-                    this.FindControl<TextBox>("ca6").Text = string.Empty;
-                    this.FindControl<CheckBox>("ca7").IsChecked = false;
-                }
-                else
-                    await MessageBoxManager.GetMessageBoxStandardWindow("Create result",
-                        "Failed to create.", MEnums.ButtonEnum.Ok,
-                        MEnums.Icon.Info, WindowStartupLocation.CenterOwner).Show();
+                    if (mkvlib.CreateMKVs(CreateArg.vDir, CreateArg.sDir, CreateArg.fDir, string.Empty, CreateArg.oDir,
+                        CreateArg.slang, CreateArg.stitle, CreateArg.clean, lcb))
+                    {
+                        PrintResult("Create", "Create successfully.");
+                        CreateArg.vDir = string.Empty;
+                        CreateArg.sDir = string.Empty;
+                        CreateArg.fDir = string.Empty;
+                        CreateArg.oDir = string.Empty;
+                        CreateArg.clean = false;
+                        DoUIThread(() =>
+                        {
+                            this.FindControl<TextBlock>("ca1").Text = string.Empty;
+                            this.FindControl<TextBlock>("ca2").Text = string.Empty;
+                            this.FindControl<TextBlock>("ca3").Text = string.Empty;
+                            this.FindControl<TextBlock>("ca4").Text = string.Empty;
+                            this.FindControl<TextBox>("ca5").Text = string.Empty;
+                            this.FindControl<TextBox>("ca6").Text = string.Empty;
+                            this.FindControl<ToggleSwitch>("ca7").IsChecked = false;
+                        });
+                    }
+                    else
+                        PrintResult("Create", "Failed to create.");
+
+                    SetBusy(false);
+                }).Start();
             }
+        }
+
+        class WorkflowArg
+        {
+            public static string Dir { get; set; }
+            public static string Data { get; set; }
+            public static string Dist { get; set; }
+        }
+
+        private async void WorkflowSelectBtns_OnClick(object? sender, RoutedEventArgs e)
+        {
+            Button btn = (Button) sender;
+            string dir;
+            switch (btn.Tag.ToString())
+            {
+                case "dir":
+                    WorkflowArg.Dir = string.Empty;
+                    this.FindControl<TextBlock>("wa1").Text = string.Empty;
+                    dir = await new OpenFolderDialog().ShowAsync(this);
+                    if (!string.IsNullOrEmpty(dir))
+                    {
+                        WorkflowArg.Dir = dir;
+                        this.FindControl<TextBlock>("wa1").Text = dir;
+                    }
+
+                    break;
+                case "data":
+                    WorkflowArg.Data = string.Empty;
+                    this.FindControl<TextBlock>("wa2").Text = string.Empty;
+                    dir = await new OpenFolderDialog().ShowAsync(this);
+                    if (!string.IsNullOrEmpty(dir))
+                    {
+                        WorkflowArg.Data = dir;
+                        this.FindControl<TextBlock>("wa2").Text = dir;
+                    }
+
+                    break;
+                case "dist":
+                    WorkflowArg.Dist = string.Empty;
+                    this.FindControl<TextBlock>("wa3").Text = string.Empty;
+                    dir = await new OpenFolderDialog().ShowAsync(this);
+                    if (!string.IsNullOrEmpty(dir))
+                    {
+                        WorkflowArg.Dist = dir;
+                        this.FindControl<TextBlock>("wa3").Text = dir;
+                    }
+
+                    break;
+            }
+        }
+
+        private async void DoWorkflowBtn_OnClick(object? sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(WorkflowArg.Dir) && !string.IsNullOrEmpty(WorkflowArg.Data) &&
+                !string.IsNullOrEmpty(WorkflowArg.Dist))
+            {
+                SetBusy(true);
+                new Thread(() =>
+                {
+                    if (mkvlib.DumpMKVs(WorkflowArg.Dir, WorkflowArg.Data, true, lcb) &&
+                        mkvlib.MakeMKVs(WorkflowArg.Dir, WorkflowArg.Data, WorkflowArg.Dist, "", "", lcb))
+                    {
+                        PrintResult("Workflow", "Workflow successfully.");
+                        WorkflowArg.Dir = string.Empty;
+                        WorkflowArg.Data = string.Empty;
+                        WorkflowArg.Dist = string.Empty;
+                        DoUIThread(() =>
+                        {
+                            this.FindControl<TextBlock>("wa1").Text = string.Empty;
+                            this.FindControl<TextBlock>("wa2").Text = string.Empty;
+                            this.FindControl<TextBlock>("wa3").Text = string.Empty;
+                        });
+                    }
+                    else
+                        PrintResult("Workflow", "Failed to workflow.");
+
+                    SetBusy(false);
+                }).Start();
+            }
+        }
+
+        void PrintResult(string str1, string str2)
+        {
+            string str = $"##### {str1} result: \"{str2}\"";
+            lcb(str);
+        }
+
+        async void DoUIThread(Action action)
+        {
+            await Dispatcher.UIThread.InvokeAsync(action);
+        }
+
+        void SetBusy(bool busy)
+        {
+            DoUIThread(() => this.FindControl<BusyIndicator>("busyBox").IsBusy = busy);
         }
     }
 }

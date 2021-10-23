@@ -1,218 +1,262 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="600"
-        d:DesignHeight="600"
-        Width="850"
-        Height="650"
-        x:Class="mkvtool.MainWindow"
-        WindowStartupLocation="CenterScreen"
-        xmlns:Controls="clr-namespace:Avalonia.Controlz.Controls;assembly=Avalonia.Controlz"
-        Title="MKV Tool" Opened="TopLevel_OnOpened">
+<Controls:MetroWindow xmlns="https://github.com/avaloniaui"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      mc:Ignorable="d" d:DesignWidth="600"
+                      d:DesignHeight="600"
+                      Width="850"
+                      Height="670"
+                      x:Class="mkvtool.MainWindow"
+                      WindowStartupLocation="CenterScreen"
+                      xmlns:Controlz="clr-namespace:Avalonia.Controlz.Controls;assembly=Avalonia.Controlz"
+                      xmlns:Controls="clr-namespace:Avalonia.ExtendedToolkit.Controls;assembly=Avalonia.ExtendedToolkit"
+                      Title="MKV Tool" Opened="TopLevel_OnOpened">
     <DockPanel>
-        <TabControl DockPanel.Dock="Left">
-            <TabItem Header="Subset">
-                <StackPanel>
-                    <Controls:GroupBox Header="Check subsetted" Margin="10">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="File..." Click="CheckFileBtn_OnClick" Margin="5" />
-                            <Button Content="Folder..." Click="CheckFolderBtn_OnClick" Margin="5" />
-                        </StackPanel>
-                    </Controls:GroupBox>
-                    <Controls:GroupBox Header="Do subset" Margin="10">
-                        <StackPanel Margin="5" HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="ASS subtitles:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="sa1" />
-                                    </ScrollViewer>
-                                </StackPanel>
-                                <Button Content="Select..." Tag="asses" Click="SubsetSelectBtns_OnClick" />
+        <Grid Name="mainBox" IsEnabled="False">
+            <TabControl DockPanel.Dock="Left">
+                <TabItem Header="Subset">
+                    <StackPanel>
+                        <Controlz:GroupBox Header="Check subsetted" Margin="10">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="File..." Click="CheckFileBtn_OnClick" Margin="5" />
+                                <Button Content="Folder..." Click="CheckFolderBtn_OnClick" Margin="5" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Fonts:" />
+                        </Controlz:GroupBox>
+                        <Controlz:GroupBox Header="Do subset" Margin="10">
+                            <StackPanel Margin="5" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="ASS subtitles:" />
                                         <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                                       VerticalScrollBarVisibility="Auto">
-                                            <TextBlock Name="sa2" />
+                                            <TextBlock Name="sa1" />
                                         </ScrollViewer>
                                     </StackPanel>
+                                    <Button Content="Select..." Tag="asses" Click="SubsetSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="fonts" Click="SubsetSelectBtns_OnClick" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Output folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="sa3" />
-                                    </ScrollViewer>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Fonts:" />
+                                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                          VerticalScrollBarVisibility="Auto">
+                                                <TextBlock Name="sa2" />
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="fonts" Click="SubsetSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="output" Click="SubsetSelectBtns_OnClick" />
-                            </StackPanel>
-                            <CheckBox Content="Output in sub folder" IsChecked="True" Name="sa4" />
-                            <Button Margin="10" Content="Go" Click="DoSubsetBtn_OnClick" />
-                        </StackPanel>
-                    </Controls:GroupBox>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="Dump / Make">
-                <StackPanel>
-                    <Controls:GroupBox Header="Dump" Margin="10">
-                        <StackPanel Margin="5" HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="File or folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="da1" />
-                                    </ScrollViewer>
-                                </StackPanel>
-                                <Button Content="Select file..." Tag="file" Click="DumpSelectBtns_OnClick" />
-                                <Button Content="Select folder..." Tag="folder" Click="DumpSelectBtns_OnClick" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Output folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="da2" />
-                                    </ScrollViewer>
-                                </StackPanel>
-                                <Button Content="Select..." Tag="output" Click="DumpSelectBtns_OnClick" />
-                            </StackPanel>
-                            <CheckBox Content="Subset" IsChecked="True" Name="da3" />
-                            <Button Margin="10" Content="Go" Click="DoDumpBtn_OnClick" />
-                        </StackPanel>
-                    </Controls:GroupBox>
-                    <Controls:GroupBox Header="Make" Margin="10">
-                        <StackPanel Margin="5" HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Video folder:" />
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Output folder:" />
                                         <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                                       VerticalScrollBarVisibility="Auto">
-                                            <TextBlock Name="ma1" />
+                                            <TextBlock Name="sa3" />
                                         </ScrollViewer>
                                     </StackPanel>
+                                    <Button Content="Select..." Tag="output" Click="SubsetSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="dir" Click="MakeSelectBtns_OnClick" />
+                                <Controls:ToggleSwitch Content="Output in sub folder" IsChecked="True" Name="sa4" />
+                                <Button Margin="10" Content="Go" Click="DoSubsetBtn_OnClick"
+                                        HorizontalAlignment="Center" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Data folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="ma2" />
-                                    </ScrollViewer>
+                        </Controlz:GroupBox>
+                        <Controlz:GroupBox Header="Standard workflow" Margin="10">
+                            <StackPanel Margin="5" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Video folder:" />
+                                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                          VerticalScrollBarVisibility="Auto">
+                                                <TextBlock Name="wa1" />
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="dir" Click="WorkflowSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="data" Click="MakeSelectBtns_OnClick" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Output folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="ma3" />
-                                    </ScrollViewer>
-                                </StackPanel>
-                                <Button Content="Select..." Tag="output" Click="MakeSelectBtns_OnClick" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Default Subtitle language:" VerticalAlignment="Center"
-                                               TextAlignment="Center" />
-                                    <TextBox Name="ma4" />
-                                </StackPanel>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Default Subtitle title:" VerticalAlignment="Center"
-                                               TextAlignment="Center" />
-                                    <TextBox Name="ma5" />
-                                </StackPanel>
-                            </StackPanel>
-                            <Button Margin="10" Content="Go" Click="DoMakeBtn_OnClick" />
-                        </StackPanel>
-                    </Controls:GroupBox>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="Create">
-                <StackPanel>
-                    <Controls:GroupBox Header="Do Create" Margin="10">
-                        <StackPanel Margin="5" HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Video folder:" />
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Data folder:" />
                                         <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                                       VerticalScrollBarVisibility="Auto">
-                                            <TextBlock Name="ca1" />
+                                            <TextBlock Name="wa2" />
                                         </ScrollViewer>
                                     </StackPanel>
+                                    <Button Content="Select..." Tag="data" Click="WorkflowSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="v" Click="CreateSelectBtns_OnClick" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Subtitles folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="ca2" />
-                                    </ScrollViewer>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Dist folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="wa3" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="dist" Click="WorkflowSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="s" Click="CreateSelectBtns_OnClick" />
+                                <Button Margin="10" Content="Go" Click="DoWorkflowBtn_OnClick"
+                                        HorizontalAlignment="Center" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Fonts folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="ca3" />
-                                    </ScrollViewer>
+                        </Controlz:GroupBox>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Dump / Make">
+                    <StackPanel>
+                        <Controlz:GroupBox Header="Dump" Margin="10">
+                            <StackPanel Margin="5" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="File or folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="da1" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select file..." Tag="file" Click="DumpSelectBtns_OnClick" />
+                                    <Button Content="Select folder..." Tag="folder" Click="DumpSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="f" Click="CreateSelectBtns_OnClick" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Output folder:" />
-                                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                                  VerticalScrollBarVisibility="Auto">
-                                        <TextBlock Name="ca4" />
-                                    </ScrollViewer>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Output folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="da2" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="output" Click="DumpSelectBtns_OnClick" />
                                 </StackPanel>
-                                <Button Content="Select..." Tag="o" Click="CreateSelectBtns_OnClick" />
+                                <Controls:ToggleSwitch Content="Subset" IsChecked="True" Name="da3" />
+                                <Button Margin="10" Content="Go" Click="DoDumpBtn_OnClick" HorizontalAlignment="Center" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Default Subtitle language:" VerticalAlignment="Center"
-                                               TextAlignment="Center" />
-                                    <TextBox Name="ca5" />
+                        </Controlz:GroupBox>
+                        <Controlz:GroupBox Header="Make" Margin="10">
+                            <StackPanel Margin="5" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Video folder:" />
+                                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                          VerticalScrollBarVisibility="Auto">
+                                                <TextBlock Name="ma1" />
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="dir" Click="MakeSelectBtns_OnClick" />
                                 </StackPanel>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="Default Subtitle title:" VerticalAlignment="Center"
-                                               TextAlignment="Center" />
-                                    <TextBox Name="ca6" />
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Data folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="ma2" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="data" Click="MakeSelectBtns_OnClick" />
                                 </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Output folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="ma3" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="output" Click="MakeSelectBtns_OnClick" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Default Subtitle language:" VerticalAlignment="Center"
+                                                   TextAlignment="Center" />
+                                        <TextBox Name="ma4" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Default Subtitle title:" VerticalAlignment="Center"
+                                                   TextAlignment="Center" />
+                                        <TextBox Name="ma5" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Margin="10" Content="Go" Click="DoMakeBtn_OnClick" HorizontalAlignment="Center" />
                             </StackPanel>
-                            <CheckBox Content="Clean old data" IsChecked="False" Name="ca7" />
-                            <Button Margin="10" Content="Go" Click="DoCreatetn_OnClick" />
-                        </StackPanel>
-                    </Controls:GroupBox>
-                </StackPanel>
-            </TabItem>
-        </TabControl>
-        <Controls:GroupBox Header="Log" Margin="10" DockPanel.Dock="Right">
+                        </Controlz:GroupBox>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Create">
+                    <StackPanel>
+                        <Controlz:GroupBox Header="Do Create" Margin="10">
+                            <StackPanel Margin="5" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Video folder:" />
+                                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                          VerticalScrollBarVisibility="Auto">
+                                                <TextBlock Name="ca1" />
+                                            </ScrollViewer>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="v" Click="CreateSelectBtns_OnClick" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Subtitles folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="ca2" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="s" Click="CreateSelectBtns_OnClick" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Fonts folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="ca3" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="f" Click="CreateSelectBtns_OnClick" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Output folder:" />
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <TextBlock Name="ca4" />
+                                        </ScrollViewer>
+                                    </StackPanel>
+                                    <Button Content="Select..." Tag="o" Click="CreateSelectBtns_OnClick" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Default Subtitle language:" VerticalAlignment="Center"
+                                                   TextAlignment="Center" />
+                                        <TextBox Name="ca5" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="Default Subtitle title:" VerticalAlignment="Center"
+                                                   TextAlignment="Center" />
+                                        <TextBox Name="ca6" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <Controls:ToggleSwitch Content="Clean old data" IsChecked="False" Name="ca7" />
+                                <Button Margin="10" Content="Go" Click="DoCreateBtn_OnClick"
+                                        HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Controlz:GroupBox>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+            <Controls:BusyIndicator Name="busyBox" />
+        </Grid>
+        <Controlz:GroupBox Header="Log" Margin="10" DockPanel.Dock="Right">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <TextBox IsReadOnly="True" Name="logBox" Margin="10" />
             </ScrollViewer>
-        </Controls:GroupBox>
+        </Controlz:GroupBox>
     </DockPanel>
-</Window>
+</Controls:MetroWindow>
