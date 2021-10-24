@@ -25,7 +25,7 @@ namespace mkvtool
         private async void CheckFileBtn_OnClick(object? sender, RoutedEventArgs e)
         {
             string[] files = await ShowSelectFileDialog("MKV file", new string[] {"mkv"}, false);
-            if (files != null)
+            if (files != null && files.Length > 0)
             {
                 SetBusy(true);
                 new Thread(() =>
