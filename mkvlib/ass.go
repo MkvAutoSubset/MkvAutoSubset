@@ -1,6 +1,7 @@
 package mkvlib
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"github.com/antchfx/xmlquery"
@@ -286,9 +287,17 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		args = append(args, "--name-languages="+"*")
 		args = append(args, "--font-number="+font.index)
 		args = append(args, font.file)
-		if p, err := newProcess(nil, nil, nil, "", pyftsubset, args...); err == nil {
+		buf := bytes.NewBufferString("")
+		if p, err := newProcess(nil, nil, buf, "", pyftsubset, args...); err == nil {
 			s, err := p.Wait()
 			ok = err == nil && s.ExitCode() == 0
+			if strings.Contains(buf.String(), "WARNING: mort NOT subset; don't know how to subset; dropped") {
+				_ = os.Remove(_fn)
+				if len(findFonts(self.output)) == 0 {
+					_ = os.RemoveAll(self.output)
+				}
+				ok = false
+			}
 		}
 		if !ok {
 			printLog(self.lcb, `Failed to subset font: "%s"[%s].`, n, font.index)
@@ -359,8 +368,19 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 					args = append(args, "-o", font.sFont)
 					args = append(args, fn)
 					ok := false
-					if p, err := newProcess(os.Stdin, nil, nil, "", ttx, args...); err == nil {
+					buf := bytes.NewBufferString("")
+					if p, err := newProcess(nil, nil, buf, "", ttx, args...); err == nil {
+						r := true
+						go func() {
+							for r {
+								time.Sleep(500 * time.Millisecond)
+								if strings.Contains(buf.String(), "(Hit any key to exit)") {
+									_ = p.Kill()
+								}
+							}
+						}()
 						s, err := p.Wait()
+						r = false
 						ok = err == nil && s.ExitCode() == 0
 					}
 					if !ok {
