@@ -271,7 +271,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
 	fn := fmt.Sprintf(`%s.txt`, font.file)
 	_, n, e, ne := splitPath(font.file)
-	if _e, _ := regexp.MatchString(`\.(?i)ttc$`, e); _e {
+	if _e, _ := regexp.MatchString(`^\.(?i)ttc$`, e); _e {
 		e = ".ttf"
 	}
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
