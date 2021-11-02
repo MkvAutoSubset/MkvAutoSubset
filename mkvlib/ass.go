@@ -368,6 +368,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 								time.Sleep(500 * time.Millisecond)
 								if strings.Contains(buf.String(), "(Hit any key to exit)") {
 									_ = p.Kill()
+									break
 								}
 							}
 						}()
