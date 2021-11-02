@@ -140,7 +140,7 @@ func (self *assProcessor) dumpFont(file string, full bool) bool {
 	ok := false
 	count := 1
 	_, n, _, _ := splitPath(file)
-	if strings.HasSuffix(file, ".ttc") {
+	if e, _ := regexp.MatchString(`\.(?i)ttc$`, n); e {
 		count = self.getTTCCount(file)
 		if count < 1 {
 			printLog(self.lcb, `Failed to get the ttc font count: "%s".`, n)
@@ -271,7 +271,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
 	fn := fmt.Sprintf(`%s.txt`, font.file)
 	_, n, e, ne := splitPath(font.file)
-	if e == ".ttc" {
+	if _e, _ := regexp.MatchString(`\.(?i)ttc$`, e); _e {
 		e = ".ttf"
 	}
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
@@ -287,17 +287,9 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		args = append(args, "--name-languages="+"*")
 		args = append(args, "--font-number="+font.index)
 		args = append(args, font.file)
-		buf := bytes.NewBufferString("")
-		if p, err := newProcess(nil, nil, buf, "", pyftsubset, args...); err == nil {
+		if p, err := newProcess(nil, nil, nil, "", pyftsubset, args...); err == nil {
 			s, err := p.Wait()
 			ok = err == nil && s.ExitCode() == 0
-			if strings.Contains(buf.String(), "WARNING: mort NOT subset; don't know how to subset; dropped") {
-				_ = os.Remove(_fn)
-				if len(findFonts(self.output)) == 0 {
-					_ = os.RemoveAll(self.output)
-				}
-				ok = false
-			}
 		}
 		if !ok {
 			printLog(self.lcb, `Failed to subset font: "%s"[%s].`, n, font.index)
