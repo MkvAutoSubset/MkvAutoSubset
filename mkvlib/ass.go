@@ -140,7 +140,7 @@ func (self *assProcessor) dumpFont(file string, full bool) bool {
 	ok := false
 	count := 1
 	_, n, _, _ := splitPath(file)
-	if e, _ := regexp.MatchString(`\.(?i)ttc$`, n); e {
+	if strings.HasSuffix(strings.ToLower(n), ".ttc") {
 		count = self.getTTCCount(file)
 		if count < 1 {
 			printLog(self.lcb, `Failed to get the ttc font count: "%s".`, n)
@@ -271,9 +271,10 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
 	fn := fmt.Sprintf(`%s.txt`, font.file)
 	_, n, e, ne := splitPath(font.file)
-	if _e, _ := regexp.MatchString(`^\.(?i)ttc$`, e); _e {
+	if strings.ToLower(e) == ".ttc" {
 		e = ".ttf"
 	}
+	e = strings.ToLower(e)
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
 		printLog(self.lcb, "Failed to create the output folder.")
 		return false
