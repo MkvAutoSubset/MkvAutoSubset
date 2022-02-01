@@ -90,8 +90,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 				if subset {
 					asses := make([]string, 0)
 					for _, _item := range tracks {
-						_arr := strings.Split(_item, ":")
-						f := _arr[len(_arr)-1]
+						f := _item[strings.Index(_item, ":")+1:]
 						if strings.HasSuffix(f, ".ass") {
 							asses = append(asses, f)
 						}
