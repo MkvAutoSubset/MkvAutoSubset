@@ -63,10 +63,11 @@ func (self *assProcessor) parse() bool {
 		}
 	}
 	if ec == 0 {
+		opt := astisub.SSAOptions{}
 		reg, _ := regexp.Compile(`\{?\\fn@?([^\r\n\\\}]+)[\\\}]`)
 		m := make(map[string]map[rune]bool)
 		for k, v := range self.subtitles {
-			subtitle, err := astisub.ReadFromSSA(strings.NewReader(v))
+			subtitle, err := astisub.ReadFromSSAWithOptions(strings.NewReader(v), opt)
 			if err != nil {
 				ec++
 				printLog(self.lcb, `Failed to read the ass file: "%s"`, k)

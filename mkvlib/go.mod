@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/antchfx/xmlquery v1.3.8
-	github.com/asticode/go-astisub v0.19.0
+	github.com/asticode/go-astisub v0.20.0
 )
 
 require (
