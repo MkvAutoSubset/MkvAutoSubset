@@ -7,12 +7,14 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"runtime"
 	"strings"
 )
 
 const (
 	mkvmerge   = `mkvmerge`
 	mkvextract = `mkvextract`
+	spp2pgs    = `spp2pgs`
 )
 
 type mkvInfo struct {
@@ -33,7 +35,12 @@ type mkvInfo struct {
 	}
 }
 
-type mkvProcessor bool
+type mkvProcessor struct {
+	a2p bool
+	apc bool
+	pr  int
+	pf  int
+}
 
 func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
 	buf := bytes.NewBufferString("")
@@ -265,7 +272,7 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 		d, n, _, f := splitPath(p)
 		p = path.Join(data, d, f)
 		_p := path.Join(p, "subsetted")
-		subs, _ := findPath(p, `\.sub`)
+		subs, _ := findPath(p, `\.(sub)|(pgs)`)
 		asses, _ := findPath(_p, `\.ass$`)
 		attachments := findFonts(_p)
 		tracks := append(subs, asses...)
@@ -301,5 +308,23 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 	}
 	obj.fonts = findFonts(obj._fonts)
 
-	return obj.parse() && obj.matchFonts() && obj.createFontsSubset() && obj.changeFontsName() && obj.replaceFontNameInAss()
+	r := obj.parse() && obj.matchFonts() && obj.createFontsSubset() && obj.changeFontsName() && obj.replaceFontNameInAss()
+	if self.a2p {
+		r = self.ass2Pgs(obj._files, self.pr, self.pf, obj.output, d, lcb)
+		if r && !self.apc {
+			_ = os.RemoveAll(obj.output)
+		}
+	}
+	return r
+}
+
+func (self *mkvProcessor) A2P(a2p, apc bool, pr, pf int) {
+	self.a2p = runtime.GOOS == "windows" && runtime.GOARCH == "amd64" && a2p
+	self.apc = apc
+	self.pr = pr
+	self.pf = pf
+}
+
+func (self *mkvProcessor) ass2Pgs(input []string, resolution, frameRate int, fontsDir string, output string, lcb logCallback) bool {
+	return self.a2p && ass2Pgs(input, resolution, frameRate, fontsDir, output, lcb)
 }

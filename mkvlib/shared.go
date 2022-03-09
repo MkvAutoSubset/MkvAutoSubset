@@ -11,7 +11,7 @@ import (
 )
 
 const libName = "mkvlib"
-const libVer = "v1.1.8"
+const libVer = "v1.1.9"
 
 const LibFName = libName + " " + libVer
 
@@ -51,12 +51,18 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	_, _pyftsubset := exec.LookPath(pyftsubset)
 	_, _mkvextract := exec.LookPath(mkvextract)
 	_, _mkvmerge := exec.LookPath(mkvmerge)
+	_, _spp2pgs := exec.LookPath(spp2pgs)
 	if _ttx != nil || _pyftsubset != nil {
 		printLog(lcb, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
 		ec++
 	}
 	if _mkvextract != nil || _mkvmerge != nil {
 		printLog(lcb, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
+		ec++
+	}
+
+	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" && _spp2pgs != nil {
+		printLog(lcb, `Missing dependency: spp2pgs.`, spp2pgs)
 		ec++
 	}
 

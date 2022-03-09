@@ -33,6 +33,7 @@ type fontInfo struct {
 
 type assProcessor struct {
 	files     []string
+	_files    []string
 	_fonts    string
 	output    string
 	m         map[string]*fontInfo
@@ -449,6 +450,7 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 			ok := false
 			if os.WriteFile(fn, []byte(s), os.ModePerm) == nil {
 				ok = true
+				self._files = append(self._files, fn)
 			} else {
 				ec++
 			}
