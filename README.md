@@ -36,8 +36,9 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 - 从 [这里](https://www.python.org/downloads) 下载并安装Python
 - 命令提示符(CMD)里参考上面使用pip的方式安装FontTools依赖
+- 从 [这里](https://github.com/KurenaiRyu/MkvAutoSubset/raw/master/mkvtool/spp2pgs.exe) 下载spp2pgs,感谢[这个repo](https://github.com/qwe7989199/Spp2Pgs)
 - 从 [这里](https://www.fosshub.com/MKVToolNix.html) 下载并安装MKVToolNix
-- 保证以上两个依赖项的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_)在 **path** 环境变量里
+- 保证以上两个依赖项的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_,_spp2pgs.exe_)在 **path** 环境变量里
 
 ### 本体
 
@@ -58,6 +59,15 @@ ASS字幕字体子集化 MKV批量提取/生成
   [点此下载](https://github.com/KurenaiRyu/MkvAutoSubset/releases/latest)
 
 ## mkvtool 功能及使用示例
+
+- 2022.03新增的ASS转PGS说明
+  ```shell
+  mkvtool -a2p -apc -pr 1080 -pf 23 ...xxx...
+  #-a2p: 启用ass转pgs(win64专属功能且依赖spp2pgs)
+  #-apc: 使pgs字幕与子集化后的ass字幕共存(该选项会影响混流行为)
+  #-pr: 设置psg字幕的分辨率(有"480,576,720,1080,2160"可选)
+  #-pf: 设置psg字幕的帧率(有"23,24,25,29,30,50,59,60"可选)
+  ```
 
 - 标准工作流
   ```shell
