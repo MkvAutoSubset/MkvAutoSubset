@@ -1,4 +1,4 @@
-//go:build !windows || (windows && 386)
+//go:build !windows || (windows && !amd64)
 
 package mkvlib
 
