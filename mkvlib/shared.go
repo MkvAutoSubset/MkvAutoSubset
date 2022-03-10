@@ -62,7 +62,7 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	}
 
 	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" && _spp2pgs != nil {
-		printLog(lcb, `Missing dependency: spp2pgs.`, spp2pgs)
+		printLog(lcb, `Missing dependency: spp2pgs.`)
 		ec++
 	}
 
