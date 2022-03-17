@@ -244,9 +244,11 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			if !self.ASSFontSubset(asses, fDir, "", false, lcb) {
 				ec++
 			} else {
+				_tracks, _ := findPath(p, `\.pgs$`)
 				__p := path.Join(p, "subsetted")
 				attachments = findFonts(__p)
 				tracks, _ = findPath(__p, `\.ass$`)
+				tracks = append(tracks, _tracks...)
 			}
 		}
 		tracks = append(tracks, subs...)
