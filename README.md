@@ -168,7 +168,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   #*当"-ans"参数存在时输出文件夹为"${output}",否则为${output}/subsetted".
   #*由于会预先清空${output}文件夹,为了安全请慎用"-ans".
   ```
-  - 创建字体缓存
+- 创建字体缓存
   ```shell
   mkvtool -cc -s input #{input}获取字体信息并创建缓存
   
