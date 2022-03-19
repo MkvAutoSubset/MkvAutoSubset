@@ -123,6 +123,14 @@ func MakeMKVs(dir, data, output, slang, stitle *C.char, lcb C.logCallback) bool 
 	return getter.GetProcessorInstance().MakeMKVs(gs(dir), gs(data), gs(output), gs(slang), gs(stitle), _lcb(lcb))
 }
 
+//export A2P
+func A2P(a2p, apc bool, pr, pf int) {
+	if !checkInstance() {
+		return
+	}
+	getter.GetProcessorInstance().A2P(a2p, apc, pr, pf)
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }
