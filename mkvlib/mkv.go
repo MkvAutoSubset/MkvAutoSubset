@@ -343,3 +343,18 @@ func (self *mkvProcessor) GetFontsList(input string, lcb logCallback) []string {
 	}
 	return nil
 }
+
+func (self *mkvProcessor) CreateFontsCache(dir, output string, lcb logCallback) bool {
+	obj := new(assProcessor)
+	obj._fonts = dir
+	obj.lcb = lcb
+	return obj.createFontsCache(output)
+}
+
+func (self *mkvProcessor) CopyFontsFromCache(subs, cache, dist string, lcb logCallback) bool {
+	asses, _ := findPath(subs, `\.ass$`)
+	obj := new(assProcessor)
+	obj.lcb = lcb
+	obj.files = asses
+	return obj.CopyFontsFromCache(cache, dist)
+}
