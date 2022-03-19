@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.2.9"
+const appVer = "v3.3.0"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -34,6 +34,11 @@ func main() {
 	s := ""
 	data := ""
 	dist := ""
+	cache_p := os.Getenv("HOME")
+	if runtime.GOOS == "windows" {
+		cache_p = os.Getenv("USERPROFILE")
+	}
+	cache_p = path.Join(cache_p, ".mkvtool/fonts.cache")
 	f := ""
 	c := false
 	d := false
@@ -46,9 +51,12 @@ func main() {
 	a2p := false
 	apc := false
 	l := false
+	cc := false
+	cfc := false
 	sl, st := "", ""
 	af, ao := "", ""
 	flog := ""
+	co := ""
 	asses := new(arrayArg)
 	pf := 0
 	pr := 0
@@ -61,6 +69,7 @@ func main() {
 	flag.BoolVar(&a2p, "a2p", false, "Enable ass2pgs(only work in win64 and need spp2pgs)")
 	flag.BoolVar(&apc, "apc", false, "Ass and pgs coexist")
 	flag.BoolVar(&l, "l", false, "Show fonts list.")
+	flag.BoolVar(&cc, "cc", false, "Create fonts cache.")
 	flag.Var(asses, "a", "ASS files. (multiple & join ass mode)")
 	flag.BoolVar(&n, "n", false, "Not do ass font subset. (dump mode only)")
 	flag.BoolVar(&clean, "clean", false, "Clean original file subtitles and fonts. (create mode only)")
@@ -68,6 +77,9 @@ func main() {
 	flag.StringVar(&st, "st", "", "Subtitle title. (create & make mode only)")
 	flag.StringVar(&af, "af", "", "ASS fonts folder. (ass mode only)")
 	flag.StringVar(&ao, "ao", "", "ASS output folder. (ass mode only)")
+	flag.StringVar(&co, "co", "fonts", "Copy fonts from cache dist folder.")
+	flag.StringVar(&cache_p, "cp", cache_p, "Fonts cache path. (cache mode only)")
+	flag.BoolVar(&cfc, "cfc", false, "Copy fonts from cache.")
 	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subsetted" folder. (ass mode only)`)
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
 	flag.StringVar(&dist, "dist", "dist", "Results output folder (make mode only)")
@@ -100,10 +112,24 @@ func main() {
 	processer := getter.GetProcessorInstance()
 	processer.A2P(a2p, apc, pr, pf)
 
+	if cc && s != "" {
+
+		if !processer.CreateFontsCache(s, cache_p, nil) {
+			ec++
+			return
+		}
+	}
+
 	if l && s != "" {
 		list := processer.GetFontsList(s, nil)
 		if len(list) > 0 {
 			fmt.Println(strings.Join(list, "\n"))
+		}
+		if cfc {
+			if !processer.CopyFontsFromCache(s, cache_p, co, nil) {
+				ec++
+				return
+			}
 		}
 		return
 	}
