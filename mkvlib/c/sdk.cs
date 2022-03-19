@@ -37,6 +37,12 @@ public static class mkvlib
     [DllImport("mkvlib.so")]
     static extern bool MakeMKVs(IntPtr dir, IntPtr data, IntPtr output, IntPtr slang, IntPtr stitle, logCallback lcb);
 
+    [DllImport("mkvlib.so")]
+    static extern bool A2P(bool a2p, bool apc, int pr, int pf);
+
+    [DllImport("mkvlib.so")]
+    static extern bool GetFontsList(IntPtr dir, logCallback lcb);
+
     #endregion
 
     public static bool InitInstance(Action<string> lcb)
@@ -96,6 +102,17 @@ public static class mkvlib
     public static bool MakeMKVs(string dir, string data, string output, string slang, string stitle, Action<string> lcb)
     {
         return MakeMKVs(cs(dir), cs(data), cs(output), cs(slang), cs(stitle), _lcb(lcb));
+    }
+
+    public static void A2P(bool a2p, bool apc, int pr, int pf)
+    {
+        A2P(a2p, apc, pr, pf);
+    }
+
+    public string[] GetFontsList(string dir, Action<string> lcb)
+    {
+        string result = css(GetFontsList(cs(dir), _lcb(lcb)));
+        return JsonSerializer.Deserialize<string[]>(result);
     }
 
 
