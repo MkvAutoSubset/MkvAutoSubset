@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.2.8"
+const appVer = "v3.2.9"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -45,6 +45,7 @@ func main() {
 	ans := false
 	a2p := false
 	apc := false
+	l := false
 	sl, st := "", ""
 	af, ao := "", ""
 	flog := ""
@@ -59,6 +60,7 @@ func main() {
 	flag.BoolVar(&q, "q", false, "Query mode.")
 	flag.BoolVar(&a2p, "a2p", false, "Enable ass2pgs(only work in win64 and need spp2pgs)")
 	flag.BoolVar(&apc, "apc", false, "Ass and pgs coexist")
+	flag.BoolVar(&l, "l", false, "Show fonts list.")
 	flag.Var(asses, "a", "ASS files. (multiple & join ass mode)")
 	flag.BoolVar(&n, "n", false, "Not do ass font subset. (dump mode only)")
 	flag.BoolVar(&clean, "clean", false, "Clean original file subtitles and fonts. (create mode only)")
@@ -97,6 +99,14 @@ func main() {
 
 	processer := getter.GetProcessorInstance()
 	processer.A2P(a2p, apc, pr, pf)
+
+	if l && s != "" {
+		list := processer.GetFontsList(s, nil)
+		if len(list) > 0 {
+			fmt.Println(strings.Join(list, "\n"))
+		}
+		return
+	}
 
 	if len(*asses) > 0 {
 		if !processer.ASSFontSubset(*asses, af, ao, !ans, nil) {
