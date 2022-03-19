@@ -330,3 +330,16 @@ func (self *mkvProcessor) A2P(a2p, apc bool, pr, pf int) {
 func (self *mkvProcessor) ass2Pgs(input []string, resolution, frameRate int, fontsDir string, output string, lcb logCallback) bool {
 	return self.a2p && ass2Pgs(input, resolution, frameRate, fontsDir, output, lcb)
 }
+
+func (self *mkvProcessor) GetFontsList(input string, lcb logCallback) []string {
+	files, _ := findPath(input, `\.ass$`)
+	if len(files) > 0 {
+		obj := new(assProcessor)
+		obj.files = files
+		obj.lcb = lcb
+		if obj.parse() {
+			return obj.getFontsList()
+		}
+	}
+	return nil
+}

@@ -38,7 +38,6 @@ type assProcessor struct {
 	output    string
 	m         map[string]*fontInfo
 	fonts     []string
-	sFonts    []string
 	subtitles map[string]string
 	lcb       logCallback
 }
@@ -124,6 +123,14 @@ func (self *assProcessor) parse() bool {
 		printLog(self.lcb, `Not Found item in the ass file(s): "%d"`, len(self.files))
 	}
 	return ec == 0
+}
+
+func (self *assProcessor) getFontsList() []string {
+	list := make([]string, 0)
+	for k, _ := range self.m {
+		list = append(list, k)
+	}
+	return list
 }
 
 func (self *assProcessor) getTTCCount(file string) int {
