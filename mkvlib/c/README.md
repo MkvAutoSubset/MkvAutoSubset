@@ -116,3 +116,9 @@
     //dirSafe: 是否把成品输出到"${output}/subsetted"文件夹里(为了安全建议设置为true)
     //return: 是否全程无错
     ```
+  - ```c
+    char* CreateMKVs(char* dir, logCallback lcb);
+    //取得指定目录内所有字幕需要的全部字体
+    //dir: 字幕文件所在的目录
+    //return: json格式的数组
+    ```

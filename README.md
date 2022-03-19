@@ -63,6 +63,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 2022.03新增的ASS转PGS说明
   ```shell
   mkvtool -a2p -apc -pr 1080 -pf 23 ...xxx...
+  
   #-a2p: 启用ass转pgs(win64专属功能且依赖spp2pgs)
   #-apc: 使pgs字幕与子集化后的ass字幕共存(该选项会影响混流行为)
   #-pr: 设置psg字幕的分辨率(有"480,576,720,1080,2160"可选)
@@ -72,6 +73,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 标准工作流
   ```shell
   mkvtool -s bangumi 
+  
   #从${bangumi}文件夹抽取所有mkv文件的字幕和字体,
   #遇到ass字幕就自动进行子集化,
   #输出替换字幕和字体后的新mkv文件.
@@ -165,6 +167,10 @@ ASS字幕字体子集化 MKV批量提取/生成
   #"-ao"参数为子集化成品输出路径,默认值为"${workdir}".
   #*当"-ans"参数存在时输出文件夹为"${output}",否则为${output}/subsetted".
   #*由于会预先清空${output}文件夹,为了安全请慎用"-ans".
+  ```
+- 取得一个目录里所有ass字幕文件所需要的全部字体
+  ```shell
+  mkvtool -l -s input #{input}获取
   ```
 
 ### 一些碎碎念

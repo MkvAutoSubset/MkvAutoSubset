@@ -131,6 +131,16 @@ func A2P(a2p, apc bool, pr, pf int) {
 	getter.GetProcessorInstance().A2P(a2p, apc, pr, pf)
 }
 
+//export GetFontsList
+func GetFontsList(dir *C.char, lcb C.logCallback) *C.char {
+	if !checkInstance() {
+		return cs("")
+	}
+	list := getter.GetProcessorInstance().GetFontsList(gs(dir), _lcb(lcb))
+	data, _ := json.Marshal(list)
+	return cs(string(data))
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }
