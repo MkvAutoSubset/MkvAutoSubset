@@ -29,13 +29,17 @@ type fontInfo struct {
 	index   string
 	oldName string
 	newName string
-	ttx     string
 	sFont   string
 }
 
 type fontCache struct {
-	Font  string   `json:"font"`
-	Names []string `json:"names"`
+	Font   string      `json:"font"`
+	Caches []cacheInfo `json:"caches"`
+}
+
+type cacheInfo struct {
+	Name  string `json:"name"`
+	Index int    `json:"index"`
 }
 
 type assProcessor struct {
@@ -47,6 +51,9 @@ type assProcessor struct {
 	fonts     []string
 	subtitles map[string]string
 	lcb       logCallback
+	cache     []fontCache
+	tDir      string
+	_m        map[string][]string
 }
 
 func (self *assProcessor) parse() bool {
@@ -193,17 +200,27 @@ func (self *assProcessor) dumpFont(file, out string, full bool) []string {
 }
 
 func (self *assProcessor) dumpFonts(files []string, full bool) bool {
+	if self.tDir == "" {
+		self.tDir = path.Join(os.TempDir(), randomStr(8))
+		if os.MkdirAll(self.tDir, os.ModePerm) != nil {
+			return false
+		}
+	}
 	ok := 0
 	l := len(files)
 	wg := new(sync.WaitGroup)
 	wg.Add(l)
 	m := new(sync.Mutex)
+	if self._m == nil {
+		self._m = make(map[string][]string)
+	}
 	for _, item := range files {
 		go func(_item string) {
-			_ok := self.dumpFont(_item, "", full)
+			_ok := self.dumpFont(_item, self.tDir, full)
 			if len(_ok) > 0 {
 				m.Lock()
 				ok++
+				self._m[_item] = _ok
 				m.Unlock()
 			}
 			wg.Done()
@@ -262,29 +279,34 @@ func (self *assProcessor) matchFonts() bool {
 	if !self.dumpFonts(self.fonts, false) {
 		return false
 	}
-	files, _ := findPath(self._fonts, `\.ttx$`)
-	m := self.getFontsName(files)
-	if len(m) > 0 {
-		reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
-		for k, _ := range self.m {
-			for _k, v := range m {
-				for _, _v := range v {
-					if _v == k {
-						self.m[k].file = reg.ReplaceAllString(_k, "")
-						self.m[k].ttx = _k
-						self.m[k].index = reg.FindStringSubmatch(_k)[1]
-						self.m[k].newName = randomStr(8)
-						break
+	reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
+	for font, ttxs := range self._m {
+		m := self.getFontsName(ttxs)
+		if len(m) > 0 {
+			for k, _ := range self.m {
+				for _k, v := range m {
+					for _, _v := range v {
+						if _v == k {
+							self.m[k].file = font
+							self.m[k].index = reg.FindStringSubmatch(_k)[1]
+							self.m[k].newName = randomStr(8)
+							break
+						}
 					}
 				}
 			}
 		}
 	}
 	ok := true
-	for _, v := range self.m {
+	for k, v := range self.m {
 		if v.file == "" {
-			ok = false
-			printLog(self.lcb, `Missing the font: "%s".`, v.oldName)
+			if f, i := self.matchCache(k); f != "" {
+				self.m[k].file, self.m[k].index = f, i
+				self.m[k].newName = randomStr(8)
+			} else {
+				ok = false
+				printLog(self.lcb, `Missing the font: "%s".`, v.oldName)
+			}
 		}
 	}
 	return ok
@@ -293,6 +315,8 @@ func (self *assProcessor) matchFonts() bool {
 func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
 	fn := fmt.Sprintf(`%s.txt`, font.file)
+	_, fn, _, _ = splitPath(fn)
+	fn = path.Join(self.tDir, fn)
 	_, n, e, ne := splitPath(font.file)
 	if strings.ToLower(e) == ".ttc" {
 		e = ".ttf"
@@ -354,9 +378,17 @@ func (self *assProcessor) createFontsSubset() bool {
 }
 
 func (self *assProcessor) changeFontName(font *fontInfo) bool {
+	if self.tDir == "" {
+		self.tDir = path.Join(os.TempDir(), randomStr(8))
+		if os.MkdirAll(self.tDir, os.ModePerm) != nil {
+			return false
+		}
+	}
 	ec := 0
-	if len(self.dumpFont(font.sFont, "", true)) > 0 {
+	if len(self.dumpFont(font.sFont, self.tDir, true)) > 0 {
 		fn := fmt.Sprintf("%s_0.ttx", font.sFont)
+		_, fn, _, _ = splitPath(fn)
+		fn = path.Join(self.tDir, fn)
 		f, err := openFile(fn, true, false)
 		if err == nil {
 			defer func() {
@@ -432,6 +464,7 @@ func (self *assProcessor) changeFontsName() bool {
 		}(item)
 	}
 	wg.Wait()
+	_ = os.RemoveAll(self.tDir)
 	return ok == l
 }
 
@@ -489,33 +522,37 @@ func (self *assProcessor) createFontsCache(output string) bool {
 	ok := 0
 	l := len(fonts)
 	m := new(sync.Mutex)
-	tDir := path.Join(os.TempDir(), randomStr(8))
-	if os.MkdirAll(tDir, os.ModePerm) != nil {
-		return false
+	if self.tDir == "" {
+		self.tDir = path.Join(os.TempDir(), randomStr(8))
+		if os.MkdirAll(self.tDir, os.ModePerm) != nil {
+			return false
+		}
 	}
-
+	reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
 	wg := new(sync.WaitGroup)
 	w := func(s, e int) {
 		for i := s; i < e; i++ {
 			go func(x int) {
 				_item := fonts[x]
-				list := self.dumpFont(_item, tDir, false)
+				list := self.dumpFont(_item, self.tDir, false)
 				if len(list) > 0 {
 					m.Lock()
 					ok++
 					_m := self.getFontsName(list)
 					__m := make(map[string]bool)
-					for _, v := range _m {
+					caches := make([]cacheInfo, 0)
+					for k, v := range _m {
+						index := reg.FindStringSubmatch(k)[1]
 						for _, _v := range v {
 							__m[_v] = true
 						}
+						for _k, _ := range __m {
+							q, _ := strconv.Atoi(index)
+							caches = append(caches, cacheInfo{_k, q})
+						}
 					}
-					list = make([]string, 0)
-					for k, _ := range __m {
-						list = append(list, k)
-					}
-					cache = append(cache, fontCache{Font: _item, Names: list})
-					printLog(self.lcb, "Dump font (%d/%d) done.", ok, l)
+					cache = append(cache, fontCache{_item, caches})
+					printLog(self.lcb, "Cache font (%d/%d) done.", ok, l)
 					m.Unlock()
 				}
 				wg.Done()
@@ -537,51 +574,61 @@ func (self *assProcessor) createFontsCache(output string) bool {
 		wg.Wait()
 	}
 	data, _ := json.Marshal(cache)
-	defer func() { _ = os.RemoveAll(tDir) }()
+	defer func() { _ = os.RemoveAll(self.tDir) }()
 	d, _, _, _ := splitPath(output)
 	_ = os.MkdirAll(d, os.ModePerm)
 	return ioutil.WriteFile(output, data, os.ModePerm) == nil
 }
 
-func (self *assProcessor) CopyFontsFromCache(input, output string) bool {
+func (self *assProcessor) copyFontsFromCache() bool {
 	ec := 0
 	if self.parse() {
-		if data, err := ioutil.ReadFile(input); err == nil {
-			j := make([]fontCache, 0)
-			if err := json.Unmarshal(data, &j); err == nil {
-				l := len(self.m)
-				i := 0
-				for k, _ := range self.m {
-					ok := ""
-					for _, v := range j {
-						for _, _v := range v.Names {
-							if k == _v {
-								ok = v.Font
-							}
-							if ok != "" {
-								break
-							}
-						}
-						if ok != "" {
-							break
-						}
-					}
-					if ok != "" {
-						_, fn, _, _ := splitPath(ok)
-						fn = path.Join(output, fn)
-						if copyFile(ok, fn) == nil {
-							i++
-							printLog(self.lcb, "Copy (%d/%d) done.", i, l)
-						}
-					} else {
-						ec++
-						printLog(self.lcb, `Missing the font: "%s".`, k)
-					}
+		l := len(self.m)
+		i := 0
+		for k, _ := range self.m {
+			ok, _ := self.matchCache(k)
+			if ok != "" {
+				_, fn, _, _ := splitPath(ok)
+				fn = path.Join(self.output, fn)
+				if copyFile(ok, fn) == nil {
+					i++
+					printLog(self.lcb, "Copy (%d/%d) done.", i, l)
 				}
+			} else {
+				ec++
+				printLog(self.lcb, `Missing the font: "%s".`, k)
 			}
 		}
-	} else {
-		ec++
 	}
 	return ec == 0
+}
+
+func (self *assProcessor) loadCache(p string) {
+	if data, err := ioutil.ReadFile(p); err == nil {
+		self.cache = make([]fontCache, 0)
+		_ = json.Unmarshal(data, &self.cache)
+	}
+}
+
+func (self *assProcessor) matchCache(k string) (string, string) {
+	ok := ""
+	i := -1
+	for _, v := range self.cache {
+		for _, _v := range v.Caches {
+			if k == _v.Name {
+				ok = v.Font
+				i = _v.Index
+			}
+			if ok != "" {
+				break
+			}
+		}
+		if ok != "" {
+			break
+		}
+	}
+	if _, err := os.Stat(ok); err != nil {
+		ok = ""
+	}
+	return ok, strconv.Itoa(i)
 }

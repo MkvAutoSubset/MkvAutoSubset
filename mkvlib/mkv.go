@@ -36,10 +36,11 @@ type mkvInfo struct {
 }
 
 type mkvProcessor struct {
-	a2p bool
-	apc bool
-	pr  int
-	pf  int
+	a2p   bool
+	apc   bool
+	pr    int
+	pf    int
+	cache string
 }
 
 func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
@@ -309,7 +310,7 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 		obj.output = path.Join(obj.output, "subsetted")
 	}
 	obj.fonts = findFonts(obj._fonts)
-
+	obj.loadCache(self.cache)
 	r := obj.parse() && obj.matchFonts() && obj.createFontsSubset() && obj.changeFontsName() && obj.replaceFontNameInAss()
 	if self.a2p {
 		r = self.ass2Pgs(obj._files, self.pr, self.pf, obj.output, d, lcb)
@@ -351,10 +352,16 @@ func (self *mkvProcessor) CreateFontsCache(dir, output string, lcb logCallback) 
 	return obj.createFontsCache(output)
 }
 
-func (self *mkvProcessor) CopyFontsFromCache(subs, cache, dist string, lcb logCallback) bool {
+func (self *mkvProcessor) CopyFontsFromCache(subs, dist string, lcb logCallback) bool {
 	asses, _ := findPath(subs, `\.ass$`)
 	obj := new(assProcessor)
 	obj.lcb = lcb
 	obj.files = asses
-	return obj.CopyFontsFromCache(cache, dist)
+	obj.output = dist
+	obj.loadCache(self.cache)
+	return obj.copyFontsFromCache()
+}
+
+func (self *mkvProcessor) Cache(p string) {
+	self.cache = p
 }
