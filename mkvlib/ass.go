@@ -166,6 +166,7 @@ func (self *assProcessor) dumpFont(file, out string, full bool) []string {
 			return list
 		}
 	}
+	reg, _ := regexp.Compile(`[\x00-\x1f]|(&#([0-9]|[12][0-9]|3[01]);)`)
 	for i := 0; i < count; i++ {
 		fn := fmt.Sprintf("%s_%d.ttx", file, i)
 		if out != "" {
@@ -188,8 +189,7 @@ func (self *assProcessor) dumpFont(file, out string, full bool) []string {
 				f, err := ioutil.ReadFile(fn)
 				if err == nil {
 					str := string(f)
-					str = strings.ReplaceAll(str, "\x00", "")
-					str = strings.ReplaceAll(str, "&#0;", "")
+					str = reg.ReplaceAllString(str, "")
 					ok = ioutil.WriteFile(fn, []byte(str), os.ModePerm) == nil
 				}
 			}
