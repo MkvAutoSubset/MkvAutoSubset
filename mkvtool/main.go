@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.3.2"
+const appVer = "v3.3.3"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -113,11 +113,12 @@ func main() {
 	processer.A2P(a2p, apc, pr, pf)
 
 	if cc && s != "" {
-
-		if !processer.CreateFontsCache(s, cache_p, nil) {
+		list := processer.CreateFontsCache(s, cache_p, nil)
+		if len(list) > 0 {
 			ec++
-			return
+			log.Printf("Error list:\n%s", strings.Join(list, "\n"))
 		}
+		return
 	}
 
 	if cache_p != "" {
@@ -210,8 +211,4 @@ func main() {
 		flag.PrintDefaults()
 	}
 	defer os.Exit(ec)
-}
-
-func init() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
 }
