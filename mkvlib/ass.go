@@ -33,13 +33,8 @@ type fontInfo struct {
 }
 
 type fontCache struct {
-	Font   string      `json:"font"`
-	Caches []cacheInfo `json:"caches"`
-}
-
-type cacheInfo struct {
-	Name  string `json:"name"`
-	Index int    `json:"index"`
+	File  string     `json:"file"`
+	Fonts [][]string `json:"fonts"`
 }
 
 type assProcessor struct {
@@ -189,6 +184,14 @@ func (self *assProcessor) dumpFont(file, out string, full bool) []string {
 		if p, err := newProcess(nil, nil, nil, "", ttx, args...); err == nil {
 			s, err := p.Wait()
 			ok = err == nil && s.ExitCode() == 0
+			if ok {
+				f, err := ioutil.ReadFile(fn)
+				if err == nil {
+					str := string(f)
+					str = strings.ReplaceAll(str, "\x00", "")
+					ok = ioutil.WriteFile(fn, []byte(str), os.ModePerm) == nil
+				}
+			}
 		}
 		if !ok {
 			printLog(self.lcb, `Failed to dump font(%t): "%s"[%d].`, full, n, i)
@@ -422,7 +425,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 						go func() {
 							for r {
 								time.Sleep(500 * time.Millisecond)
-								if strings.Contains(buf.String(), "(Hit any key to exit)") {
+								if strings.Contains(buf.String(), "ERROR: Unhandled exception has occurred") {
 									_ = p.Kill()
 									break
 								}
@@ -435,6 +438,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 					if !ok {
 						ec++
 						_, n, _, _ := splitPath(font.sFont)
+						_ = os.Remove(font.sFont)
 						printLog(self.lcb, `Failed to compile the font: "%s".`, n)
 					}
 				}
@@ -516,7 +520,7 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 	return ec == 0
 }
 
-func (self *assProcessor) createFontsCache(output string) bool {
+func (self *assProcessor) createFontsCache(output string) []string {
 	cache := make([]fontCache, 0)
 	fonts := findFonts(self._fonts)
 	ok := 0
@@ -525,11 +529,13 @@ func (self *assProcessor) createFontsCache(output string) bool {
 	if self.tDir == "" {
 		self.tDir = path.Join(os.TempDir(), randomStr(8))
 		if os.MkdirAll(self.tDir, os.ModePerm) != nil {
-			return false
+			printLog(self.lcb, `Failed to create temp dir: "%s"`, self.tDir)
+			return []string{""}
 		}
 	}
 	reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
 	wg := new(sync.WaitGroup)
+	el := make([]string, 0)
 	w := func(s, e int) {
 		for i := s; i < e; i++ {
 			go func(x int) {
@@ -540,20 +546,24 @@ func (self *assProcessor) createFontsCache(output string) bool {
 					ok++
 					_m := self.getFontsName(list)
 					__m := make(map[string]bool)
-					caches := make([]cacheInfo, 0)
+					_fonts := make([][]string, len(_m))
 					for k, v := range _m {
 						index := reg.FindStringSubmatch(k)[1]
 						for _, _v := range v {
 							__m[_v] = true
 						}
+						_list := make([]string, 0)
 						for _k, _ := range __m {
-							q, _ := strconv.Atoi(index)
-							caches = append(caches, cacheInfo{_k, q})
+							_list = append(_list, _k)
 						}
+						q, _ := strconv.Atoi(index)
+						_fonts[q] = _list
 					}
-					cache = append(cache, fontCache{_item, caches})
+					cache = append(cache, fontCache{_item, _fonts})
 					printLog(self.lcb, "Cache font (%d/%d) done.", ok, l)
 					m.Unlock()
+				} else {
+					el = append(el, _item)
 				}
 				wg.Done()
 			}(i)
@@ -573,11 +583,16 @@ func (self *assProcessor) createFontsCache(output string) bool {
 		w(x*c, l)
 		wg.Wait()
 	}
-	data, _ := json.Marshal(cache)
 	defer func() { _ = os.RemoveAll(self.tDir) }()
-	d, _, _, _ := splitPath(output)
-	_ = os.MkdirAll(d, os.ModePerm)
-	return ioutil.WriteFile(output, data, os.ModePerm) == nil
+	if len(cache) > 0 {
+		data, _ := json.Marshal(cache)
+		d, _, _, _ := splitPath(output)
+		_ = os.MkdirAll(d, os.ModePerm)
+		if ioutil.WriteFile(output, data, os.ModePerm) != nil {
+			printLog(self.lcb, `Failed to write cache file: "%s"`, output)
+		}
+	}
+	return el
 }
 
 func (self *assProcessor) copyFontsFromCache() bool {
@@ -614,17 +629,17 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	ok := ""
 	i := -1
 	for _, v := range self.cache {
-		for _, _v := range v.Caches {
-			if k == _v.Name {
-				ok = v.Font
-				i = _v.Index
+		for q, _v := range v.Fonts {
+			for _, __v := range _v {
+				if __v == k {
+					ok = v.File
+					i = q
+					break
+				}
 			}
 			if ok != "" {
 				break
 			}
-		}
-		if ok != "" {
-			break
 		}
 	}
 	if _, err := os.Stat(ok); err != nil {

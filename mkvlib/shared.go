@@ -11,7 +11,7 @@ import (
 )
 
 const libName = "mkvlib"
-const libVer = "v1.2.4"
+const libVer = "v1.2.5"
 
 const LibFName = libName + " " + libVer
 
@@ -88,4 +88,8 @@ func printLog(lcb logCallback, f string, v ...interface{}) {
 	} else {
 		log.Printf(f, v...)
 	}
+}
+
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 }
