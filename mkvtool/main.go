@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.3.4"
+const appVer = "v3.3.5"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -114,9 +114,10 @@ func main() {
 
 	if cc && s != "" {
 		list := processer.CreateFontsCache(s, cache_p, nil)
-		if len(list) > 0 {
+		el := len(list)
+		if el > 0 {
 			ec++
-			log.Printf("Error list:\n%s", strings.Join(list, "\n"))
+			log.Printf("Error list:(%d)\n%s", el, strings.Join(list, "\n"))
 		}
 		return
 	}
