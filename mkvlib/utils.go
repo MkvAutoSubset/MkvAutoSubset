@@ -193,6 +193,6 @@ func findMKVs(dir string) []string {
 }
 
 func findFonts(dir string) []string {
-	list, _ := findPath(dir, `\.((?i)(ttf)|(otf)|(ttc)|(fon))$`)
+	list, _ := findPath(dir, `\.((?i)(ttf)|(otf)|(ttc))$`)
 	return list
 }
