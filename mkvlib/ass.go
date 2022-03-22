@@ -189,6 +189,7 @@ func (self *assProcessor) dumpFont(file, out string, full bool) []string {
 				if err == nil {
 					str := string(f)
 					str = strings.ReplaceAll(str, "\x00", "")
+					str = strings.ReplaceAll(str, "&#0;", "")
 					ok = ioutil.WriteFile(fn, []byte(str), os.ModePerm) == nil
 				}
 			}
@@ -238,7 +239,8 @@ func (self *assProcessor) getFontName(p string) []string {
 	if err == nil {
 		defer func() { _ = f.Close() }()
 		names := make([]string, 0)
-		if xml, err := xmlquery.Parse(f); err == nil {
+		xml, err := xmlquery.Parse(f)
+		if err == nil {
 			for _, v := range xml.SelectElements(`ttFont/name/namerecord[@platformID=3]`) {
 				id := v.SelectAttr("nameID")
 				name := strings.TrimSpace(v.FirstChild.Data)
@@ -543,7 +545,6 @@ func (self *assProcessor) createFontsCache(output string) []string {
 				list := self.dumpFont(_item, self.tDir, false)
 				if len(list) > 0 {
 					m.Lock()
-					ok++
 					_m := self.getFontsName(list)
 					__m := make(map[string]bool)
 					_fonts := make([][]string, len(_m))
@@ -559,8 +560,13 @@ func (self *assProcessor) createFontsCache(output string) []string {
 						q, _ := strconv.Atoi(index)
 						_fonts[q] = _list
 					}
-					cache = append(cache, fontCache{_item, _fonts})
-					printLog(self.lcb, "Cache font (%d/%d) done.", ok, l)
+					if len(_fonts) > 0 {
+						ok++
+						cache = append(cache, fontCache{_item, _fonts})
+						printLog(self.lcb, "Cache font (%d/%d) done.", ok, l)
+					} else {
+						el = append(el, _item)
+					}
 					m.Unlock()
 				} else {
 					el = append(el, _item)
