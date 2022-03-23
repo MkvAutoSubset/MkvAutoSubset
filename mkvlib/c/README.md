@@ -94,8 +94,7 @@
   //subset: 是否进行子集化
   //return: 是否全程无错
   ```
-    -
-  输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
+    - 输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
 - ```c
   bool CreateMKV(char* file, char* tracks, char* attachments, char* output, char* slang, char* stitle, bool clean);
   //将字幕和字体封进mkv文件
@@ -133,8 +132,7 @@
   //stitle: 默认字幕标题
   //return: 是否全程无错
   ```
-    -
-  输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
+    - 输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
     - 关于字幕的命名方式请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 
 ### 字幕相关
