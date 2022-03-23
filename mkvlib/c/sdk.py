@@ -77,3 +77,19 @@ def getFontsList(dir, lcb):
     call = lib.GetFontsList
     call.restype = c_char_p
     return loads(call(dir.encode(), lcb).decode())
+
+
+def cache(p):
+    call = lib.Cache
+    return call(p.encode())
+
+
+def createFontsCache(dir, output, lcb):
+    call = lib.CreateFontsCache
+    call.restype = c_char_p
+    return loads(call(dir.encode(), output.encode(), lcb).decode())
+
+
+def copyFontsFromCache(subs, dist, lcb):
+    call = lib.CopyFontsFromCache
+    return call(subs.encode(), dist.encode(), lcb)

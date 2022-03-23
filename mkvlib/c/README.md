@@ -1,6 +1,7 @@
 # C导出函数说明
 
 ## 2022.03新增的ASS转PGS说明
+
 - ```c
   void A2P(bool a2p, bool apc, int pr, int pf);
   //启用ass转pgs(win64专属,且应在执行工作流之前调用.)
@@ -11,17 +12,19 @@
   ```
 
 ## 日志回调
+
 - 原型
     ```c
     void (*logCallback)(char* str); 
     //str: UTF-8编码的指针,并约定所有"char*"数据类型的参数或返回值都为此.
     ```
 - 一些说明
-  - 几乎所有导出的方法都有这个参数(在最后),当出现错误时会进行调用,可以用来判断执行过程是否出错,错在哪.
-  - 虽然可以为NULL,但并不建议这样做.
-  - 以下名为"lcb"的参数均为日志回调,不再赘述.
+    - 几乎所有导出的方法都有这个参数(在最后),当出现错误时会进行调用,可以用来判断执行过程是否出错,错在哪.
+    - 虽然可以为NULL,但并不建议这样做.
+    - 以下名为"lcb"的参数均为日志回调,不再赘述.
 
 ## 初始化实例
+
 - ```c
   bool InitInstance(logCallbac lcb);
   //return: 是否初始化成功
@@ -30,7 +33,30 @@
 - 会检测依赖,如果不满足会返回false.
 - 如果在**未**或**未成功**调用本函数的情况下调用其他函数会永远返回失败状态.
 
+### 缓存相关
+
+- ```c
+    void Cache(char* p);
+    //设置字体缓存(应在执行工作流之前调用)
+    //p: 缓存文件路径
+    ```
+- ```c
+    char* CreateFontsCache(char* dir, char* output, logCallback lcb);
+    //从字体目录创建缓存
+    //dir: 字体文件目录
+    //output: 缓存文件保存路径
+    //return: 缓存失败字体的json格式的数组
+    ```
+- ```c
+    char* CopyFontsFromCache(char* subs, char* dist, logCallback lcb);
+    //从缓存复制字幕所需的字体
+    //subs: 字体文件目录
+    //dist: 字体文件保存目录
+    //return: 是否全部导出
+    ```
+
 ### 查询相关
+
 - ```c
   char* GetMKVInfo(char* file);
   //查询一个mkv文件内封的字幕和字体信息
@@ -49,7 +75,9 @@
   //dir: 文件夹路径
   //return: 需要子集化的mkv文件路径数组
   ```
+
 ### MKV相关
+
 - ```c
   bool DumpMKV(char* file, char* output, bool subset, logCallback lcb);
   //抽取一个mkv文件里的字幕和字体并顺便进行子集化(可选)
@@ -66,7 +94,8 @@
   //subset: 是否进行子集化
   //return: 是否全程无错
   ```
-  - 输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
+    -
+  输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
 - ```c
   bool CreateMKV(char* file, char* tracks, char* attachments, char* output, char* slang, char* stitle, bool clean);
   //将字幕和字体封进mkv文件
@@ -79,7 +108,7 @@
   //clean: 是否清除源mkv原有的字幕和字体
   //return: 是否全程无错
   ```
-  - 关于字幕的命名方式请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
+    - 关于字幕的命名方式请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 - ```c
   bool CreateMKVs(char* vDir, char* sDir, char* fDir, char* tDir, char* oDir, char* slang, char* stitle, bool clean, logCallback lcb);
   //从一组文件夹获得情报自动生成一组mkv并自动进行子集化操作
@@ -93,7 +122,7 @@
   //clean: 是否清除源mkv原有的字幕和字体
   //return: 是否全程无错
   ```
-  - 关于字幕的命名方式请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
+    - 关于字幕的命名方式请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 - ```c
   bool MakeMKVs(char* dir, char* data, char* output, char* slang, char* stitle, logCallback lcb);
   //用子集化后的数据目录替代原有的字幕和字体
@@ -104,10 +133,13 @@
   //stitle: 默认字幕标题
   //return: 是否全程无错
   ```
-  - 输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
-  - 关于字幕的命名方式请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
+    -
+  输出文件夹的目录结构请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
+    - 关于字幕的命名方式请参考[这里](https://github.com/KurenaiRyu/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
+
 ### 字幕相关
-  - ```c
+
+- ```c
     bool ASSFontSubset(char* files, char* fonts, char* output, bool dirSafe, logCallback lcb);
     //对字幕和字体进行子集化操作
     //files: 字幕文件路径数组的json化文本
@@ -116,8 +148,8 @@
     //dirSafe: 是否把成品输出到"${output}/subsetted"文件夹里(为了安全建议设置为true)
     //return: 是否全程无错
     ```
-  - ```c
-    char* CreateMKVs(char* dir, logCallback lcb);
+- ```c
+    char* GetFontsList(char* dir, logCallback lcb);
     //取得指定目录内所有字幕需要的全部字体
     //dir: 字幕文件所在的目录
     //return: json格式的数组

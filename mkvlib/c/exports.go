@@ -141,6 +141,32 @@ func GetFontsList(dir *C.char, lcb C.logCallback) *C.char {
 	return cs(string(data))
 }
 
+//export CreateFontsCache
+func CreateFontsCache(dir, output *C.char, lcb C.logCallback) *C.char {
+	if !checkInstance() {
+		return cs("")
+	}
+	list := getter.GetProcessorInstance().CreateFontsCache(gs(dir), gs(output), _lcb(lcb))
+	data, _ := json.Marshal(list)
+	return cs(string(data))
+}
+
+//export CopyFontsFromCache
+func CopyFontsFromCache(subs, dist *C.char, lcb C.logCallback) bool {
+	if !checkInstance() {
+		return false
+	}
+	return getter.GetProcessorInstance().CopyFontsFromCache(gs(subs), gs(dist), _lcb(lcb))
+}
+
+//export Cache
+func Cache(p *C.char) {
+	if !checkInstance() {
+		return
+	}
+	getter.GetProcessorInstance().Cache(gs(p))
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }

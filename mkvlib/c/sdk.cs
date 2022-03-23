@@ -41,7 +41,16 @@ public static class mkvlib
     static extern bool A2P(bool a2p, bool apc, int pr, int pf);
 
     [DllImport("mkvlib.so")]
-    static extern bool GetFontsList(IntPtr dir, logCallback lcb);
+    static extern IntPtr GetFontsList(IntPtr dir, logCallback lcb);
+
+    [DllImport("mkvlib.so")]
+    static extern void Cache(IntPtr p);
+
+    [DllImport("mkvlib.so")]
+    static extern IntPtr CreateFontsCache(IntPtr dir, IntPtr output, logCallback lcb);
+
+    [DllImport("mkvlib.so")]
+    static extern bool CopyFontsFromCache(IntPtr subs, IntPtr dist, logCallback lcb);
 
     #endregion
 
@@ -109,12 +118,27 @@ public static class mkvlib
         A2P(a2p, apc, pr, pf);
     }
 
-    public string[] GetFontsList(string dir, Action<string> lcb)
+    public static string[] GetFontsList(string dir, Action<string> lcb)
     {
         string result = css(GetFontsList(cs(dir), _lcb(lcb)));
         return JsonSerializer.Deserialize<string[]>(result);
     }
 
+    public static void Cache(string p)
+    {
+        Cache(cs(p));
+    }
+
+    public static string[] CreateFontsCache(string dir, string output, Action<string> lcb)
+    {
+        string result = css(CreateFontsCache(cs(dir), cs(output), _lcb(lcb)));
+        return JsonSerializer.Deserialize<string[]>(result);
+    }
+
+    public static bool CopyFontsFromCache(string subs, string dist, Action<string> lcb)
+    {
+        return CopyFontsFromCache(cs(subs), cs(dist), _lcb(lcb));
+    }
 
     delegate void logCallback(IntPtr ptr);
     static logCallback _lcb(Action<string> lcb)
