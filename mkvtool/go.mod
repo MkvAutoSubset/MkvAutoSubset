@@ -1,14 +1,14 @@
 module github.com/KurenaiRyu/MkvAutoSubset/mkvtool
 
-go 1.17
+go 1.18
 
-require github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20220323064518-12b9924e13a6
+require github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20220421040106-4219efb8ffe5
 
 require (
-	github.com/antchfx/xmlquery v1.3.8 // indirect
+	github.com/antchfx/xmlquery v1.3.10 // indirect
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/asticode/go-astikit v0.20.0 // indirect
-	github.com/asticode/go-astisub v0.20.0 // indirect
+	github.com/asticode/go-astisub v0.21.0 // indirect
 	github.com/asticode/go-astits v1.8.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect

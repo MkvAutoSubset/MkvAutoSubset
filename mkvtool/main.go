@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.3.7"
+const appVer = "v3.3.8"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -84,7 +84,7 @@ func main() {
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
 	flag.StringVar(&dist, "dist", "dist", "Results output folder (make mode only)")
 	flag.StringVar(&flog, "log", "", "Log file path")
-	flag.IntVar(&pf, "pf", 23, "PGS frameRate:23,24,25,29,30,50,59,60. (ass2pgs only)")
+	flag.IntVar(&pf, "pf", 23, "PGS frame rate:23,24,25,29,30,50,59,60. (ass2pgs only)")
 	flag.IntVar(&pr, "pr", 1080, "PGS resolution:480,576,720,1080,2160. (ass2pgs only)")
 	flag.BoolVar(&v, "v", false, "Show app info.")
 	flag.Parse()
