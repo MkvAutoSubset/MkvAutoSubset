@@ -1,10 +1,10 @@
 module github.com/KurenaiRyu/MkvAutoSubset/mkvlib
 
-go 1.17
+go 1.18
 
 require (
-	github.com/antchfx/xmlquery v1.3.8
-	github.com/asticode/go-astisub v0.20.0
+	github.com/antchfx/xmlquery v1.3.10
+	github.com/asticode/go-astisub v0.21.0
 )
 
 require (

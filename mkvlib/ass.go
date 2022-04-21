@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -524,6 +525,9 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 
 func (self *assProcessor) createFontsCache(output string) []string {
 	cache := make([]fontCache, 0)
+	if !filepath.IsAbs(self._fonts) {
+		self._fonts, _ = filepath.Abs(self._fonts)
+	}
 	fonts := findFonts(self._fonts)
 	ok := 0
 	l := len(fonts)

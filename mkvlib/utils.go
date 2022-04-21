@@ -41,9 +41,6 @@ func findPath(path, expr string) (list []string, err error) {
 	}
 	err = queryPath(path, func(path string) bool {
 		if expr == "" || reg.MatchString(path) {
-			if !filepath.IsAbs(path) {
-				path, _ = filepath.Abs(path)
-			}
 			list = append(list, path)
 		}
 		return true

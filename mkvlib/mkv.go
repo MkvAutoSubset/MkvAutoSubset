@@ -176,7 +176,7 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 	}
 	if p, err := newProcess(nil, nil, nil, "", mkvmerge, args...); err == nil {
 		s, err := p.Wait()
-		return err == nil && s.ExitCode() == 0
+		return err == nil && s.ExitCode() != 2
 	}
 	return false
 }
