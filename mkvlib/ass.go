@@ -698,12 +698,20 @@ func (self *assProcessor) loadCache(p string) {
 func (self *assProcessor) matchCache(k string) (string, string) {
 	ok := ""
 	i := -1
+	_k := strings.Split(k, "^")
 	for _, v := range self.cache {
 		for q, _v := range v.Fonts {
 			for _, __v := range _v {
-				if __v == k {
-					ok = v.File
-					i = q
+				if __v == _k[0] {
+					for _, ___v := range v.Types[q] {
+						if ___v == _k[1] {
+							ok = v.File
+							i = q
+							break
+						}
+					}
+				}
+				if ok != "" {
 					break
 				}
 			}
