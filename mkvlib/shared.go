@@ -11,7 +11,7 @@ import (
 )
 
 const libName = "mkvlib"
-const libVer = "v1.3.0"
+const libVer = "v1.4.0"
 
 const LibFName = libName + " " + libVer
 

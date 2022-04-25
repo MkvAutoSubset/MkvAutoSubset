@@ -36,6 +36,7 @@ type fontInfo struct {
 type fontCache struct {
 	File  string     `json:"file"`
 	Fonts [][]string `json:"fonts"`
+	Types [][]string `json:"types"`
 }
 
 type assProcessor struct {
@@ -50,6 +51,7 @@ type assProcessor struct {
 	cache     []fontCache
 	tDir      string
 	_m        map[string][]string
+	fg        map[string]string
 }
 
 func (self *assProcessor) parse() bool {
@@ -74,7 +76,8 @@ func (self *assProcessor) parse() bool {
 	}
 	if ec == 0 {
 		opt := astisub.SSAOptions{}
-		reg, _ := regexp.Compile(`\{?\\fn@?([^\r\n\\\}]+)[\\\}]`)
+		reg, _ := regexp.Compile(`\\fn@?([^\r\n\\\}]*)`)
+		_reg, _ := regexp.Compile(`\\([bir])([^\r\n\\\}]*)`)
 		m := make(map[string]map[rune]bool)
 		for k, v := range self.subtitles {
 			subtitle, err := astisub.ReadFromSSAWithOptions(strings.NewReader(v), opt)
@@ -85,30 +88,74 @@ func (self *assProcessor) parse() bool {
 			}
 			for _, item := range subtitle.Items {
 				for _, _item := range item.Lines {
+					name := ""
+					_b := *item.Style.InlineStyle.SSABold
+					_i := *item.Style.InlineStyle.SSAItalic
 					for _, __item := range _item.Items {
-						name := item.Style.InlineStyle.SSAFontName
 						if __item.InlineStyle != nil {
 							arr := reg.FindStringSubmatch(__item.InlineStyle.SSAEffect)
 							if len(arr) > 1 {
 								name = arr[1]
 							}
+							_arr := _reg.FindAllStringSubmatch(__item.InlineStyle.SSAEffect, -1)
+							for _, v := range _arr {
+								if len(v) > 2 {
+									switch v[1] {
+									case "b":
+										_b = v[2] == "1"
+										break
+									case "i":
+										_i = v[2] == "1"
+										break
+									case "r":
+										v[2] = strings.TrimPrefix(v[2], "*")
+										if v[2] == "" {
+											name = ""
+											_b = *item.Style.InlineStyle.SSABold
+											_i = *item.Style.InlineStyle.SSAItalic
+										} else if s, ok := subtitle.Styles[v[2]]; ok {
+											name = s.InlineStyle.SSAFontName
+											_b = *s.InlineStyle.SSABold
+											_i = *s.InlineStyle.SSAItalic
+										} else {
+											printLog(self.lcb, `Not Found style in the ass file:"%s" [%s].`, k, v[2])
+											ec++
+										}
+										break
+									}
+								}
+							}
+							if name == "" || name == "0" {
+								name = item.Style.InlineStyle.SSAFontName
+							}
 						}
 						if strings.HasPrefix(name, "@") && len(name) > 1 {
 							name = name[1:]
 						}
-						if m[name] == nil {
-							m[name] = make(map[rune]bool)
+						arr := make([]string, 0)
+						if _b {
+							arr = append(arr, "Bold")
+						}
+						if _i {
+							arr = append(arr, "Italic")
+						}
+						if !_b && !_i {
+							arr = append(arr, "Regular")
+						}
+						_name := fmt.Sprintf("%s^%s", name, strings.Join(arr, " "))
+						if m[_name] == nil {
+							m[_name] = make(map[rune]bool)
 						}
 						str := __item.Text
 						for _, char := range str {
-							m[name][char] = true
+							m[_name][char] = true
 						}
 					}
 				}
 			}
 		}
 		self.m = make(map[string]*fontInfo)
-		reg, _ = regexp.Compile("[A-Za-z0-9]]")
+		reg, _ = regexp.Compile("[A-Za-z0-9]")
 		for k, v := range m {
 			str := ""
 			for _k, _ := range v {
@@ -125,7 +172,7 @@ func (self *assProcessor) parse() bool {
 				}
 				self.m[k] = new(fontInfo)
 				self.m[k].str = str
-				self.m[k].oldName = k
+				self.m[k].oldName = strings.Split(k, "^")[0]
 			}
 		}
 	}
@@ -235,37 +282,38 @@ func (self *assProcessor) dumpFonts(files []string, full bool) bool {
 	return ok == l
 }
 
-func (self *assProcessor) getFontName(p string) []string {
+func (self *assProcessor) getFontName(p string) []map[string]bool {
 	f, err := openFile(p, true, false)
 	if err == nil {
 		defer func() { _ = f.Close() }()
-		names := make([]string, 0)
+		names := make(map[string]bool)
+		types := make(map[string]bool)
 		xml, err := xmlquery.Parse(f)
 		if err == nil {
-			for _, v := range xml.SelectElements(`ttFont/name/namerecord[@platformID=3]`) {
+			for _, v := range xml.SelectElements(`ttFont/name/namerecord`) {
 				id := v.SelectAttr("nameID")
 				name := strings.TrimSpace(v.FirstChild.Data)
 				switch id {
-				case "1":
-					names = append(names, name)
+				case "1", "3", "4", "6":
+					names[name] = true
 					break
-				case "4":
-					names = append(names, name)
+				case "2":
+					types[name] = true
 					break
 				}
 			}
 		}
-		return names
+		return []map[string]bool{names, types}
 	}
 	return nil
 }
 
-func (self *assProcessor) getFontsName(files []string) map[string][]string {
+func (self *assProcessor) getFontsName(files []string) map[string][]map[string]bool {
 	l := len(files)
 	wg := new(sync.WaitGroup)
 	wg.Add(l)
 	m := new(sync.Mutex)
-	_m := make(map[string][]string)
+	_m := make(map[string][]map[string]bool)
 	for _, item := range files {
 		go func(_item string) {
 			names := self.getFontName(_item)
@@ -285,19 +333,24 @@ func (self *assProcessor) matchFonts() bool {
 	if !self.dumpFonts(self.fonts, false) {
 		return false
 	}
+	self.fg = make(map[string]string)
 	reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
 	for font, ttxs := range self._m {
 		m := self.getFontsName(ttxs)
 		if len(m) > 0 {
 			for k, _ := range self.m {
-				for _k, v := range m {
-					for _, _v := range v {
-						if _v == k {
-							self.m[k].file = font
-							self.m[k].index = reg.FindStringSubmatch(_k)[1]
-							self.m[k].newName = randomStr(8)
-							break
+				_k := strings.Split(k, "^")
+				for __k, v := range m {
+					if v[0][_k[0]] && v[1][_k[1]] {
+						self.m[k].file = font
+						self.m[k].index = reg.FindStringSubmatch(__k)[1]
+						n := self.fg[_k[0]]
+						if n == "" {
+							n = randomStr(8)
+							self.fg[_k[0]] = n
 						}
+						self.m[k].newName = n
+						break
 					}
 				}
 			}
@@ -311,7 +364,7 @@ func (self *assProcessor) matchFonts() bool {
 				self.m[k].newName = randomStr(8)
 			} else {
 				ok = false
-				printLog(self.lcb, `Missing the font: "%s".`, v.oldName)
+				printLog(self.lcb, `Missing the font: "%s".`, k)
 			}
 		}
 	}
@@ -498,7 +551,12 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 		comments = append(comments, "[Script Info]")
 		comments = append(comments, "; ----- Font subset begin -----")
 		for k, _ := range m[f] {
-			comments = append(comments, fmt.Sprintf("; Font subset: %s - %s", self.m[k].newName, k))
+			for _, v := range self.m {
+				if strings.Split(v.oldName, "^")[0] == k {
+					comments = append(comments, fmt.Sprintf("; Font subset: %s - %s", v.newName, k))
+					break
+				}
+			}
 		}
 		if len(comments) > 2 {
 			comments = append(comments, "")
@@ -550,23 +608,25 @@ func (self *assProcessor) createFontsCache(output string) []string {
 				if len(list) > 0 {
 					m.Lock()
 					_m := self.getFontsName(list)
-					__m := make(map[string]bool)
 					_fonts := make([][]string, len(_m))
+					_types := make([][]string, len(_m))
 					for k, v := range _m {
 						index := reg.FindStringSubmatch(k)[1]
-						for _, _v := range v {
-							__m[_v] = true
-						}
+						q, _ := strconv.Atoi(index)
 						_list := make([]string, 0)
-						for _k, _ := range __m {
+						for _k, _ := range v[0] {
 							_list = append(_list, _k)
 						}
-						q, _ := strconv.Atoi(index)
 						_fonts[q] = _list
+						_list = make([]string, 0)
+						for _k, _ := range v[1] {
+							_list = append(_list, _k)
+						}
+						_types[q] = _list
 					}
-					if len(_fonts) > 0 {
+					if len(_fonts) > 0 && len(_types) > 0 {
 						ok++
-						cache = append(cache, fontCache{_item, _fonts})
+						cache = append(cache, fontCache{_item, _fonts, _types})
 						printLog(self.lcb, "Cache font (%d/%d) done.", ok, l)
 					} else {
 						el = append(el, _item)
