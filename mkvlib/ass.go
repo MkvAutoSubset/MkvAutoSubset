@@ -52,10 +52,12 @@ type assProcessor struct {
 	tDir      string
 	_m        map[string][]string
 	fg        map[string]string
+	seps      []string
 }
 
 func (self *assProcessor) parse() bool {
 	ec := 0
+	self.seps = []string{"-", " "}
 	self.subtitles = make(map[string]string)
 	for _, file := range self.files {
 		f, err := openFile(file, true, false)
@@ -352,14 +354,29 @@ func (self *assProcessor) matchFonts() bool {
 				printLog(self.lcb, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
 				_k[1] = "Regular"
 			}
-			l := strings.LastIndex(_k[0], "-")
-			tk := ""
-			if l > -1 && len(_k[0]) > 1 {
-				tk = _k[0][l+1:]
+			seps := make([]string, 0)
+			for _, v := range self.seps {
+				l := strings.LastIndex(_k[0], v)
+				tk := ""
+				if l > -1 && len(_k[0]) > 1 {
+					tk = _k[0][l+1:]
+				}
+				if tk != "" {
+					seps = append(seps, tk)
+				}
+			}
+			_tk := func(qk map[string]bool) bool {
+				for _, v := range seps {
+					if qk[v] {
+						return true
+					}
+
+				}
+				return false
 			}
 			for __k, v := range m {
 				for ___k, _v := range v {
-					if _v[0][_k[0]] && (_v[1][_k[1]] || (tk != "" && _v[1][tk])) {
+					if _v[0][_k[0]] && (_v[1][_k[1]] || _tk(_v[1])) {
 						self.m[k].file = __k
 						self.m[k].index = reg.FindStringSubmatch(___k)[1]
 						n := self.fg[_k[0]]
@@ -729,17 +746,31 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	ok := ""
 	i := -1
 	_k := strings.Split(k, "^")
-	l := strings.LastIndex(_k[0], "-")
-	tk := ""
-	if l > -1 && len(_k[0]) > 1 {
-		tk = _k[0][l+1:]
+	seps := make([]string, 0)
+	for _, v := range self.seps {
+		l := strings.LastIndex(_k[0], v)
+		tk := ""
+		if l > -1 && len(_k[0]) > 1 {
+			tk = _k[0][l+1:]
+		}
+		if tk != "" {
+			seps = append(seps, tk)
+		}
+	}
+	_tk := func(qk string) bool {
+		for _, v := range seps {
+			if qk == v {
+				return true
+			}
+		}
+		return false
 	}
 	for _, v := range self.cache {
 		for q, _v := range v.Fonts {
 			for _, __v := range _v {
 				if __v == _k[0] {
 					for _, ___v := range v.Types[q] {
-						if ___v == _k[1] || (tk != "" && ___v == tk) {
+						if ___v == _k[1] || _tk(___v) {
 							ok = v.File
 							i = q
 							break
