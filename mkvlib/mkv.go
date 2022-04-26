@@ -227,7 +227,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		tDir = os.TempDir()
 	}
 	tDir = path.Join(tDir, randomStr(8))
-	files, _ := findPath(vDir, fmt.Sprintf(`\.\S+$`))
+	files, _ := findPath(vDir, `\.\S+$`)
 	l := len(files)
 	for i, item := range files {
 		_, _, _, _f := splitPath(item)
@@ -274,7 +274,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 
 func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb logCallback) bool {
 	ec := 0
-	files := findMKVs(dir)
+	files, _ := findPath(dir, `\.\S+$`)
 	l := len(files)
 	for i, item := range files {
 		p := strings.TrimPrefix(item, dir)
