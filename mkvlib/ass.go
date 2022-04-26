@@ -87,10 +87,10 @@ func (self *assProcessor) parse() bool {
 				continue
 			}
 			for _, item := range subtitle.Items {
+				name := ""
+				_b := *item.Style.InlineStyle.SSABold
+				_i := *item.Style.InlineStyle.SSAItalic
 				for _, _item := range item.Lines {
-					name := ""
-					_b := *item.Style.InlineStyle.SSABold
-					_i := *item.Style.InlineStyle.SSAItalic
 					for _, __item := range _item.Items {
 						if __item.InlineStyle != nil {
 							arr := reg.FindStringSubmatch(__item.InlineStyle.SSAEffect)
@@ -125,9 +125,9 @@ func (self *assProcessor) parse() bool {
 									}
 								}
 							}
-							if name == "" || name == "0" {
-								name = item.Style.InlineStyle.SSAFontName
-							}
+						}
+						if name == "" || name == "0" {
+							name = item.Style.InlineStyle.SSAFontName
 						}
 						if strings.HasPrefix(name, "@") && len(name) > 1 {
 							name = name[1:]
