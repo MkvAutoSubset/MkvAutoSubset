@@ -335,15 +335,28 @@ func (self *assProcessor) matchFonts() bool {
 	}
 	self.fg = make(map[string]string)
 	reg, _ := regexp.Compile(`_(\d+)\.ttx$`)
+	m := make(map[string]map[string][]map[string]bool)
 	for font, ttxs := range self._m {
-		m := self.getFontsName(ttxs)
-		if len(m) > 0 {
-			for k, _ := range self.m {
-				_k := strings.Split(k, "^")
-				for __k, v := range m {
-					if v[0][_k[0]] && v[1][_k[1]] {
-						self.m[k].file = font
-						self.m[k].index = reg.FindStringSubmatch(__k)[1]
+		_m := self.getFontsName(ttxs)
+		if len(_m) > 0 {
+			m[font] = _m
+		}
+	}
+	w := func(fb bool) {
+		for k, _ := range self.m {
+			_k := strings.Split(k, "^")
+			if self.m[k].file != "" || (fb && _k[1] == "Regular") {
+				continue
+			}
+			if fb {
+				printLog(self.lcb, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
+				_k[1] = "Regular"
+			}
+			for __k, v := range m {
+				for ___k, _v := range v {
+					if _v[0][_k[0]] && _v[1][_k[1]] {
+						self.m[k].file = __k
+						self.m[k].index = reg.FindStringSubmatch(___k)[1]
 						n := self.fg[_k[0]]
 						if n == "" {
 							n = randomStr(8)
@@ -353,19 +366,31 @@ func (self *assProcessor) matchFonts() bool {
 						break
 					}
 				}
+				if self.m[k].file != "" {
+					break
+				}
+			}
+			if self.m[k].file != "" {
+				continue
+			}
+			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1])); f != "" {
+				self.m[k].file, self.m[k].index = f, i
+				n := self.fg[_k[0]]
+				if n == "" {
+					n = randomStr(8)
+					self.fg[_k[0]] = n
+				}
+				self.m[k].newName = n
 			}
 		}
 	}
+	w(false)
+	w(true)
 	ok := true
-	for k, v := range self.m {
-		if v.file == "" {
-			if f, i := self.matchCache(k); f != "" {
-				self.m[k].file, self.m[k].index = f, i
-				self.m[k].newName = randomStr(8)
-			} else {
-				ok = false
-				printLog(self.lcb, `Missing the font: "%s".`, k)
-			}
+	for k, _ := range self.m {
+		if self.m[k].file == "" {
+			ok = false
+			printLog(self.lcb, `Missing the font: "%s".`, k)
 		}
 	}
 	return ok
