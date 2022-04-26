@@ -38,13 +38,16 @@ public static class mkvlib
     static extern bool MakeMKVs(IntPtr dir, IntPtr data, IntPtr output, IntPtr slang, IntPtr stitle, logCallback lcb);
 
     [DllImport("mkvlib.so")]
-    static extern bool A2P(bool a2p, bool apc, int pr, int pf);
+    static extern void A2P(bool a2p, bool apc, int pr, int pf);
 
     [DllImport("mkvlib.so")]
     static extern IntPtr GetFontsList(IntPtr dir, logCallback lcb);
 
     [DllImport("mkvlib.so")]
     static extern void Cache(IntPtr p);
+
+    [DllImport("mkvlib.so")]
+    static extern void MKS();
 
     [DllImport("mkvlib.so")]
     static extern IntPtr CreateFontsCache(IntPtr dir, IntPtr output, logCallback lcb);
@@ -127,6 +130,11 @@ public static class mkvlib
     public static void Cache(string p)
     {
         Cache(cs(p));
+    }
+
+    public static void MKS()
+    {
+        MKS();
     }
 
     public static string[] CreateFontsCache(string dir, string output, Action<string> lcb)

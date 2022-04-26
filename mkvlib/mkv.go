@@ -38,6 +38,7 @@ type mkvInfo struct {
 type mkvProcessor struct {
 	a2p   bool
 	apc   bool
+	mks   bool
 	pr    int
 	pf    int
 	cache string
@@ -151,7 +152,12 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 	if clean {
 		args = append(args, "--no-subtitles", "--no-attachments")
 	}
-	args = append(args, file)
+	if !self.mks {
+		args = append(args, file)
+	} else {
+		d, _, _, ne := splitPath(output)
+		output = path.Join(d, ne+".mks")
+	}
 	for _, _item := range attachments {
 		args = append(args, "--attach-file", _item)
 	}
@@ -364,4 +370,8 @@ func (self *mkvProcessor) CopyFontsFromCache(subs, dist string, lcb logCallback)
 
 func (self *mkvProcessor) Cache(p string) {
 	self.cache = p
+}
+
+func (self *mkvProcessor) MKS() {
+	self.mks = true
 }

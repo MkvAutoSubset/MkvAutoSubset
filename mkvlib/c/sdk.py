@@ -70,7 +70,7 @@ def makeMKVs(dir, data, output, slang, stitle, lcb):
 
 def a2p(en, apc, pr, pf):
     call = lib.A2P
-    return call(en, apc, pr, pf)
+    call(en, apc, pr, pf)
 
 
 def getFontsList(dir, lcb):
@@ -81,7 +81,7 @@ def getFontsList(dir, lcb):
 
 def cache(p):
     call = lib.Cache
-    return call(p.encode())
+    call(p.encode())
 
 
 def createFontsCache(dir, output, lcb):
@@ -93,3 +93,8 @@ def createFontsCache(dir, output, lcb):
 def copyFontsFromCache(subs, dist, lcb):
     call = lib.CopyFontsFromCache
     return call(subs.encode(), dist.encode(), lcb)
+
+
+def mks():
+    call = lib.MKS
+    call()

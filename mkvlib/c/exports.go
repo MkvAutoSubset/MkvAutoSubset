@@ -167,6 +167,14 @@ func Cache(p *C.char) {
 	getter.GetProcessorInstance().Cache(gs(p))
 }
 
+//export MKS
+func MKS() {
+	if !checkInstance() {
+		return
+	}
+	getter.GetProcessorInstance().MKS()
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }
