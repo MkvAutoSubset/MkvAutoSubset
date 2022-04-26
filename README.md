@@ -5,6 +5,7 @@
 ASS字幕字体子集化 MKV批量提取/生成
 
 ## 什么叫字幕字体子集化
+
 - 这里说的字幕特指ass(ssa)这种带有特效的文本字幕;
 - ass字幕会引用一些字体,这些字体在播放器所在的系统里可能有安装,也可能没有;
 - 为了实现在任意地方都能有完整的视觉体验,可以把字幕以及字幕里所引用的字体文件一起打包进mkv文件里;
@@ -36,7 +37,8 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 - 从 [这里](https://www.python.org/downloads) 下载并安装Python
 - 命令提示符(CMD)里参考上面使用pip的方式安装FontTools依赖
-- 从 [这里](https://github.com/KurenaiRyu/MkvAutoSubset/raw/master/mkvtool/spp2pgs.exe) 下载spp2pgs,感谢[这个repo](https://github.com/qwe7989199/Spp2Pgs)
+- 从 [这里](https://github.com/KurenaiRyu/MkvAutoSubset/raw/master/mkvtool/spp2pgs.exe)
+  下载spp2pgs,感谢[这个repo](https://github.com/qwe7989199/Spp2Pgs)
 - 从 [这里](https://www.fosshub.com/MKVToolNix.html) 下载并安装MKVToolNix
 - 保证以上两个依赖项的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_,_spp2pgs.exe_)在 **path** 环境变量里
 
@@ -60,6 +62,12 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 ## mkvtool 功能及使用示例
 
+- 2022.04新增的输出MKS格式说明(影响“-m”,"-c"模式)
+  ```shell
+  mkvtool -mks ...xxx...
+  
+  #-mks: 启用MKS格式输出
+  ```
 - 2022.03新增的ASS转PGS说明
   ```shell
   mkvtool -a2p -apc -pr 1080 -pf 23 ...xxx...
@@ -70,20 +78,20 @@ ASS字幕字体子集化 MKV批量提取/生成
   #-pf: 设置psg字幕的帧率(有"23,24,25,29,30,50,59,60"可选)
   ```
 - 缓存相关(缓存会影响工作流,即无需额外准备在缓存内的字体.)
-  - 创建字体缓存(推荐缓存 [超级字体整合包 XZ](https://www.dmhy.org/topics/view/516705_XZ.html) "完整包"可完全缓存,但不保证所有字体都能成功子集化.)
-    ```shell
-    mkvtool -cc -s input #从${input}获取字体信息并创建缓存
-  
-    #可选"-cp"参数:指定缓存文件的保存路径.
-    ```
-  - 取得一个目录里所有ass字幕文件所需要的全部字体
-    ```shell
-    mkvtool -l -s input #{input}获取
-  
-    #可选"-cfc"参数:当"-cfc"存在时,将从字体缓存中复制需要的字体到指定目录.
-    #可选"-co"参数:指定字体复制的目标目录.
-    #可选"-cp"参数:指定要使用的缓存文件.
-    ```
+    - 创建字体缓存(推荐缓存 [超级字体整合包 XZ](https://www.dmhy.org/topics/view/516705_XZ.html) "完整包"可完全缓存,但不保证所有字体都能成功子集化.)
+      ```shell
+      mkvtool -cc -s input #从${input}获取字体信息并创建缓存
+    
+      #可选"-cp"参数:指定缓存文件的保存路径.
+      ```
+    - 取得一个目录里所有ass字幕文件所需要的全部字体
+      ```shell
+      mkvtool -l -s input #{input}获取
+    
+      #可选"-cfc"参数:当"-cfc"存在时,将从字体缓存中复制需要的字体到指定目录.
+      #可选"-co"参数:指定字体复制的目标目录.
+      #可选"-cp"参数:指定要使用的缓存文件.
+      ```
 - 标准工作流
   ```shell
   mkvtool -s bangumi 
@@ -182,8 +190,9 @@ ASS字幕字体子集化 MKV批量提取/生成
   #*当"-ans"参数存在时输出文件夹为"${output}",否则为${output}/subsetted".
   #*由于会预先清空${output}文件夹,为了安全请慎用"-ans".
   ```
-  
+
 ### 一些碎碎念
+
 - "-cp"参数:手动指定缓存文件路径,当提供的字体目录里缺少字体时,会尝试在缓存里查找.
 - "-log"参数:输出终端输出到指定文件,空为不输出,默认为空.
 - "-m","-c"模式下的"-sl","-st"参数:

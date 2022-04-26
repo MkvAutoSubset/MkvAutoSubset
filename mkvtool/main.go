@@ -13,7 +13,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.4.2"
+const appVer = "v3.4.3"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -53,6 +53,7 @@ func main() {
 	l := false
 	cc := false
 	cfc := false
+	mks := false
 	sl, st := "", ""
 	af, ao := "", ""
 	flog := ""
@@ -68,6 +69,7 @@ func main() {
 	flag.BoolVar(&q, "q", false, "Query mode.")
 	flag.BoolVar(&a2p, "a2p", false, "Enable ass2pgs(only work in win64 and need spp2pgs)")
 	flag.BoolVar(&apc, "apc", false, "Ass and pgs coexist")
+	flag.BoolVar(&mks, "mks", false, "Enable mks mode")
 	flag.BoolVar(&l, "l", false, "Show fonts list.")
 	flag.BoolVar(&cc, "cc", false, "Create fonts cache.")
 	flag.Var(asses, "a", "ASS files. (multiple & join ass mode)")
@@ -111,6 +113,7 @@ func main() {
 
 	processer := getter.GetProcessorInstance()
 	processer.A2P(a2p, apc, pr, pf)
+	processer.MKS(mks)
 
 	if cc && s != "" {
 		list := processer.CreateFontsCache(s, cache_p, nil)
