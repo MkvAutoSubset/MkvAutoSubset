@@ -148,7 +148,6 @@ func (self *mkvProcessor) CheckSubset(file string, lcb logCallback) (bool, bool)
 
 func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, output, slang, stitle string, clean bool) bool {
 	args := make([]string, 0)
-	args = append(args, "--output", output)
 	if clean {
 		args = append(args, "--no-subtitles", "--no-attachments")
 	}
@@ -158,6 +157,7 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 		d, _, _, ne := splitPath(output)
 		output = path.Join(d, ne+".mks")
 	}
+	args = append(args, "--output", output)
 	for _, _item := range attachments {
 		args = append(args, "--attach-file", _item)
 	}
