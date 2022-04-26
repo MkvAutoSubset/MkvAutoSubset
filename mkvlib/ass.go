@@ -297,7 +297,7 @@ func (self *assProcessor) getFontName(p string) []map[string]bool {
 				case "1", "3", "4", "6":
 					names[name] = true
 					break
-				case "2":
+				case "2", "17":
 					types[name] = true
 					break
 				}
@@ -352,9 +352,14 @@ func (self *assProcessor) matchFonts() bool {
 				printLog(self.lcb, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
 				_k[1] = "Regular"
 			}
+			l := strings.LastIndex(_k[0], "-")
+			tk := ""
+			if l > 0 && len(_k[0]) > 1 {
+				tk = _k[0][l+1:]
+			}
 			for __k, v := range m {
 				for ___k, _v := range v {
-					if _v[0][_k[0]] && _v[1][_k[1]] {
+					if _v[0][_k[0]] && (_v[1][_k[1]] || (tk != "" && _v[1][tk])) {
 						self.m[k].file = __k
 						self.m[k].index = reg.FindStringSubmatch(___k)[1]
 						n := self.fg[_k[0]]
@@ -724,12 +729,17 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	ok := ""
 	i := -1
 	_k := strings.Split(k, "^")
+	l := strings.LastIndex(_k[0], "-")
+	tk := ""
+	if l > 0 && len(_k[0]) > 1 {
+		tk = _k[0][l+1:]
+	}
 	for _, v := range self.cache {
 		for q, _v := range v.Fonts {
 			for _, __v := range _v {
 				if __v == _k[0] {
 					for _, ___v := range v.Types[q] {
-						if ___v == _k[1] {
+						if ___v == _k[1] || (tk != "" && ___v == tk) {
 							ok = v.File
 							i = q
 							break
