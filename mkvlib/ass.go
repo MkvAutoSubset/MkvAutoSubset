@@ -354,7 +354,7 @@ func (self *assProcessor) matchFonts() bool {
 			}
 			l := strings.LastIndex(_k[0], "-")
 			tk := ""
-			if l > 0 && len(_k[0]) > 1 {
+			if l > -1 && len(_k[0]) > 1 {
 				tk = _k[0][l+1:]
 			}
 			for __k, v := range m {
@@ -731,7 +731,7 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	_k := strings.Split(k, "^")
 	l := strings.LastIndex(_k[0], "-")
 	tk := ""
-	if l > 0 && len(_k[0]) > 1 {
+	if l > -1 && len(_k[0]) > 1 {
 		tk = _k[0][l+1:]
 	}
 	for _, v := range self.cache {
