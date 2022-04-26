@@ -372,6 +372,6 @@ func (self *mkvProcessor) Cache(p string) {
 	self.cache = p
 }
 
-func (self *mkvProcessor) MKS() {
-	self.mks = true
+func (self *mkvProcessor) MKS(mks bool) {
+	self.mks = mks
 }

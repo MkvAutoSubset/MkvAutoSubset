@@ -168,11 +168,11 @@ func Cache(p *C.char) {
 }
 
 //export MKS
-func MKS() {
+func MKS(mks bool) {
 	if !checkInstance() {
 		return
 	}
-	getter.GetProcessorInstance().MKS()
+	getter.GetProcessorInstance().MKS(mks)
 }
 
 func cs(gs string) *C.char {

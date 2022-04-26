@@ -95,6 +95,6 @@ def copyFontsFromCache(subs, dist, lcb):
     return call(subs.encode(), dist.encode(), lcb)
 
 
-def mks():
+def mks(en):
     call = lib.MKS
-    call()
+    call(en)

@@ -47,7 +47,7 @@ public static class mkvlib
     static extern void Cache(IntPtr p);
 
     [DllImport("mkvlib.so")]
-    static extern void MKS();
+    static extern void MKS(bool mks);
 
     [DllImport("mkvlib.so")]
     static extern IntPtr CreateFontsCache(IntPtr dir, IntPtr output, logCallback lcb);
@@ -132,9 +132,9 @@ public static class mkvlib
         Cache(cs(p));
     }
 
-    public static void MKS()
+    public static void MKS(bool mks)
     {
-        MKS();
+        MKS(mks);
     }
 
     public static string[] CreateFontsCache(string dir, string output, Action<string> lcb)
