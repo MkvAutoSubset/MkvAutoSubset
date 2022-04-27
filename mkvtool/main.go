@@ -65,15 +65,15 @@ func main() {
 	flog := ""
 	co := ""
 	asses := new(arrayArg)
-	pf := 0
-	pr := 0
+	pf := ""
+	pr := ""
 	flag.StringVar(&s, "s", "", "Source folder.")
 	flag.StringVar(&f, "f", "", "MKV file. (join single mode)")
 	flag.BoolVar(&c, "c", false, "Create mode.")
 	flag.BoolVar(&d, "d", false, "Dump mode.")
 	flag.BoolVar(&m, "m", false, "Make mode.")
 	flag.BoolVar(&q, "q", false, "Query mode.")
-	flag.BoolVar(&a2p, "a2p", false, "Enable ass2pgs(only work in win64 and need spp2pgs)")
+	flag.BoolVar(&a2p, "a2p", false, "Enable ass2pgs(need ass2bdnxml)")
 	flag.BoolVar(&apc, "apc", false, "Ass and pgs coexist")
 	flag.BoolVar(&mks, "mks", false, "Enable mks mode")
 	flag.BoolVar(&l, "l", false, "Show fonts list.")
@@ -92,8 +92,8 @@ func main() {
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
 	flag.StringVar(&dist, "dist", "dist", "Results output folder (make mode only)")
 	flag.StringVar(&flog, "log", "", "Log file path")
-	flag.IntVar(&pf, "pf", 23, "PGS frame rate:23,24,25,29,30,50,59,60. (ass2pgs only)")
-	flag.IntVar(&pr, "pr", 1080, "PGS resolution:480,576,720,1080,2160. (ass2pgs only)")
+	flag.StringVar(&pf, "pf", "23.976", "PGS frame rate:23.976, 24, 25, 30, 29.97, 50, 59.94, 60 or custom fps like 15/1. (ass2pgs only)")
+	flag.StringVar(&pr, "pr", "1920*1080", "PGS resolution:720p, 1080p, 2k, or with custom resolution like 720*480. (ass2pgs only)")
 	flag.BoolVar(&v, "v", false, "Show app info.")
 	flag.Parse()
 

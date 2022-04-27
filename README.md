@@ -31,14 +31,16 @@ ASS字幕字体子集化 MKV批量提取/生成
   apk add mkvtoolnix #Alpine
   brew install mkvtoolnix #macOS
   ```
+- ass2bdnxml
+  从[这库](https://github.com/Masaiki/ass2bdnxml/releases)获取
 
 #### 关于Windows用户
 
 - 从 [这里](https://www.python.org/downloads) 下载并安装Python
 - 命令提示符(CMD)里参考上面使用pip的方式安装FontTools依赖
-- 从 [这里](https://github.com/KurenaiRyu/MkvAutoSubset/raw/master/mkvtool/spp2pgs.exe) 下载spp2pgs,感谢[这个repo](https://github.com/qwe7989199/Spp2Pgs)
+- 从 [这里](https://github.com/Masaiki/ass2bdnxml/releases) ass2bdnxml)
 - 从 [这里](https://www.fosshub.com/MKVToolNix.html) 下载并安装MKVToolNix
-- 保证以上两个依赖项的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_,_spp2pgs.exe_)在 **path** 环境变量里
+- 保证以上两个依赖项的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_,_ass2bdnxml.exe_)在 **path** 环境变量里
 
 ### 本体
 
@@ -48,7 +50,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   ```
 
 - Arch Linux用户(通过Arch User Repository):
-    - 点击[这里](https://aur.archlinux.org/packages/mkvtool/) 查看具体信息或使用AUR Helper
+  - 点击[这里](https://aur.archlinux.org/packages/mkvtool/) 查看具体信息或使用AUR Helper
   ```shell
   yay -S mkvtool #yay
   paru -S mkvtool #paru
@@ -59,25 +61,25 @@ ASS字幕字体子集化 MKV批量提取/生成
   [点此下载](https://github.com/KurenaiRyu/MkvAutoSubset/releases/latest)
 
 - macOS用户请注意
-    - 由于系统默认的maxfiles值过低,会导致建立字体缓存等操作不能正常完成,请手动调高
-    - 详细操作请参考[这里](https://wilsonmar.github.io/maximum-limits/)
-    - 调高限制后请完全重启终端进行后续操作
-    - *如其他类unix平台遇到相同的问题也可参照
+  - 由于系统默认的maxfiles值过低,会导致建立字体缓存等操作不能正常完成,请手动调高
+  - 详细操作请参考[这里](https://wilsonmar.github.io/maximum-limits/)
+  - 调高限制后请完全重启终端进行后续操作
+  - *如其他类unix平台遇到相同的问题也可参照
 ## mkvtool 功能及使用示例
+- 2022.04更新的ASS转PGS说明
+  ```shell
+  mkvtool -a2p -apc -pr 1920*1080 -pf 23.976 ...xxx...
+  
+  #-a2p: 启用ass转pgs(依赖ass2bdnxml)
+  #-apc: 使pgs字幕与子集化后的ass字幕共存(该选项会影响混流行为)
+  #-pr: 设置psg字幕的分辨率(例如"720p,1080p,2k"或者类似“720*480”)
+  #-pf: 设置psg字幕的帧率(例如"23.976, 24, 25, 30, 29.97, 50, 59.94, 60"或者类似“15/1”)
+  ```
 - 2022.04新增的输出MKS格式说明(影响“-m”,"-c"模式)
   ```shell
   mkvtool -mks ...xxx...
   
   #-mks: 启用MKS格式输出
-  ```
-- 2022.03新增的ASS转PGS说明
-  ```shell
-  mkvtool -a2p -apc -pr 1080 -pf 23 ...xxx...
-  
-  #-a2p: 启用ass转pgs(win64专属功能且依赖spp2pgs)
-  #-apc: 使pgs字幕与子集化后的ass字幕共存(该选项会影响混流行为)
-  #-pr: 设置psg字幕的分辨率(有"480,576,720,1080,2160"可选)
-  #-pf: 设置psg字幕的帧率(有"23,24,25,29,30,50,59,60"可选)
   ```
 - 缓存相关(缓存会影响工作流,即无需额外准备在缓存内的字体.)
   - 创建字体缓存(推荐缓存 [超级字体整合包 XZ](https://www.dmhy.org/topics/view/516705_XZ.html) "完整包"可完全缓存,但不保证所有字体都能成功子集化.)
