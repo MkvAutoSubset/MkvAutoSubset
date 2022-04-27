@@ -1,9 +1,9 @@
 # C导出函数说明
 
-## 2022.03新增的ASS转PGS说明
+## 2022.04更新的ASS转PGS说明
 
 - ```c
-  void A2P(bool a2p, bool apc, int pr, int pf);
+  void A2P(bool a2p, bool apc, char* pr, char* pf);
   //启用ass转pgs(win64专属,且应在执行工作流之前调用.)
   //a2p: 是否启用ass转pgs
   //apc: 是否使ass与pgs共存
