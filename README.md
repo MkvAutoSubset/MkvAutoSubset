@@ -58,6 +58,10 @@ ASS字幕字体子集化 MKV批量提取/生成
 
   [点此下载](https://github.com/KurenaiRyu/MkvAutoSubset/releases/latest)
 
+- macOS用户请注意
+    - 由于系统默认的maxfiles值过低,会导致建立字体缓存等操作不能正常完成,请手动调高
+    - 详细操作请参考[这里](https://wilsonmar.github.io/maximum-limits/)
+    - 调高限制后请完全重启终端进行后续操作
 ## mkvtool 功能及使用示例
 - 2022.04新增的输出MKS格式说明(影响“-m”,"-c"模式)
   ```shell
