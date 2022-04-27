@@ -70,7 +70,7 @@ def makeMKVs(dir, data, output, slang, stitle, lcb):
 
 def a2p(en, apc, pr, pf):
     call = lib.A2P
-    call(en, apc, pr, pf)
+    call(en, apc, pr.encode(), pf.encode())
 
 
 def getFontsList(dir, lcb):
