@@ -687,7 +687,7 @@ func (self *assProcessor) createFontsCache(output string) []string {
 		}
 	}
 
-	c := 50
+	c := 100
 	x := l / c
 	y := l % c
 	for i := 0; i < x; i++ {
