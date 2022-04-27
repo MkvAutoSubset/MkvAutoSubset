@@ -31,6 +31,7 @@ type fontInfo struct {
 	oldName string
 	newName string
 	sFont   string
+	_type   string
 }
 
 type fontCache struct {
@@ -379,6 +380,7 @@ func (self *assProcessor) matchFonts() bool {
 					if _v[0][_k[0]] && (_v[1][_k[1]] || _tk(_v[1])) {
 						self.m[k].file = __k
 						self.m[k].index = reg.FindStringSubmatch(___k)[1]
+						self.m[k]._type = _k[1]
 						n := self.fg[_k[0]]
 						if n == "" {
 							n = randomStr(8)
@@ -397,6 +399,7 @@ func (self *assProcessor) matchFonts() bool {
 			}
 			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1])); f != "" {
 				self.m[k].file, self.m[k].index = f, i
+				self.m[k]._type = _k[1]
 				n := self.fg[_k[0]]
 				if n == "" {
 					n = randomStr(8)
@@ -420,7 +423,7 @@ func (self *assProcessor) matchFonts() bool {
 
 func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
-	fn := fmt.Sprintf(`%s.txt`, font.file)
+	fn := fmt.Sprintf(`%s^%s.txt`, font.file, font._type)
 	_, fn, _, _ = splitPath(fn)
 	fn = path.Join(self.tDir, fn)
 	_, n, e, ne := splitPath(font.file)
@@ -433,7 +436,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		return false
 	}
 	if os.WriteFile(fn, []byte(font.str), os.ModePerm) == nil {
-		_fn := fmt.Sprintf("%s.%s%s", ne, font.newName, e)
+		_fn := fmt.Sprintf("%s^%s.%s%s", ne, font._type, font.newName, e)
 		_fn = path.Join(self.output, _fn)
 		args := make([]string, 0)
 		args = append(args, "--text-file="+fn)
