@@ -5,15 +5,18 @@ import (
 	"fmt"
 	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"runtime"
 	"strings"
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.4.7"
+const appVer = "v3.4.8"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -29,8 +32,11 @@ func (self *arrayArg) Set(value string) error {
 	return nil
 }
 
+var latestTag = ""
+
 func main() {
 	setWindowTitle(tTitle)
+	go getLatestTag()
 	s := ""
 	data := ""
 	dist := ""
@@ -214,5 +220,22 @@ func main() {
 		ec++
 		flag.PrintDefaults()
 	}
-	defer os.Exit(ec)
+	defer func() {
+		if latestTag != "" && latestTag != appVer {
+			log.Printf("New version available:%s", latestTag)
+		}
+		os.Exit(ec)
+	}()
+}
+
+func getLatestTag() {
+	if resp, err := http.DefaultClient.Get("https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest"); err == nil {
+		if data, err := ioutil.ReadAll(resp.Body); err == nil {
+			reg, _ := regexp.Compile(`"tag_name":"([^"]+)"`)
+			arr := reg.FindStringSubmatch(string(data))
+			if len(arr) > 1 {
+				latestTag = arr[1]
+			}
+		}
+	}
 }
