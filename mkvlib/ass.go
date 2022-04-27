@@ -423,10 +423,10 @@ func (self *assProcessor) matchFonts() bool {
 
 func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
-	fn := fmt.Sprintf(`%s^%s.txt`, font.file, font.rand)
+	fn := fmt.Sprintf(`%s.%s.txt`, font.newName, font.rand)
 	_, fn, _, _ = splitPath(fn)
 	fn = path.Join(self.tDir, fn)
-	_, n, e, ne := splitPath(font.file)
+	_, n, e, _ := splitPath(font.file)
 	if strings.ToLower(e) == ".ttc" {
 		e = ".ttf"
 	}
@@ -436,7 +436,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		return false
 	}
 	if os.WriteFile(fn, []byte(font.str), os.ModePerm) == nil {
-		_fn := fmt.Sprintf("%s^%s.%s%s", ne, font.rand, font.newName, e)
+		_fn := fmt.Sprintf("%s.%s%s", font.newName, font.rand, e)
 		_fn = path.Join(self.output, _fn)
 		args := make([]string, 0)
 		args = append(args, "--text-file="+fn)
@@ -613,7 +613,13 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 			comments = append(comments, "; Processed by "+LibFName+" at "+time.Now().Format("2006-01-02 15:04:05"))
 			comments = append(comments, "; -----  Font subset end  -----")
 			comments = append(comments, "")
-			s = strings.Replace(s, "[Script Info]\r\n", strings.Join(comments, "\r\n"), 1)
+			r := "[Script Info]\n"
+			_r := "\n"
+			if strings.Contains(s, "[Script Info]\r\n") {
+				r = "[Script Info]\r\n"
+				_r = "\r\n"
+			}
+			s = strings.Replace(s, r, strings.Join(comments, _r), 1)
 			_, n, _, _ := splitPath(f)
 			fn := path.Join(self.output, n)
 			ok := false
