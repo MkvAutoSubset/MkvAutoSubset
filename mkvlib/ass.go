@@ -355,7 +355,8 @@ func (self *assProcessor) matchFonts() bool {
 				printLog(self.lcb, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
 				_k[1] = "Regular"
 			}
-			seps := make([]string, 0)
+			seps0 := make([]string, 0)
+			seps1 := make([]string, 0)
 			for _, v := range self.seps {
 				l := strings.LastIndex(_k[0], v)
 				tk := ""
@@ -363,11 +364,16 @@ func (self *assProcessor) matchFonts() bool {
 					tk = _k[0][l+1:]
 				}
 				if tk != "" {
-					seps = append(seps, tk)
+					seps0 = append(seps0, _k[0][:l])
+					seps1 = append(seps1, tk)
 				}
 			}
-			_tk := func(qk map[string]bool) bool {
-				for _, v := range seps {
+			_tk := func(q1 bool, qk map[string]bool) bool {
+				arr := seps0
+				if q1 {
+					arr = seps1
+				}
+				for _, v := range arr {
 					if qk[v] {
 						return true
 					}
@@ -377,7 +383,7 @@ func (self *assProcessor) matchFonts() bool {
 			}
 			for __k, v := range m {
 				for ___k, _v := range v {
-					if _v[0][_k[0]] && (_v[1][_k[1]] || _tk(_v[1])) {
+					if (_v[0][_k[0]] || _tk(false, _v[0])) && (_v[1][_k[1]] || _tk(true, _v[1])) {
 						self.m[k].file = __k
 						self.m[k].index = reg.FindStringSubmatch(___k)[1]
 						self.m[k].rand = randomStr(4)
@@ -755,7 +761,8 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	ok := ""
 	i := -1
 	_k := strings.Split(k, "^")
-	seps := make([]string, 0)
+	seps0 := make([]string, 0)
+	seps1 := make([]string, 0)
 	for _, v := range self.seps {
 		l := strings.LastIndex(_k[0], v)
 		tk := ""
@@ -763,12 +770,17 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 			tk = _k[0][l+1:]
 		}
 		if tk != "" {
-			seps = append(seps, tk)
+			seps0 = append(seps0, _k[0][:l])
+			seps1 = append(seps1, tk)
 		}
 	}
-	_tk := func(qk string) bool {
-		for _, v := range seps {
-			if qk == v {
+	_tk := func(q1 bool, qk string) bool {
+		arr := seps0
+		if q1 {
+			arr = seps1
+		}
+		for _, v := range arr {
+			if v == qk {
 				return true
 			}
 		}
@@ -777,9 +789,9 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	for _, v := range self.cache {
 		for q, _v := range v.Fonts {
 			for _, __v := range _v {
-				if __v == _k[0] {
+				if __v == _k[0] || _tk(false, _k[0]) {
 					for _, ___v := range v.Types[q] {
-						if ___v == _k[1] || _tk(___v) {
+						if ___v == _k[1] || _tk(true, _k[1]) {
 							ok = v.File
 							i = q
 							break
