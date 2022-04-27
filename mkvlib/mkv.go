@@ -7,14 +7,13 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"runtime"
 	"strings"
 )
 
 const (
 	mkvmerge   = `mkvmerge`
 	mkvextract = `mkvextract`
-	spp2pgs    = `spp2pgs`
+	ass2bdnxml = `ass2bdnxml`
 )
 
 type mkvInfo struct {
@@ -36,12 +35,13 @@ type mkvInfo struct {
 }
 
 type mkvProcessor struct {
-	a2p   bool
-	apc   bool
-	mks   bool
-	pr    int
-	pf    int
-	cache string
+	a2p        bool
+	apc        bool
+	mks        bool
+	pr         string
+	pf         string
+	cache      string
+	ass2bdnxml bool
 }
 
 func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
@@ -327,14 +327,14 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 	return r
 }
 
-func (self *mkvProcessor) A2P(a2p, apc bool, pr, pf int) {
-	self.a2p = runtime.GOOS == "windows" && runtime.GOARCH == "amd64" && a2p
+func (self *mkvProcessor) A2P(a2p, apc bool, pr, pf string) {
+	self.a2p = self.ass2bdnxml && a2p
 	self.apc = apc
 	self.pr = pr
 	self.pf = pf
 }
 
-func (self *mkvProcessor) ass2Pgs(input []string, resolution, frameRate int, fontsDir string, output string, lcb logCallback) bool {
+func (self *mkvProcessor) ass2Pgs(input []string, resolution, frameRate, fontsDir, output string, lcb logCallback) bool {
 	return self.a2p && ass2Pgs(input, resolution, frameRate, fontsDir, output, lcb)
 }
 
