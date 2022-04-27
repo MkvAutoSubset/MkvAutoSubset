@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.5.0"
+const appVer = "v3.5.1"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -107,6 +107,14 @@ func main() {
 	}
 
 	ec := 0
+
+	defer func() {
+		if latestTag != "" && latestTag != appVer {
+			log.Printf("New version available:%s", latestTag)
+		}
+		os.Exit(ec)
+	}()
+
 	if v {
 		log.Printf("%s (powered by %s)", appFN, mkvlib.LibFName)
 		return
@@ -220,12 +228,6 @@ func main() {
 		ec++
 		flag.PrintDefaults()
 	}
-	defer func() {
-		if latestTag != "" && latestTag != appVer {
-			log.Printf("New version available:%s", latestTag)
-		}
-		os.Exit(ec)
-	}()
 }
 
 func getLatestTag() {
