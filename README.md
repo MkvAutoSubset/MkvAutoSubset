@@ -32,6 +32,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   brew install mkvtoolnix #macOS
   ```
 - ass2bdnxml
+
   从[这里](https://github.com/Masaiki/ass2bdnxml/releases)获取
 
 #### 关于Windows用户
