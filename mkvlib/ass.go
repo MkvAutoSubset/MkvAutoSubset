@@ -31,7 +31,6 @@ type fontInfo struct {
 	oldName string
 	newName string
 	sFont   string
-	rand    string
 }
 
 type fontCache struct {
@@ -82,7 +81,8 @@ func (self *assProcessor) parse() bool {
 		reg, _ := regexp.Compile(`\\fn@?([^\r\n\\\}]*)`)
 		_reg, _ := regexp.Compile(`\\([bir])([^\r\n\\\}]*)`)
 		__reg, _ := regexp.Compile(`nd\d+`)
-		m := make(map[string]map[rune]bool)
+		___reg, _ := regexp.Compile(`\s`)
+		m := make(map[string]string)
 		for k, v := range self.subtitles {
 			subtitle, err := astisub.ReadFromSSAWithOptions(strings.NewReader(v), opt)
 			if err != nil {
@@ -150,13 +150,7 @@ func (self *assProcessor) parse() bool {
 							arr = append(arr, "Regular")
 						}
 						_name := fmt.Sprintf("%s^%s", name, strings.Join(arr, " "))
-						if m[_name] == nil {
-							m[_name] = make(map[rune]bool)
-						}
-						str := __item.Text
-						for _, char := range str {
-							m[_name][char] = true
-						}
+						m[_name] += __item.Text
 					}
 				}
 			}
@@ -164,21 +158,10 @@ func (self *assProcessor) parse() bool {
 		self.m = make(map[string]*fontInfo)
 		reg, _ = regexp.Compile("[A-Za-z0-9]")
 		for k, v := range m {
-			str := ""
-			for _k, _ := range v {
-				str += string(_k)
-			}
-			str = strings.TrimSpace(str)
-			if str != "" {
-				str = reg.ReplaceAllString(str, "")
-				str += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-				reg, _ = regexp.Compile("[１２３４５６７８９０]")
-				if reg.MatchString(str) {
-					str = reg.ReplaceAllString(str, "")
-					str += "１２３４５６７８９０"
-				}
+			v = ___reg.ReplaceAllLiteralString(v, "")
+			if v != "" {
 				self.m[k] = new(fontInfo)
-				self.m[k].str = str
+				self.m[k].str = v
 				self.m[k].oldName = strings.Split(k, "^")[0]
 			}
 		}
@@ -390,7 +373,6 @@ func (self *assProcessor) matchFonts() bool {
 					if (_v[0][_k[0]] || _tk(false, _v[0])) && (_v[1][_k[1]] || _tk(true, _v[1])) {
 						self.m[k].file = __k
 						self.m[k].index = reg.FindStringSubmatch(___k)[1]
-						self.m[k].rand = randomStr(4)
 						n := self.fg[_k[0]]
 						if n == "" {
 							n = randomStr(8)
@@ -409,7 +391,6 @@ func (self *assProcessor) matchFonts() bool {
 			}
 			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1])); f != "" {
 				self.m[k].file, self.m[k].index = f, i
-				self.m[k].rand = randomStr(4)
 				n := self.fg[_k[0]]
 				if n == "" {
 					n = randomStr(8)
@@ -431,9 +412,21 @@ func (self *assProcessor) matchFonts() bool {
 	return ok
 }
 
+func (self *assProcessor) reMap() {
+	m := make(map[string]*fontInfo)
+	for _, v := range self.m {
+		if _, ok := m[v.newName]; !ok {
+			m[v.newName] = v
+		} else {
+			m[v.newName].str += v.str
+		}
+	}
+	self.m = m
+}
+
 func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	ok := false
-	fn := fmt.Sprintf(`%s.%s.txt`, font.newName, font.rand)
+	fn := fmt.Sprintf(`%s.txt`, font.newName)
 	_, fn, _, _ = splitPath(fn)
 	fn = path.Join(self.tDir, fn)
 	_, n, e, _ := splitPath(font.file)
@@ -446,7 +439,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		return false
 	}
 	if os.WriteFile(fn, []byte(font.str), os.ModePerm) == nil {
-		_fn := fmt.Sprintf("%s.%s%s", font.newName, font.rand, e)
+		_fn := fmt.Sprintf("%s%s", font.newName, e)
 		_fn = path.Join(self.output, _fn)
 		args := make([]string, 0)
 		args = append(args, "--text-file="+fn)
@@ -471,6 +464,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 }
 
 func (self *assProcessor) createFontsSubset() bool {
+	self.reMap()
 	err := os.RemoveAll(self.output)
 	if !(err == nil || err == os.ErrNotExist) {
 		printLog(self.lcb, "Failed to clean the output folder.")
