@@ -156,7 +156,6 @@ func (self *assProcessor) parse() bool {
 			}
 		}
 		self.m = make(map[string]*fontInfo)
-		reg, _ = regexp.Compile("[A-Za-z0-9]")
 		for k, v := range m {
 			v = ___reg.ReplaceAllLiteralString(v, "")
 			if v != "" {
