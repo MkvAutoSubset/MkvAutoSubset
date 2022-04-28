@@ -81,6 +81,7 @@ func (self *assProcessor) parse() bool {
 		opt := astisub.SSAOptions{}
 		reg, _ := regexp.Compile(`\\fn@?([^\r\n\\\}]*)`)
 		_reg, _ := regexp.Compile(`\\([bir])([^\r\n\\\}]*)`)
+		__reg, _ := regexp.Compile(`nd\d+`)
 		m := make(map[string]map[rune]bool)
 		for k, v := range self.subtitles {
 			subtitle, err := astisub.ReadFromSSAWithOptions(strings.NewReader(v), opt)
@@ -111,6 +112,9 @@ func (self *assProcessor) parse() bool {
 										_i = v[2] == "1"
 										break
 									case "r":
+										if __reg.MatchString(v[2]) {
+											break
+										}
 										v[2] = strings.TrimPrefix(v[2], "*")
 										if v[2] == "" {
 											name = ""
@@ -789,9 +793,9 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	for _, v := range self.cache {
 		for q, _v := range v.Fonts {
 			for _, __v := range _v {
-				if __v == _k[0] || _tk(false, _k[0]) {
+				if __v == _k[0] || _tk(false, __v) {
 					for _, ___v := range v.Types[q] {
-						if ___v == _k[1] || _tk(true, _k[1]) {
+						if ___v == _k[1] || _tk(true, ___v) {
 							ok = v.File
 							i = q
 							break
