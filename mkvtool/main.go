@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.5.8"
+const appVer = "v3.5.9"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -73,13 +73,13 @@ func main() {
 	flag.BoolVar(&d, "d", false, "Dump mode.")
 	flag.BoolVar(&m, "m", false, "Make mode.")
 	flag.BoolVar(&q, "q", false, "Query mode.")
-	flag.BoolVar(&a2p, "a2p", false, "Enable ass2pgs(need ass2bdnxml)")
-	flag.BoolVar(&apc, "apc", false, "Ass and pgs coexist")
-	flag.BoolVar(&mks, "mks", false, "Enable mks mode")
+	flag.BoolVar(&a2p, "a2p", false, "Enable ass2pgs. (need ass2bdnxml)")
+	flag.BoolVar(&apc, "apc", false, "Ass and pgs coexist.")
+	flag.BoolVar(&mks, "mks", false, "Enable mks mode.")
 	flag.BoolVar(&l, "l", false, "Show fonts list.")
 	flag.BoolVar(&cc, "cc", false, "Create fonts cache.")
 	flag.Var(asses, "a", "ASS files. (multiple & join ass mode)")
-	flag.BoolVar(&n, "n", false, "Not do ass font subset. (dump mode only)")
+	flag.BoolVar(&n, "n", false, "Not do ass font subset & not change font name.")
 	flag.BoolVar(&clean, "clean", false, "Clean original file subtitles and fonts. (create mode only)")
 	flag.StringVar(&sl, "sl", "chi", "Subtitle language. (create & make mode only)")
 	flag.StringVar(&st, "st", "", "Subtitle title. (create & make mode only)")
@@ -91,7 +91,7 @@ func main() {
 	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subsetted" folder. (ass mode only)`)
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
 	flag.StringVar(&dist, "dist", "dist", "Results output folder (make mode only)")
-	flag.StringVar(&flog, "log", "", "Log file path")
+	flag.StringVar(&flog, "log", "", "Log file path.")
 	flag.StringVar(&pf, "pf", "23.976", "PGS frame rate:23.976, 24, 25, 30, 29.97, 50, 59.94, 60 or custom fps like 15/1. (ass2pgs only)")
 	flag.StringVar(&pr, "pr", "1920*1080", "PGS resolution:720p, 1080p, 2k, or with custom resolution like 720*480. (ass2pgs only)")
 	flag.BoolVar(&v, "v", false, "Show app info.")
@@ -128,6 +128,7 @@ func main() {
 	processer := getter.GetProcessorInstance()
 	processer.A2P(a2p, apc, pr, pf)
 	processer.MKS(mks)
+	processer.NRename(n)
 
 	if cc && s != "" {
 		list := processer.CreateFontsCache(s, cache_p, nil)
