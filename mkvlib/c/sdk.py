@@ -98,3 +98,8 @@ def copyFontsFromCache(subs, dist, lcb):
 def mks(en):
     call = lib.MKS
     call(en)
+
+
+def nrename(n):
+    call = lib.NRename
+    call(n)

@@ -79,6 +79,11 @@
 ### MKV相关
 
 - ```c
+  void MKS(bool mks);
+  //使用mks输出
+  //en: 是否启用
+  ```
+- ```c
   bool DumpMKV(char* file, char* output, bool subset, logCallback lcb);
   //抽取一个mkv文件里的字幕和字体并顺便进行子集化(可选)
   //file: mkv文件路径
@@ -151,4 +156,9 @@
     //取得指定目录内所有字幕需要的全部字体
     //dir: 字幕文件所在的目录
     //return: json格式的数组
+    ```
+  - ```c
+    void NRename(bool n);
+    //子集化时不重命名字体
+    //n: 是否不重命名
     ```

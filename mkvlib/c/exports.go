@@ -175,6 +175,14 @@ func MKS(mks bool) {
 	getter.GetProcessorInstance().MKS(mks)
 }
 
+//export NRename
+func NRename(n bool) {
+	if !checkInstance() {
+		return
+	}
+	getter.GetProcessorInstance().NRename(n)
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }
