@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib/parser"
 	"github.com/antchfx/xmlquery"
-	"github.com/asticode/go-astisub"
 	"io"
 	"io/ioutil"
 	"os"
@@ -77,14 +77,14 @@ func (self *assProcessor) parse() bool {
 		}
 	}
 	if ec == 0 {
-		opt := astisub.SSAOptions{}
+		opt := parser.SSAOptions{}
 		reg, _ := regexp.Compile(`\\fn@?([^\r\n\\\}]*)`)
 		_reg, _ := regexp.Compile(`\\([bir])([^\r\n\\\}]*)`)
 		__reg, _ := regexp.Compile(`nd\d+`)
 		___reg, _ := regexp.Compile(`\s`)
 		m := make(map[string]string)
 		for k, v := range self.subtitles {
-			subtitle, err := astisub.ReadFromSSAWithOptions(strings.NewReader(v), opt)
+			subtitle, err := parser.ReadFromSSAWithOptions(strings.NewReader(v), opt)
 			if err != nil {
 				ec++
 				printLog(self.lcb, `Failed to read the ass file: "%s"`, k)
