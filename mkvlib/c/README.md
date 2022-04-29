@@ -81,7 +81,7 @@
 - ```c
   void MKS(bool mks);
   //使用mks输出
-  //en: 是否启用
+  //mks: 是否启用
   ```
 - ```c
   bool DumpMKV(char* file, char* output, bool subset, logCallback lcb);
