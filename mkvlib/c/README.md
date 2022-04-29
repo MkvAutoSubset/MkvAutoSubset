@@ -4,7 +4,7 @@
 
 - ```c
   void A2P(bool a2p, bool apc, char* pr, char* pf);
-  //启用ass转pgs(win64专属,且应在执行工作流之前调用.)
+  //启用ass转pgs(依赖ass2bdnxml且应在执行工作流之前调用)
   //a2p: 是否启用ass转pgs
   //apc: 是否使ass与pgs共存
   //pr: pgs分辨率
