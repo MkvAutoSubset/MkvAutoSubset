@@ -53,6 +53,7 @@ type assProcessor struct {
 	_m        map[string][]string
 	fg        map[string]string
 	seps      []string
+	rename    bool
 }
 
 func (self *assProcessor) parse() bool {
@@ -436,7 +437,11 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		return false
 	}
 	if os.WriteFile(fn, []byte(font.str), os.ModePerm) == nil {
-		_fn := fmt.Sprintf("%s%s", font.newName, e)
+		n := font.newName
+		if !self.rename {
+			n = font.oldName
+		}
+		_fn := fmt.Sprintf("%s%s", n, e)
 		_fn = path.Join(self.output, _fn)
 		args := make([]string, 0)
 		args = append(args, "--text-file="+fn)
@@ -558,6 +563,9 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 }
 
 func (self *assProcessor) changeFontsName() bool {
+	if !self.rename {
+		return true
+	}
 	ok := 0
 	l := len(self.m)
 	wg := new(sync.WaitGroup)
@@ -582,57 +590,62 @@ func (self *assProcessor) changeFontsName() bool {
 func (self *assProcessor) replaceFontNameInAss() bool {
 	ec := 0
 	m := make(map[string]map[string]bool)
-	for _, v := range self.m {
-		for f, s := range self.subtitles {
-			if m[f] == nil {
-				m[f] = make(map[string]bool)
-			}
-			n := regexp.QuoteMeta(v.oldName)
-			reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, n))
-			if reg.MatchString(s) {
-				r := fmt.Sprintf("${1}${2}%s${3}", v.newName)
-				s = reg.ReplaceAllString(s, r)
-				m[f][v.oldName] = true
-				self.subtitles[f] = s
+	if self.rename {
+		for _, v := range self.m {
+			for f, s := range self.subtitles {
+				if m[f] == nil {
+					m[f] = make(map[string]bool)
+				}
+				n := regexp.QuoteMeta(v.oldName)
+				reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, n))
+				if reg.MatchString(s) {
+					r := fmt.Sprintf("${1}${2}%s${3}", v.newName)
+					s = reg.ReplaceAllString(s, r)
+					m[f][v.oldName] = true
+					self.subtitles[f] = s
+				}
 			}
 		}
 	}
 	for f, s := range self.subtitles {
-		comments := make([]string, 0)
-		comments = append(comments, "[Script Info]")
-		comments = append(comments, "; ----- Font subset begin -----")
-		for k, _ := range m[f] {
-			for _, v := range self.m {
-				if strings.Split(v.oldName, "^")[0] == k {
-					comments = append(comments, fmt.Sprintf("; Font subset: %s - %s", v.newName, k))
-					break
+		if self.rename {
+			comments := make([]string, 0)
+			comments = append(comments, "[Script Info]")
+			comments = append(comments, "; ----- Font subset begin -----")
+			for k, _ := range m[f] {
+				for _, v := range self.m {
+					if strings.Split(v.oldName, "^")[0] == k {
+						comments = append(comments, fmt.Sprintf("; Font subset: %s - %s", v.newName, k))
+						break
+					}
 				}
 			}
+			if len(comments) > 2 {
+				comments = append(comments, "")
+				comments = append(comments, "; Processed by "+LibFName+" at "+time.Now().Format("2006-01-02 15:04:05"))
+				comments = append(comments, "; -----  Font subset end  -----")
+				comments = append(comments, "")
+				r := "[Script Info]\n"
+				_r := "\n"
+				if strings.Contains(s, "[Script Info]\r\n") {
+					r = "[Script Info]\r\n"
+					_r = "\r\n"
+				}
+				s = strings.Replace(s, r, strings.Join(comments, _r), 1)
+			}
 		}
-		if len(comments) > 2 {
-			comments = append(comments, "")
-			comments = append(comments, "; Processed by "+LibFName+" at "+time.Now().Format("2006-01-02 15:04:05"))
-			comments = append(comments, "; -----  Font subset end  -----")
-			comments = append(comments, "")
-			r := "[Script Info]\n"
-			_r := "\n"
-			if strings.Contains(s, "[Script Info]\r\n") {
-				r = "[Script Info]\r\n"
-				_r = "\r\n"
-			}
-			s = strings.Replace(s, r, strings.Join(comments, _r), 1)
-			_, n, _, _ := splitPath(f)
-			fn := path.Join(self.output, n)
-			ok := false
-			if os.WriteFile(fn, []byte(s), os.ModePerm) == nil {
-				ok = true
-				self._files = append(self._files, fn)
-			} else {
-				ec++
-			}
-			if !ok {
-				printLog(self.lcb, `Failed to write the new ass file: "%s".`, fn)
-			}
+		_, n, _, _ := splitPath(f)
+		fn := path.Join(self.output, n)
+		ok := false
+		if os.WriteFile(fn, []byte(s), os.ModePerm) == nil {
+			ok = true
+			self._files = append(self._files, fn)
+		} else {
+			ec++
+		}
+		if !ok {
+			ec++
+			printLog(self.lcb, `Failed to write the new ass file: "%s".`, fn)
 		}
 	}
 	return ec == 0

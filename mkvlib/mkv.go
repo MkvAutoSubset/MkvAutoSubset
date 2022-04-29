@@ -42,6 +42,7 @@ type mkvProcessor struct {
 	pf         string
 	cache      string
 	ass2bdnxml bool
+	nrename    bool
 }
 
 func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
@@ -304,6 +305,7 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 	obj._fonts = fonts
 	obj.output = output
 	obj.lcb = lcb
+	obj.rename = !self.nrename
 	d, _, _, _ := splitPath(obj.files[0])
 	if obj._fonts == "" {
 		obj._fonts += path.Join(d, "fonts")
@@ -374,4 +376,8 @@ func (self *mkvProcessor) Cache(p string) {
 
 func (self *mkvProcessor) MKS(mks bool) {
 	self.mks = mks
+}
+
+func (self *mkvProcessor) NRename(nrename bool) {
+	self.nrename = nrename
 }
