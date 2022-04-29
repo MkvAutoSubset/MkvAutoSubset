@@ -81,7 +81,6 @@ func (self *assProcessor) parse() bool {
 		reg, _ := regexp.Compile(`\\fn@?([^\r\n\\\}]*)`)
 		_reg, _ := regexp.Compile(`\\([bir])([^\r\n\\\}]*)`)
 		__reg, _ := regexp.Compile(`nd\d+`)
-		___reg, _ := regexp.Compile(`\s`)
 		m := make(map[string]string)
 		for k, v := range self.subtitles {
 			subtitle, err := parser.ReadFromSSAWithOptions(strings.NewReader(v), opt)
@@ -157,7 +156,6 @@ func (self *assProcessor) parse() bool {
 		}
 		self.m = make(map[string]*fontInfo)
 		for k, v := range m {
-			v = ___reg.ReplaceAllLiteralString(v, "")
 			if v != "" {
 				self.m[k] = new(fontInfo)
 				self.m[k].str = v
