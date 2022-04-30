@@ -43,6 +43,8 @@ type mkvProcessor struct {
 	cache      string
 	ass2bdnxml bool
 	nrename    bool
+	check      bool
+	strict     bool
 }
 
 func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
@@ -376,6 +378,11 @@ func (self *mkvProcessor) Cache(p string) {
 
 func (self *mkvProcessor) MKS(mks bool) {
 	self.mks = mks
+}
+
+func (self *mkvProcessor) Check(check, strict bool) {
+	self.check = check
+	self.strict = strict
 }
 
 func (self *mkvProcessor) NRename(nrename bool) {

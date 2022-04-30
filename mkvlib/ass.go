@@ -26,7 +26,7 @@ const (
 
 type fontInfo struct {
 	file    string
-	str     string
+	runes   []rune
 	index   string
 	oldName string
 	newName string
@@ -54,6 +54,8 @@ type assProcessor struct {
 	fg        map[string]string
 	seps      []string
 	rename    bool
+	check     bool
+	strict    bool
 }
 
 func (self *assProcessor) parse() bool {
@@ -159,7 +161,7 @@ func (self *assProcessor) parse() bool {
 		for k, v := range m {
 			if v != "" {
 				self.m[k] = new(fontInfo)
-				self.m[k].str = v
+				self.m[k].runes = []rune(v)
 				self.m[k].oldName = strings.Split(k, "^")[0]
 			}
 		}
@@ -190,20 +192,25 @@ func (self *assProcessor) getTTCCount(file string) int {
 	return 0
 }
 
-func (self *assProcessor) dumpFont(file, out string, full bool) []string {
+func (self *assProcessor) dumpFont(file, out string, full, cmap bool, index int) []string {
 	ok := false
 	count := 1
 	_, n, _, _ := splitPath(file)
 	list := make([]string, 0)
-	if strings.HasSuffix(strings.ToLower(n), ".ttc") {
-		count = self.getTTCCount(file)
-		if count < 1 {
-			printLog(self.lcb, `Failed to get the ttc font count: "%s".`, n)
-			return list
+	if index > -1 {
+		count = index + 1
+	} else {
+		index = 0
+		if strings.HasSuffix(strings.ToLower(n), ".ttc") {
+			count = self.getTTCCount(file)
+			if count < 1 {
+				printLog(self.lcb, `Failed to get the ttc font count: "%s".`, n)
+				return list
+			}
 		}
 	}
 	reg, _ := regexp.Compile(`[\x00-\x1f]|(&#([0-9]|[12][0-9]|3[01]);)`)
-	for i := 0; i < count; i++ {
+	for i := index; i < count; i++ {
 		fn := fmt.Sprintf("%s_%d.ttx", file, i)
 		if out != "" {
 			_, fn, _, _ = splitPath(fn)
@@ -216,6 +223,9 @@ func (self *assProcessor) dumpFont(file, out string, full bool) []string {
 		args = append(args, "-o", fn)
 		if !full {
 			args = append(args, "-t", "name")
+			if cmap {
+				args = append(args, "-t", "cmap")
+			}
 		}
 		args = append(args, file)
 		if p, err := newProcess(nil, nil, nil, "", ttx, args...); err == nil {
@@ -256,7 +266,7 @@ func (self *assProcessor) dumpFonts(files []string, full bool) bool {
 	}
 	for _, item := range files {
 		go func(_item string) {
-			_ok := self.dumpFont(_item, self.tDir, full)
+			_ok := self.dumpFont(_item, self.tDir, full, self.check, -1)
 			if len(_ok) > 0 {
 				m.Lock()
 				ok++
@@ -276,6 +286,7 @@ func (self *assProcessor) getFontName(p string) []map[string]bool {
 		defer func() { _ = f.Close() }()
 		names := make(map[string]bool)
 		types := make(map[string]bool)
+		items := make(map[string]bool)
 		xml, err := xmlquery.Parse(f)
 		if err == nil {
 			for _, v := range xml.SelectElements(`ttFont/name/namerecord`) {
@@ -290,8 +301,14 @@ func (self *assProcessor) getFontName(p string) []map[string]bool {
 					break
 				}
 			}
+			for _, v := range xml.SelectElements(`ttFont/cmap//map`) {
+				code := v.SelectAttr("code")
+				hex, _ := strconv.ParseInt(code, 0, 64)
+				c := string(rune(hex))
+				items[c] = true
+			}
+			return []map[string]bool{names, types, items}
 		}
-		return []map[string]bool{names, types}
 	}
 	return nil
 }
@@ -302,6 +319,11 @@ func (self *assProcessor) getFontsName(files []string) map[string][]map[string]b
 	wg.Add(l)
 	m := new(sync.Mutex)
 	_m := make(map[string][]map[string]bool)
+	defer func() {
+		for _, item := range files {
+			_ = os.Remove(item)
+		}
+	}()
 	for _, item := range files {
 		go func(_item string) {
 			names := self.getFontName(_item)
@@ -317,6 +339,36 @@ func (self *assProcessor) getFontsName(files []string) map[string][]map[string]b
 	return _m
 }
 
+func (self *assProcessor) checkFontMissing(f *fontInfo, v map[string]bool, i int, c bool) bool {
+	_str := ""
+	_runes := make([]rune, 0)
+	for _, _v := range f.runes {
+		if !v[string(_v)] {
+			if _v == '\u0020' || _v == '\u00a0' {
+				_runes = append(_runes, _v)
+			} else {
+				_str += string(_v)
+			}
+		}
+	}
+	h := "M"
+	if c {
+		h = "C"
+	}
+	if _str != "" {
+		printLog(self.lcb, `{%s%02d}Font [%s] missing nomal char(s): "%s"`, h, i, f.oldName, _str)
+	}
+	if len(_runes) > 0 {
+		_str = ""
+		for _, _rune := range _runes {
+			_str += fmt.Sprintf(`,0x%x`, _rune)
+		}
+		_str = _str[1:]
+		printLog(self.lcb, `{%s%02d}Font [%s] missing special char(s): "%s"`, h, i, f.oldName, _str)
+	}
+	return _str == "" && len(_runes) == 0
+}
+
 func (self *assProcessor) matchFonts() bool {
 	if !self.dumpFonts(self.fonts, false) {
 		return false
@@ -330,6 +382,7 @@ func (self *assProcessor) matchFonts() bool {
 			m[font] = _m
 		}
 	}
+	_count := make(map[string]int)
 	w := func(fb bool) {
 		for k, _ := range self.m {
 			_k := strings.Split(k, "^")
@@ -369,6 +422,12 @@ func (self *assProcessor) matchFonts() bool {
 			for __k, v := range m {
 				for ___k, _v := range v {
 					if (_v[0][_k[0]] || _tk(false, _v[0])) && (_v[1][_k[1]] || _tk(true, _v[1])) {
+						if self.check {
+							_count[_k[0]]++
+							if !self.checkFontMissing(self.m[k], _v[2], _count[_k[0]], false) && self.strict {
+								continue
+							}
+						}
 						self.m[k].file = __k
 						self.m[k].index = reg.FindStringSubmatch(___k)[1]
 						n := self.fg[_k[0]]
@@ -416,9 +475,9 @@ func (self *assProcessor) reMap() {
 		if _, ok := m[v.newName]; !ok {
 			m[v.newName] = v
 		} else {
-			m[v.newName].str += v.str
+			m[v.newName].runes = append(m[v.newName].runes, v.runes...)
 		}
-		m[v.newName].str += "\u00a0\u0020"
+		m[v.newName].runes = append(m[v.newName].runes, '\u00a0', '\u0020')
 	}
 	self.m = m
 }
@@ -437,7 +496,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		printLog(self.lcb, "Failed to create the output folder.")
 		return false
 	}
-	if os.WriteFile(fn, []byte(font.str), os.ModePerm) == nil {
+	if os.WriteFile(fn, []byte(string(font.runes)), os.ModePerm) == nil {
 		n := font.newName
 		if !self.rename {
 			n = font.oldName
@@ -501,7 +560,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 		}
 	}
 	ec := 0
-	if len(self.dumpFont(font.sFont, self.tDir, true)) > 0 {
+	if len(self.dumpFont(font.sFont, self.tDir, true, false, -1)) > 0 {
 		fn := fmt.Sprintf("%s_0.ttx", font.sFont)
 		_, fn, _, _ = splitPath(fn)
 		fn = path.Join(self.tDir, fn)
@@ -676,7 +735,7 @@ func (self *assProcessor) createFontsCache(output string) []string {
 		for i := s; i < e; i++ {
 			go func(x int) {
 				_item := fonts[x]
-				list := self.dumpFont(_item, self.tDir, false)
+				list := self.dumpFont(_item, self.tDir, false, false, -1)
 				if len(list) > 0 {
 					m.Lock()
 					_m := self.getFontsName(list)
@@ -796,12 +855,29 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 		}
 		return false
 	}
+	_count := 0
 	for _, v := range self.cache {
 		for q, _v := range v.Fonts {
 			for _, __v := range _v {
 				if __v == _k[0] || _tk(false, __v) {
 					for _, ___v := range v.Types[q] {
 						if ___v == _k[1] || _tk(true, ___v) {
+							if self.check {
+								ttxs := self.dumpFont(v.File, self.tDir, false, self.check, i)
+								if len(ttxs) > 0 {
+									names := self.getFontsName(ttxs)
+									if len(names) > 0 {
+										_count++
+										if !self.checkFontMissing(self.m[k], names[ttxs[0]][2], _count, true) && self.strict {
+											continue
+										}
+									} else {
+										continue
+									}
+								} else {
+									continue
+								}
+							}
 							ok = v.File
 							i = q
 							break
