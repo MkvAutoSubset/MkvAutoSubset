@@ -183,6 +183,14 @@ func NRename(n bool) {
 	getter.GetProcessorInstance().NRename(n)
 }
 
+//export Check
+func Check(check, strict bool) {
+	if !checkInstance() {
+		return
+	}
+	getter.GetProcessorInstance().Check(check, strict)
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }

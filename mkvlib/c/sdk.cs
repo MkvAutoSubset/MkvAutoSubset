@@ -53,6 +53,9 @@ public static class mkvlib
     static extern void NRename(bool n);
 
     [DllImport("mkvlib.so")]
+    static extern void Check(bool check, bool strict);
+
+    [DllImport("mkvlib.so")]
     static extern IntPtr CreateFontsCache(IntPtr dir, IntPtr output, logCallback lcb);
 
     [DllImport("mkvlib.so")]
@@ -143,6 +146,11 @@ public static class mkvlib
     public static void NRename(bool n)
     {
         NRename(n);
+    }
+
+    public static void Check(bool check, bool strict)
+    {
+        Check(check, strict);
     }
 
     public static string[] CreateFontsCache(string dir, string output, Action<string> lcb)

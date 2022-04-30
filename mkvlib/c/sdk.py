@@ -103,3 +103,8 @@ def mks(en):
 def nrename(n):
     call = lib.NRename
     call(n)
+
+
+def check(c, s):
+    call = lib.Check
+    call(c, s)
