@@ -149,7 +149,7 @@ func (self *mkvProcessor) CheckSubset(file string, lcb logCallback) (bool, bool)
 
 func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, output, slang, stitle string, clean bool) bool {
 	args := make([]string, 0)
-	if clean {
+	if clean && !self.mks {
 		args = append(args, "--no-subtitles", "--no-attachments")
 	}
 	if !self.mks {
@@ -232,7 +232,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 	l := len(files)
 	for i, item := range files {
 		_, _, _, _f := splitPath(item)
-		tmp, _ := findPath(sDir, fmt.Sprintf(`%s\S*\.\S+$`, regexp.QuoteMeta(_f)))
+		tmp, _ := findPath(sDir, fmt.Sprintf(`%s(_[\S ]*)?\.\S+$`, regexp.QuoteMeta(_f)))
 		asses := make([]string, 0)
 		subs := make([]string, 0)
 		p := path.Join(tDir, _f)
@@ -265,7 +265,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			ec++
 		}
 		if ec > 0 {
-			printLog(lcb, `Failed to create the mkv file: "%s".`, item)
+			printLog(lcb, `Failed to create the mkv/mks file: "%s".`, item)
 		}
 		printLog(lcb, "Create (%d/%d) done.", i+1, l)
 	}
