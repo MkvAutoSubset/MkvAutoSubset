@@ -351,7 +351,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, v map[string]bool, i int
 			}
 		}
 	}
-	h := "M"
+	h := "N"
 	if c {
 		h = "C"
 	}

@@ -308,6 +308,8 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 	obj.output = output
 	obj.lcb = lcb
 	obj.rename = !self.nrename
+	obj.check = self.check
+	obj.strict = self.strict
 	d, _, _, _ := splitPath(obj.files[0])
 	if obj._fonts == "" {
 		obj._fonts += path.Join(d, "fonts")
