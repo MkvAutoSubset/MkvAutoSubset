@@ -418,7 +418,7 @@ func (self *assProcessor) reMap() {
 		} else {
 			m[v.newName].str += v.str
 		}
-		m[v.newName].str += " "
+		m[v.newName].str += "\u00a0\u0020"
 	}
 	self.m = m
 }
