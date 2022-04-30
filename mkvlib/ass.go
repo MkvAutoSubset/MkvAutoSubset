@@ -510,6 +510,10 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 				_ = f.Close()
 				_ = os.Remove(fn)
 			}()
+			n := font.newName
+			if !self.rename {
+				n = font.oldName
+			}
 			if xml, err := xmlquery.Parse(f); err == nil {
 				for _, v := range xml.SelectElements(`ttFont/name/namerecord`) {
 					id := v.SelectAttr("nameID")
@@ -518,7 +522,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 						v.FirstChild.Data = "Processed by " + LibFName + " at " + time.Now().Format("2006-01-02 15:04:05")
 						break
 					case "1", "3", "4", "6":
-						v.FirstChild.Data = font.newName
+						v.FirstChild.Data = n
 						break
 					}
 				}
@@ -563,9 +567,6 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 }
 
 func (self *assProcessor) changeFontsName() bool {
-	if !self.rename {
-		return true
-	}
 	ok := 0
 	l := len(self.m)
 	wg := new(sync.WaitGroup)
