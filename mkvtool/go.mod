@@ -13,4 +13,4 @@ require (
 	golang.org/x/text v0.3.0 // indirect
 )
 
-// replace github.com/KurenaiRyu/MkvAutoSubset/mkvlib => ../mkvlib
+replace github.com/KurenaiRyu/MkvAutoSubset/mkvlib => ../mkvlib
