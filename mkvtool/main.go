@@ -1,22 +1,25 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
+	"github.com/google/uuid"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.6.9"
+const appVer = "v3.7.0"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -44,7 +47,8 @@ func main() {
 	if runtime.GOOS == "windows" {
 		cache_p = os.Getenv("USERPROFILE")
 	}
-	cache_p = path.Join(cache_p, ".mkvtool/fonts.cache")
+	cache_p = path.Join(cache_p, ".mkvtool", "caches")
+	ccs, _ := findPath(cache_p, `\.cache$`)
 	f := ""
 	c := false
 	d := false
@@ -90,7 +94,7 @@ func main() {
 	flag.StringVar(&af, "af", "", "ASS fonts folder. (ass mode only)")
 	flag.StringVar(&ao, "ao", "", "ASS output folder. (ass mode only)")
 	flag.StringVar(&co, "co", "fonts", "Copy fonts from cache dist folder.")
-	flag.StringVar(&cache_p, "cp", cache_p, "Fonts cache path. (cache mode only)")
+	flag.StringVar(&cache_p, "cp", cache_p, "Fonts caches dir path. (cache mode only)")
 	flag.BoolVar(&cfc, "cfc", false, "Copy fonts from cache.")
 	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subsetted" folder. (ass mode only)`)
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
@@ -111,7 +115,6 @@ func main() {
 	}
 
 	ec := 0
-
 	defer func() {
 		if latestTag != "" && latestTag != appVer {
 			log.Printf("New version available:%s", latestTag)
@@ -136,7 +139,7 @@ func main() {
 	processer.Check(ck, cks)
 
 	if cc && s != "" {
-		list := processer.CreateFontsCache(s, cache_p, nil)
+		list := processer.CreateFontsCache(s, path.Join(cache_p, uuid.New().String()+".cache"), nil)
 		el := len(list)
 		if el > 0 {
 			ec++
@@ -146,7 +149,7 @@ func main() {
 	}
 
 	if cache_p != "" {
-		processer.Cache(cache_p)
+		processer.Cache(ccs)
 	}
 
 	if l && s != "" {
@@ -246,4 +249,35 @@ func getLatestTag() {
 			}
 		}
 	}
+}
+
+func findPath(path, expr string) (list []string, err error) {
+	list = make([]string, 0)
+	reg, e := regexp.Compile(expr)
+	if e != nil {
+		err = e
+		return
+	}
+	err = queryPath(path, func(path string) bool {
+		if expr == "" || reg.MatchString(path) {
+			list = append(list, path)
+		}
+		return true
+	})
+	return
+}
+
+func queryPath(path string, cb func(string) bool) error {
+	return filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+		if f == nil {
+			return err
+		}
+		if f.IsDir() {
+			return nil
+		}
+		if cb(path) {
+			return nil
+		}
+		return errors.New("call cb return false")
+	})
 }
