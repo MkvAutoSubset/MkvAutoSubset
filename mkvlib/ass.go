@@ -89,7 +89,7 @@ func (self *assProcessor) parse() bool {
 		opt := parser.SSAOptions{}
 		reg, _ := regexp.Compile(`\\fn@?([^\r\n\\\}]*)`)
 		_reg, _ := regexp.Compile(`\\([bir])([^\r\n\\\}]*)`)
-		__reg, _ := regexp.Compile(`nd\d+`)
+		__reg, _ := regexp.Compile(`nd[xyz]?\d+`)
 		m := make(map[string]string)
 		for k, v := range self.subtitles {
 			subtitle, err := parser.ReadFromSSAWithOptions(strings.NewReader(v), opt)
