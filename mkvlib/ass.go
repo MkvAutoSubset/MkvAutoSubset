@@ -537,7 +537,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 			ok = err == nil && s.ExitCode() == 0
 		}
 		if !ok {
-			printLog(self.lcb, `Failed to subset font: "%s"[%s].`, font.oldName, font.index)
+			printLog(self.lcb, `Failed to subset font: "%s"[%d].`, font.oldName, font.index)
 		} else {
 			font.sFont = _fn
 		}
@@ -827,30 +827,34 @@ func (self *assProcessor) copyFontsFromCache() bool {
 	return ec == 0
 }
 
-func (self *assProcessor) loadCache(p string) {
-	if data, err := ioutil.ReadFile(p); err == nil {
-		cache := make([]fontCache, 0)
-		if json.Unmarshal(data, &cache) == nil {
-			for _, v := range cache {
-				list := make([][]map[string]bool, 0)
-				l := len(v.Fonts)
-				for i := 0; i < l; i++ {
-					m := make([]map[string]bool, 2)
-					for _, n := range v.Fonts[i] {
-						if m[0] == nil {
-							m[0] = make(map[string]bool)
+func (self *assProcessor) loadCache(ccs []string) {
+	if len(ccs) > 0 {
+		for _, p := range ccs {
+			if data, err := ioutil.ReadFile(p); err == nil {
+				cache := make([]fontCache, 0)
+				if json.Unmarshal(data, &cache) == nil {
+					for _, v := range cache {
+						list := make([][]map[string]bool, 0)
+						l := len(v.Fonts)
+						for i := 0; i < l; i++ {
+							m := make([]map[string]bool, 2)
+							for _, n := range v.Fonts[i] {
+								if m[0] == nil {
+									m[0] = make(map[string]bool)
+								}
+								m[0][n] = true
+							}
+							for _, f := range v.Types[i] {
+								if m[1] == nil {
+									m[1] = make(map[string]bool)
+								}
+								m[1][f] = true
+							}
+							list = append(list, m)
 						}
-						m[0][n] = true
+						self.cache = append(self.cache, cacheInfo{v.File, list})
 					}
-					for _, f := range v.Types[i] {
-						if m[1] == nil {
-							m[1] = make(map[string]bool)
-						}
-						m[1][f] = true
-					}
-					list = append(list, m)
 				}
-				self.cache = append(self.cache, cacheInfo{v.File, list})
 			}
 		}
 	}

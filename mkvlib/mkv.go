@@ -40,7 +40,7 @@ type mkvProcessor struct {
 	mks        bool
 	pr         string
 	pf         string
-	cache      string
+	caches     []string
 	ass2bdnxml bool
 	nrename    bool
 	check      bool
@@ -322,7 +322,7 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 		obj.output = path.Join(obj.output, "subsetted")
 	}
 	obj.fonts = findFonts(obj._fonts)
-	obj.loadCache(self.cache)
+	obj.loadCache(self.caches)
 	r := obj.parse() && obj.matchFonts() && obj.createFontsSubset() && obj.changeFontsName() && obj.replaceFontNameInAss()
 	if r && self.a2p {
 		r = self.ass2Pgs(obj._files, self.pr, self.pf, obj.output, d, lcb)
@@ -370,12 +370,12 @@ func (self *mkvProcessor) CopyFontsFromCache(subs, dist string, lcb logCallback)
 	obj.lcb = lcb
 	obj.files = asses
 	obj.output = dist
-	obj.loadCache(self.cache)
+	obj.loadCache(self.caches)
 	return obj.copyFontsFromCache()
 }
 
-func (self *mkvProcessor) Cache(p string) {
-	self.cache = p
+func (self *mkvProcessor) Cache(ccs []string) {
+	self.caches = ccs
 }
 
 func (self *mkvProcessor) MKS(mks bool) {
