@@ -498,7 +498,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		}
 	}
 	ok := false
-	fn := fmt.Sprintf(`%s.txt`, font.newName)
+	fn := fmt.Sprintf(`%s.txt`, randomStr(8))
 	_, fn, _, _ = splitPath(fn)
 	fn = path.Join(self.tDir, fn)
 	_, n, e, _ := splitPath(font.file)
