@@ -206,8 +206,10 @@ func stringDeduplication(str string) string {
 			_m[r] = i
 		}
 	}
-	for _, v := range _m {
-		_s += string(_rs[v])
+	for i, v := range _rs {
+		if _m[v] == i {
+			_s += string(_rs[i])
+		}
 	}
 	return _s
 }
