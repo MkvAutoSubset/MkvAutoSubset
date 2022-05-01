@@ -674,17 +674,17 @@ func (f *Font) initialize(offset int, isDfont bool) error {
 	if err != nil {
 		return err
 	}
-	buf, hasXHeightCapHeight, xHeight, capHeight, err := f.parseOS2(buf)
+	/*buf, hasXHeightCapHeight, xHeight, capHeight, err := f.parseOS2(buf)
 	if err != nil {
 		return err
-	}
+	}*/
 	buf, post, err := f.parsePost(buf, numGlyphs)
 	if err != nil {
 		return err
 	}
 
 	f.cached.ascent = ascent
-	f.cached.capHeight = capHeight
+	//f.cached.capHeight = capHeight
 	f.cached.finalTableOffset = finalTableOffset
 	f.cached.glyphData = glyphData
 	f.cached.glyphIndex = glyphIndex
@@ -701,16 +701,16 @@ func (f *Font) initialize(offset int, isDfont bool) error {
 	f.cached.post = post
 	f.cached.slope = [2]int32{run, rise}
 	f.cached.unitsPerEm = unitsPerEm
-	f.cached.xHeight = xHeight
+	//f.cached.xHeight = xHeight
 
-	if !hasXHeightCapHeight {
+	/*if !hasXHeightCapHeight {
 		xh, ch, err := f.initOS2Version1()
 		if err != nil {
 			return err
 		}
 		f.cached.xHeight = xh
 		f.cached.capHeight = ch
-	}
+	}*/
 
 	return nil
 }
