@@ -347,9 +347,11 @@ func (self *assProcessor) getFontsName(files []string) map[string][]map[string]b
 func (self *assProcessor) checkFontMissing(f *fontInfo, v map[string]bool, i int, c bool) bool {
 	_str := ""
 	_runes := make([]rune, 0)
+	_m := make(map[rune]bool)
 	for _, _v := range f.runes {
 		if !v[string(_v)] {
-			if _v == '\u0020' || _v == '\u00a0' {
+			if (_v == '\u0020' || _v == '\u00a0') && !_m[_v] {
+				_m[_v] = true
 				_runes = append(_runes, _v)
 			} else {
 				_str += string(_v)
@@ -361,6 +363,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, v map[string]bool, i int
 		h = "C"
 	}
 	if _str != "" {
+		_str = stringDeduplication(_str)
 		printLog(self.lcb, `{%s%02d}Font [%s] missing nomal char(s): "%s"`, h, i, f.oldName, _str)
 	}
 	if len(_runes) > 0 {
@@ -512,7 +515,9 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		printLog(self.lcb, "Failed to create the output folder.")
 		return false
 	}
-	if os.WriteFile(fn, []byte(string(font.runes)), os.ModePerm) == nil {
+	str := string(font.runes)
+	str = stringDeduplication(str)
+	if os.WriteFile(fn, []byte(str), os.ModePerm) == nil {
 		n := font.newName
 		if !self.rename {
 			n = font.oldName
@@ -870,9 +875,6 @@ func (self *assProcessor) matchCache(k string) (string, string) {
 	_count := 0
 	_k := strings.Split(k, "^")
 	for _, v := range self.cache {
-		if ok != "" {
-			break
-		}
 		for q, list := range v.Names {
 			if self.matchFontName(list, _k) {
 				if self.check {

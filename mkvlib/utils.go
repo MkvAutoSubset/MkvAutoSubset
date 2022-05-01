@@ -196,3 +196,18 @@ func findFonts(dir string) []string {
 	list, _ := findPath(dir, `\.((?i)(ttf)|(otf)|(ttc))$`)
 	return list
 }
+
+func stringDeduplication(str string) string {
+	_s := ""
+	_m := make(map[rune]int)
+	_rs := []rune(str)
+	for i, r := range _rs {
+		if _, ok := _m[r]; !ok {
+			_m[r] = i
+		}
+	}
+	for _, v := range _m {
+		_s += string(_rs[v])
+	}
+	return _s
+}
