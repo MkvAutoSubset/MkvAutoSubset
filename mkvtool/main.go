@@ -19,7 +19,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.7.0"
+const appVer = "v3.7.1"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -70,6 +70,7 @@ func main() {
 	af, ao := "", ""
 	flog := ""
 	co := ""
+	i := ""
 	asses := new(arrayArg)
 	pf := ""
 	pr := ""
@@ -95,6 +96,7 @@ func main() {
 	flag.StringVar(&ao, "ao", "", "ASS output folder. (ass mode only)")
 	flag.StringVar(&co, "co", "fonts", "Copy fonts from cache dist folder.")
 	flag.StringVar(&cache_p, "cp", cache_p, "Fonts caches dir path. (cache mode only)")
+	flag.StringVar(&i, "i", "", "Show font info.")
 	flag.BoolVar(&cfc, "cfc", false, "Copy fonts from cache.")
 	flag.BoolVar(&ans, "ans", false, `ASS output not to the new "subsetted" folder. (ass mode only)`)
 	flag.StringVar(&data, "data", "data", "Subtitles & Fonts folder (dump & make mode only)")
@@ -131,12 +133,28 @@ func main() {
 		ec++
 		return
 	}
-
 	processer := getter.GetProcessorInstance()
 	processer.A2P(a2p, apc, pr, pf)
 	processer.MKS(mks)
 	processer.NRename(n)
 	processer.Check(ck, cks)
+
+	if i != "" {
+		info := processer.GetFontInfo(i)
+		if info != nil {
+			fmt.Printf("File Path: \t%s\n", info.File)
+			l := len(info.Fonts)
+			for _i := 0; _i < l; _i++ {
+				fmt.Printf("Font index:\t%d\n", _i)
+				fmt.Printf("Font names:\t%s\n", strings.Join(info.Fonts[_i], "\t"))
+				fmt.Printf("Font types:\t%s\n", strings.Join(info.Types[_i], "\t"))
+			}
+		} else {
+			log.Printf("Failed to get font info: [%s]", i)
+			ec++
+		}
+		return
+	}
 
 	if cc && s != "" {
 		list := processer.CreateFontsCache(s, path.Join(cache_p, uuid.New().String()+".cache"), nil)
