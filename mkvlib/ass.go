@@ -6,9 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib/parser"
+	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib/parser/sfnt"
 	"github.com/antchfx/xmlquery"
-	"golang.org/x/image/font/opentype"
-	"golang.org/x/image/font/sfnt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -256,17 +255,25 @@ func (self *assProcessor) getFontName(p string) [][]map[string]bool {
 		id2, _ := _font.Name(nil, sfnt.NameIDSubfamily)
 		id4, _ := _font.Name(nil, sfnt.NameIDFull)
 		id6, _ := _font.Name(nil, sfnt.NameIDPostScript)
-		if id1 != "" {
-			names[id1] = true
+		if id1 != nil {
+			for _, v := range id1 {
+				names[v] = true
+			}
 		}
-		if id4 != "" {
-			names[id4] = true
+		if id4 != nil {
+			for _, v := range id4 {
+				names[v] = true
+			}
 		}
-		if id6 != "" {
-			names[id6] = true
+		if id6 != nil {
+			for _, v := range id6 {
+				names[v] = true
+			}
 		}
-		if id2 != "" {
-			types[id2] = true
+		if id2 != nil {
+			for _, v := range id2 {
+				types[v] = true
+			}
 		}
 		return []map[string]bool{names, types}
 	}
@@ -278,7 +285,7 @@ func (self *assProcessor) getFontName(p string) [][]map[string]bool {
 		if err == nil {
 			fonts := make([]*sfnt.Font, 0)
 			if strings.HasSuffix(strings.ToLower(p), ".ttc") {
-				c, err := opentype.ParseCollection(data)
+				c, err := sfnt.ParseCollection(data)
 				if err == nil {
 					l := c.NumFonts()
 					for i := 0; i < l; i++ {
@@ -289,7 +296,7 @@ func (self *assProcessor) getFontName(p string) [][]map[string]bool {
 					}
 				}
 			} else {
-				_f, err := opentype.Parse(data)
+				_f, err := sfnt.Parse(data)
 				if err == nil {
 					fonts = append(fonts, _f)
 				}
@@ -333,12 +340,12 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 		if err == nil {
 			var _font *sfnt.Font
 			if strings.HasSuffix(strings.ToLower(f.file), ".ttc") {
-				c, err := opentype.ParseCollection(data)
+				c, err := sfnt.ParseCollection(data)
 				if err == nil {
 					_font, _ = c.Font(f.index)
 				}
 			} else {
-				_font, _ = opentype.Parse(data)
+				_font, _ = sfnt.Parse(data)
 			}
 			if _font != nil {
 				for _, r := range f.runes {
