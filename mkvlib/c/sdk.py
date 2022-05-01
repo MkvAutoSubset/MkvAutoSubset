@@ -79,9 +79,10 @@ def getFontsList(dir, lcb):
     return loads(call(dir.encode(), lcb).decode())
 
 
-def cache(p):
+def cache(ccs):
     call = lib.Cache
-    call(p.encode())
+    _ccs = dumps(ccs)
+    call(_ccs.encode())
 
 
 def createFontsCache(dir, output, lcb):

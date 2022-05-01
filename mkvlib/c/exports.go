@@ -160,11 +160,15 @@ func CopyFontsFromCache(subs, dist *C.char, lcb C.logCallback) bool {
 }
 
 //export Cache
-func Cache(p *C.char) {
+func Cache(ccs *C.char) {
 	if !checkInstance() {
 		return
 	}
-	getter.GetProcessorInstance().Cache(gs(p))
+	obj := make([]string, 0)
+	if json.Unmarshal([]byte(gs(ccs)), &obj) == nil {
+		_ccs := obj
+		getter.GetProcessorInstance().Cache(_ccs)
+	}
 }
 
 //export MKS

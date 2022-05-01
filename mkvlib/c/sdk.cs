@@ -44,7 +44,7 @@ public static class mkvlib
     static extern IntPtr GetFontsList(IntPtr dir, logCallback lcb);
 
     [DllImport("mkvlib.so")]
-    static extern void Cache(IntPtr p);
+    static extern void Cache(IntPtr ccs);
 
     [DllImport("mkvlib.so")]
     static extern void MKS(bool mks);
@@ -133,9 +133,10 @@ public static class mkvlib
         return JsonSerializer.Deserialize<string[]>(result);
     }
 
-    public static void Cache(string p)
+    public static void Cache(string[] ccs)
     {
-        Cache(cs(p));
+        string _ccs = JsonSerializer.Serialize<string[]>(ccs);
+        Cache(cs(_ccs));
     }
 
     public static void MKS(bool mks)

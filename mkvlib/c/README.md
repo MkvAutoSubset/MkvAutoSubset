@@ -45,9 +45,9 @@
 ### 缓存相关
 
 - ```c
-    void Cache(char* p);
+    void Cache(char* ccs);
     //设置字体缓存(应在执行工作流之前调用)
-    //p: 缓存文件路径
+    //p: 包含缓存文件路径的json化文本
     ```
 - ```c
     char* CreateFontsCache(char* dir, char* output, logCallback lcb);
