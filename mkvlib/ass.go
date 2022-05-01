@@ -39,6 +39,11 @@ type fontCache struct {
 	Types [][]string `json:"types"`
 }
 
+type cacheInfo struct {
+	File  string
+	Names [][]map[string]bool
+}
+
 type assProcessor struct {
 	files     []string
 	_files    []string
@@ -48,7 +53,7 @@ type assProcessor struct {
 	fonts     []string
 	subtitles map[string]string
 	lcb       logCallback
-	cache     []fontCache
+	cache     []cacheInfo
 	tDir      string
 	_m        map[string][]string
 	fg        map[string]string
@@ -393,35 +398,9 @@ func (self *assProcessor) matchFonts() bool {
 				printLog(self.lcb, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
 				_k[1] = "Regular"
 			}
-			seps0 := make([]string, 0)
-			seps1 := make([]string, 0)
-			for _, v := range self.seps {
-				l := strings.LastIndex(_k[0], v)
-				tk := ""
-				if l > -1 && len(_k[0]) > 1 {
-					tk = _k[0][l+1:]
-				}
-				if tk != "" {
-					seps0 = append(seps0, _k[0][:l])
-					seps1 = append(seps1, tk)
-				}
-			}
-			_tk := func(q1 bool, qk map[string]bool) bool {
-				arr := seps0
-				if q1 {
-					arr = seps1
-				}
-				for _, v := range arr {
-					if qk[v] {
-						return true
-					}
-
-				}
-				return false
-			}
 			for __k, v := range m {
 				for ___k, _v := range v {
-					if (_v[0][_k[0]] || _tk(false, _v[0])) && (_v[1][_k[1]] || _tk(true, _v[1])) {
+					if self.matchFontName(_v, _k) {
 						if self.check {
 							_count[_k[0]]++
 							if !self.checkFontMissing(self.m[k], _v[2], _count[_k[0]], false) && self.strict {
@@ -467,6 +446,43 @@ func (self *assProcessor) matchFonts() bool {
 		}
 	}
 	return ok
+}
+
+func (self *assProcessor) fontNameToMap(m []map[string]bool) map[string]map[string]bool {
+	_m := make(map[string]map[string]bool)
+	for name, _ := range m[0] {
+		for family, _ := range m[1] {
+			if _, ok := _m[name]; !ok {
+				_m[name] = make(map[string]bool)
+			}
+			_m[name][family] = true
+		}
+	}
+	return _m
+}
+
+func (self *assProcessor) matchFontName(m []map[string]bool, _k []string) bool {
+	names := make(map[string]string)
+
+	names[_k[0]] = _k[1]
+	for _, v := range self.seps {
+		l := strings.LastIndex(_k[0], v)
+		tk := ""
+		if l > -1 && len(_k[0]) > 1 {
+			tk = _k[0][l+1:]
+		}
+		if tk != "" {
+			names[_k[0][:l]] = tk
+		}
+	}
+	for name, _ := range m[0] {
+		for family, _ := range m[1] {
+			if name != "" && family != "" && names[name] == family {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func (self *assProcessor) reMap() {
@@ -821,76 +837,67 @@ func (self *assProcessor) copyFontsFromCache() bool {
 
 func (self *assProcessor) loadCache(p string) {
 	if data, err := ioutil.ReadFile(p); err == nil {
-		self.cache = make([]fontCache, 0)
-		_ = json.Unmarshal(data, &self.cache)
+		cache := make([]fontCache, 0)
+		if json.Unmarshal(data, &cache) == nil {
+			for _, v := range cache {
+				list := make([][]map[string]bool, 0)
+				l := len(v.Fonts)
+				for i := 0; i < l; i++ {
+					m := make([]map[string]bool, 2)
+					for _, n := range v.Fonts[i] {
+						if m[0] == nil {
+							m[0] = make(map[string]bool)
+						}
+						m[0][n] = true
+					}
+					for _, f := range v.Types[i] {
+						if m[1] == nil {
+							m[1] = make(map[string]bool)
+						}
+						m[1][f] = true
+					}
+					list = append(list, m)
+				}
+				self.cache = append(self.cache, cacheInfo{v.File, list})
+			}
+		}
 	}
 }
 
 func (self *assProcessor) matchCache(k string) (string, string) {
 	ok := ""
 	i := -1
-	_k := strings.Split(k, "^")
-	seps0 := make([]string, 0)
-	seps1 := make([]string, 0)
-	for _, v := range self.seps {
-		l := strings.LastIndex(_k[0], v)
-		tk := ""
-		if l > -1 && len(_k[0]) > 1 {
-			tk = _k[0][l+1:]
-		}
-		if tk != "" {
-			seps0 = append(seps0, _k[0][:l])
-			seps1 = append(seps1, tk)
-		}
-	}
-	_tk := func(q1 bool, qk string) bool {
-		arr := seps0
-		if q1 {
-			arr = seps1
-		}
-		for _, v := range arr {
-			if v == qk {
-				return true
-			}
-		}
-		return false
-	}
 	_count := 0
+	_k := strings.Split(k, "^")
 	for _, v := range self.cache {
-		for q, _v := range v.Fonts {
-			for _, __v := range _v {
-				if __v == _k[0] || _tk(false, __v) {
-					for _, ___v := range v.Types[q] {
-						if ___v == _k[1] || _tk(true, ___v) {
-							if self.check {
-								ttxs := self.dumpFont(v.File, self.tDir, false, self.check, i)
-								if len(ttxs) > 0 {
-									names := self.getFontsName(ttxs)
-									if len(names) > 0 {
-										_count++
-										if !self.checkFontMissing(self.m[k], names[ttxs[0]][2], _count, true) && self.strict {
-											continue
-										}
-									} else {
-										continue
-									}
-								} else {
-									continue
-								}
+		if ok != "" {
+			break
+		}
+		for q, list := range v.Names {
+			if self.matchFontName(list, _k) {
+				if self.check {
+					ttxs := self.dumpFont(v.File, self.tDir, false, self.check, i)
+					if len(ttxs) > 0 {
+						names := self.getFontsName(ttxs)
+						if len(names) > 0 {
+							_count++
+							if !self.checkFontMissing(self.m[k], names[ttxs[0]][2], _count, true) && self.strict {
+								continue
 							}
-							ok = v.File
-							i = q
-							break
+						} else {
+							continue
 						}
+					} else {
+						continue
 					}
 				}
-				if ok != "" {
-					break
-				}
-			}
-			if ok != "" {
+				ok = v.File
+				i = q
 				break
 			}
+		}
+		if ok != "" {
+			break
 		}
 	}
 	if _, err := os.Stat(ok); err != nil {
