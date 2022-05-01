@@ -735,6 +735,28 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 	return ec == 0
 }
 
+func (self *assProcessor) createFontCache(p string) *fontCache {
+	_m := self.getFontName(p)
+	_fonts := make([][]string, len(_m))
+	_types := make([][]string, len(_m))
+	for k, v := range _m {
+		_list := make([]string, 0)
+		for _k, _ := range v[0] {
+			_list = append(_list, _k)
+		}
+		_fonts[k] = _list
+		_list = make([]string, 0)
+		for _k, _ := range v[1] {
+			_list = append(_list, _k)
+		}
+		_types[k] = _list
+	}
+	if len(_fonts) > 0 && len(_types) > 0 {
+		return &fontCache{p, _fonts, _types}
+	}
+	return nil
+}
+
 func (self *assProcessor) createFontsCache(output string) []string {
 	cache := make([]fontCache, 0)
 	if !filepath.IsAbs(self._fonts) {
@@ -751,24 +773,10 @@ func (self *assProcessor) createFontsCache(output string) []string {
 			go func(x int) {
 				_item := fonts[x]
 				m.Lock()
-				_m := self.getFontName(_item)
-				_fonts := make([][]string, len(_m))
-				_types := make([][]string, len(_m))
-				for k, v := range _m {
-					_list := make([]string, 0)
-					for _k, _ := range v[0] {
-						_list = append(_list, _k)
-					}
-					_fonts[k] = _list
-					_list = make([]string, 0)
-					for _k, _ := range v[1] {
-						_list = append(_list, _k)
-					}
-					_types[k] = _list
-				}
-				if len(_fonts) > 0 && len(_types) > 0 {
+				c := self.createFontCache(_item)
+				if c != nil {
 					ok++
-					cache = append(cache, fontCache{_item, _fonts, _types})
+					cache = append(cache, *c)
 					printLog(self.lcb, "Cache font (%d/%d) done.", ok, l)
 				} else {
 					el = append(el, _item)

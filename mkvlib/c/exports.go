@@ -195,6 +195,16 @@ func Check(check, strict bool) {
 	getter.GetProcessorInstance().Check(check, strict)
 }
 
+//export GetFontInfo
+func GetFontInfo(p *C.char) *C.char {
+	if !checkInstance() {
+		return cs("")
+	}
+	info := getter.GetProcessorInstance().GetFontInfo(gs(p))
+	data, _ := json.Marshal(info)
+	return cs(string(data))
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }

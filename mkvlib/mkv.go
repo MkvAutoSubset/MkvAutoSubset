@@ -374,6 +374,11 @@ func (self *mkvProcessor) CopyFontsFromCache(subs, dist string, lcb logCallback)
 	return obj.copyFontsFromCache()
 }
 
+func (self *mkvProcessor) GetFontInfo(p string) *fontCache {
+	obj := new(assProcessor)
+	return obj.createFontCache(p)
+}
+
 func (self *mkvProcessor) Cache(ccs []string) {
 	self.caches = ccs
 }

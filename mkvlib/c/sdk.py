@@ -84,6 +84,11 @@ def cache(ccs):
     _ccs = dumps(ccs)
     call(_ccs.encode())
 
+def getFontInfo(p):
+    call = lib.GetFontInfo
+    call.restype = c_char_p
+    return loads(call(p.encode()).decode())
+
 
 def createFontsCache(dir, output, lcb):
     call = lib.CreateFontsCache

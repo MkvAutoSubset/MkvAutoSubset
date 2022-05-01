@@ -61,6 +61,9 @@ public static class mkvlib
     [DllImport("mkvlib.so")]
     static extern bool CopyFontsFromCache(IntPtr subs, IntPtr dist, logCallback lcb);
 
+    [DllImport("mkvlib.so")]
+    static extern IntPtr GetFontInfo(IntPtr p);
+
     #endregion
 
     public static bool InitInstance(Action<string> lcb)
@@ -152,6 +155,11 @@ public static class mkvlib
     public static void Check(bool check, bool strict)
     {
         Check(check, strict);
+    }
+
+    public static string GetFontInfo(string p)
+    {
+        return css(GetFontInfo(cs(p)));
     }
 
     public static string[] CreateFontsCache(string dir, string output, Action<string> lcb)

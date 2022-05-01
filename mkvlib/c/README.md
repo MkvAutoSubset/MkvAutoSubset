@@ -67,10 +67,16 @@
 ### 查询相关
 
 - ```c
+  char* GetFontInfo(char* p);
+  //查询一个字体的信息
+  //p: 字体文件路径
+  //return: json格式的文件信息,如果出错会返回"null".
+  ```
+- ```c
   char* GetMKVInfo(char* file);
   //查询一个mkv文件内封的字幕和字体信息
   //file: 文件路径
-  //return: json格式的文件信息,如果出错会返回"null".
+  //return: json格式的字体信息,如果出错会返回"null".
   ```
 - ```c
   char* CheckSubset(char* file, logCallbac lcb);
