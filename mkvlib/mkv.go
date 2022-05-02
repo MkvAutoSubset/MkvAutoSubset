@@ -133,7 +133,7 @@ func (self *mkvProcessor) CheckSubset(file string, lcb logCallback) (bool, bool)
 	}
 	ass := false
 	ok := false
-	reg, _ := regexp.Compile(`\.[A-Z0-9]{8}\.\S+$`)
+	reg, _ := regexp.Compile(`^[A-Z0-9]{8}\.\S+$`)
 	for _, track := range obj.Tracks {
 		ass = track.Type == "subtitles" && track.Codec == "SubStationAlpha"
 		if ass {
