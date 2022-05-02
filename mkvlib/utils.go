@@ -202,19 +202,7 @@ func stringDeduplication(str string) string {
 	return _s
 }
 
-var mRandStrings = make(map[string]bool)
-
 func randomStr(l int) string {
-	for {
-		str := _randomStr(l)
-		if !mRandStrings[str] {
-			mRandStrings[str] = true
-			return str
-		}
-	}
-}
-
-func _randomStr(l int) string {
 	str := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	bytes := []byte(str)
 	var result []byte
