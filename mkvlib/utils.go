@@ -161,18 +161,6 @@ func copyFileOrDir(src, dst string) error {
 	return copyFolder(src, dst)
 }
 
-func randomStr(l int) string {
-	str := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	bytes := []byte(str)
-	var result []byte
-	lstr := len(str) - 1
-	for i := 0; i < l; i++ {
-		n := randomNumber(0, lstr)
-		result = append(result, bytes[n])
-	}
-	return string(result)
-}
-
 var r = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func randomN(n int) int {
@@ -212,4 +200,28 @@ func stringDeduplication(str string) string {
 		}
 	}
 	return _s
+}
+
+var mRandStrings = make(map[string]bool)
+
+func randomStr(l int) string {
+	for {
+		str := _randomStr(l)
+		if !mRandStrings[str] {
+			mRandStrings[str] = true
+			return str
+		}
+	}
+}
+
+func _randomStr(l int) string {
+	str := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	bytes := []byte(str)
+	var result []byte
+	lstr := len(str) - 1
+	for i := 0; i < l; i++ {
+		n := randomNumber(0, lstr)
+		result = append(result, bytes[n])
+	}
+	return string(result)
 }

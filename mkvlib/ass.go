@@ -55,7 +55,6 @@ type assProcessor struct {
 	subtitles map[string]string
 	lcb       logCallback
 	cache     []cacheInfo
-	tDir      string
 	fg        map[string]string
 	seps      []string
 	rename    bool
@@ -197,54 +196,31 @@ func (self *assProcessor) getTTCCount(file string) int {
 	return 0
 }
 
-func (self *assProcessor) dumpFont(file, out string, full bool) []string {
+func (self *assProcessor) dumpFont(file, out string) bool {
 	ok := false
-	count := 1
 	_, n, _, _ := splitPath(file)
-	list := make([]string, 0)
-	if strings.HasSuffix(strings.ToLower(n), ".ttc") {
-		count = self.getTTCCount(file)
-		if count < 1 {
-			printLog(self.lcb, `Failed to get the ttc font count: "%s".`, n)
-			return list
-		}
-	}
-
-	reg, _ := regexp.Compile(`[\x00-\x1f]|(&#([0-9]|[12][0-9]|3[01]);)`)
-	for i := 0; i < count; i++ {
-		fn := fmt.Sprintf("%s_%d.ttx", file, i)
-		if out != "" {
-			_, fn, _, _ = splitPath(fn)
-			fn = path.Join(out, fn)
-		}
-		args := make([]string, 0)
-		args = append(args, "-q")
-		args = append(args, "-f")
-		args = append(args, "-y", strconv.Itoa(i))
-		args = append(args, "-o", fn)
-		if !full {
-			args = append(args, "-t", "name")
-		}
-		args = append(args, file)
-		if p, err := newProcess(nil, nil, nil, "", ttx, args...); err == nil {
-			s, err := p.Wait()
-			ok = err == nil && s.ExitCode() == 0
-			if ok {
-				f, err := ioutil.ReadFile(fn)
-				if err == nil {
-					str := string(f)
-					str = reg.ReplaceAllString(str, "")
-					ok = ioutil.WriteFile(fn, []byte(str), os.ModePerm) == nil
-				}
+	reg, _ := regexp.Compile(`[\x00-\x1f]`)
+	args := make([]string, 0)
+	args = append(args, "-q")
+	args = append(args, "-f")
+	args = append(args, "-o", out)
+	args = append(args, file)
+	if p, err := newProcess(nil, nil, nil, "", ttx, args...); err == nil {
+		s, err := p.Wait()
+		ok = err == nil && s.ExitCode() == 0
+		if ok {
+			f, err := ioutil.ReadFile(out)
+			if err == nil {
+				str := string(f)
+				str = reg.ReplaceAllString(str, "")
+				ok = ioutil.WriteFile(out, []byte(str), os.ModePerm) == nil
 			}
 		}
-		if !ok {
-			printLog(self.lcb, `Failed to dump font(%t): "%s"[%d].`, full, n, i)
-		} else {
-			list = append(list, fn)
-		}
 	}
-	return list
+	if !ok {
+		printLog(self.lcb, `Failed to dump font: "%s".`, n)
+	}
+	return ok
 }
 
 func (self *assProcessor) getFontName(p string) [][]map[string]bool {
@@ -257,22 +233,30 @@ func (self *assProcessor) getFontName(p string) [][]map[string]bool {
 		id6, _ := _font.Name(nil, sfnt.NameIDPostScript)
 		if id1 != nil {
 			for _, v := range id1 {
-				names[v] = true
+				if v != "" {
+					names[v] = true
+				}
 			}
 		}
 		if id4 != nil {
 			for _, v := range id4 {
-				names[v] = true
+				if v != "" {
+					names[v] = true
+				}
 			}
 		}
 		if id6 != nil {
 			for _, v := range id6 {
-				names[v] = true
+				if v != "" {
+					names[v] = true
+				}
 			}
 		}
 		if id2 != nil {
 			for _, v := range id2 {
-				types[v] = true
+				if v != "" {
+					types[v] = true
+				}
 			}
 		}
 		return []map[string]bool{names, types}
@@ -504,16 +488,10 @@ func (self *assProcessor) reMap() {
 }
 
 func (self *assProcessor) createFontSubset(font *fontInfo) bool {
-	if self.tDir == "" {
-		self.tDir = path.Join(os.TempDir(), randomStr(8))
-		if os.MkdirAll(self.tDir, os.ModePerm) != nil {
-			return false
-		}
-	}
 	ok := false
 	fn := fmt.Sprintf(`%s.txt`, randomStr(8))
 	_, fn, _, _ = splitPath(fn)
-	fn = path.Join(self.tDir, fn)
+	fn = path.Join(os.TempDir(), fn)
 	_, n, e, _ := splitPath(font.file)
 	if strings.ToLower(e) == ".ttc" {
 		e = ".ttf"
@@ -526,6 +504,9 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	str := string(font.runes)
 	str = stringDeduplication(str)
 	if os.WriteFile(fn, []byte(str), os.ModePerm) == nil {
+		defer func() {
+			_ = os.Remove(fn)
+		}()
 		n := font.newName
 		if !self.rename {
 			n = font.oldName
@@ -583,10 +564,9 @@ func (self *assProcessor) createFontsSubset() bool {
 
 func (self *assProcessor) changeFontName(font *fontInfo) bool {
 	ec := 0
-	if len(self.dumpFont(font.sFont, self.tDir, true)) > 0 {
-		fn := fmt.Sprintf("%s_0.ttx", font.sFont)
-		_, fn, _, _ = splitPath(fn)
-		fn = path.Join(self.tDir, fn)
+	fn := fmt.Sprintf("%s.ttx", randomStr(8))
+	fn = path.Join(os.TempDir(), fn)
+	if self.dumpFont(font.sFont, fn) {
 		f, err := openFile(fn, true, false)
 		if err == nil {
 			defer func() {
@@ -650,12 +630,6 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 }
 
 func (self *assProcessor) changeFontsName() bool {
-	if self.tDir == "" {
-		self.tDir = path.Join(os.TempDir(), randomStr(8))
-		if os.MkdirAll(self.tDir, os.ModePerm) != nil {
-			return false
-		}
-	}
 	ok := 0
 	l := len(self.m)
 	wg := new(sync.WaitGroup)
@@ -673,7 +647,6 @@ func (self *assProcessor) changeFontsName() bool {
 		}(item)
 	}
 	wg.Wait()
-	_ = os.RemoveAll(self.tDir)
 	return ok == l
 }
 
@@ -792,8 +765,7 @@ func (self *assProcessor) createFontsCache(output string) []string {
 			}(i)
 		}
 	}
-
-	c := 100
+	c := 5
 	x := l / c
 	y := l % c
 	for i := 0; i < x; i++ {
@@ -806,7 +778,6 @@ func (self *assProcessor) createFontsCache(output string) []string {
 		w(x*c, l)
 		wg.Wait()
 	}
-	defer func() { _ = os.RemoveAll(self.tDir) }()
 	if len(cache) > 0 {
 		data, _ := json.Marshal(cache)
 		d, _, _, _ := splitPath(output)
