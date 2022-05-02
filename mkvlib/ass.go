@@ -93,7 +93,7 @@ func (self *assProcessor) parse() bool {
 			subtitle, err := parser.ReadFromSSAWithOptions(strings.NewReader(v), opt)
 			if err != nil {
 				ec++
-				printLog(self.lcb, `Failed to read the ass file: "%s"`, k)
+				printLog(self.lcb, `Failed to parse the ass file: "%s" [%s]`, k, err)
 				continue
 			}
 			for _, item := range subtitle.Items {
