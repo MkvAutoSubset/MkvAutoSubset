@@ -19,7 +19,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.7.2"
+const appVer = "v3.7.3"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -142,12 +142,12 @@ func main() {
 	if i != "" {
 		info := processer.GetFontInfo(i)
 		if info != nil {
-			fmt.Printf("File Path: \t%s\n", info.File)
+			fmt.Printf("File: \t%s\n", info.File)
 			l := len(info.Fonts)
 			for _i := 0; _i < l; _i++ {
-				fmt.Printf("\tFont index: %d\n", _i)
-				fmt.Printf("\t\tFont names:\t%s\n", strings.Join(info.Fonts[_i], "\n\t\t\t\t"))
-				fmt.Printf("\t\tFont types:\t%s\n", strings.Join(info.Types[_i], "\n\t\t\t\t"))
+				fmt.Printf("\nIndex:\t%d\n", _i)
+				fmt.Printf("\tNames:\t%s\n", strings.Join(info.Fonts[_i], "\n\t\t"))
+				fmt.Printf("\tTypes:\t%s\n", strings.Join(info.Types[_i], "\n\t\t"))
 			}
 		} else {
 			log.Printf("Failed to get font info: [%s]", i)
