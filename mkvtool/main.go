@@ -145,9 +145,9 @@ func main() {
 			fmt.Printf("File Path: \t%s\n", info.File)
 			l := len(info.Fonts)
 			for _i := 0; _i < l; _i++ {
-				fmt.Printf("Font index:\t%d\n", _i)
-				fmt.Printf("Font names:\t%s\n", strings.Join(info.Fonts[_i], "\t"))
-				fmt.Printf("Font types:\t%s\n", strings.Join(info.Types[_i], "\t"))
+				fmt.Printf("\tFont index: %d\n", _i)
+				fmt.Printf("\t\tFont names:\t%s\n", strings.Join(info.Fonts[_i], "\n\t\t\t\t"))
+				fmt.Printf("\t\tFont types:\t%s\n", strings.Join(info.Types[_i], "\n\t\t\t\t"))
 			}
 		} else {
 			log.Printf("Failed to get font info: [%s]", i)

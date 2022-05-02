@@ -472,9 +472,15 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string) bool {
 		}
 		if tk != "" {
 			names[_k[0][:l]] = tk
+			if !m[1][_k[1]] {
+				names[_k[0]] = tk
+			}
 		}
 	}
 	for name, _ := range m[0] {
+		if len(m[1]) == 0 {
+			return _k[0] == name
+		}
 		for family, _ := range m[1] {
 			if name != "" && family != "" && names[name] == family {
 				return true
