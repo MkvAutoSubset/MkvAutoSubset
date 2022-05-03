@@ -2,7 +2,6 @@ package mkvlib
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib/parser"
@@ -182,18 +181,6 @@ func (self *assProcessor) getFontsList() []string {
 		list = append(list, k)
 	}
 	return list
-}
-
-func (self *assProcessor) getTTCCount(file string) int {
-	f, err := openFile(file, true, false)
-	if err == nil {
-		defer func() { _ = f.Close() }()
-		data := make([]byte, 4)
-		if n, err := f.ReadAt(data, 8); err == nil && n == 4 {
-			return int(binary.BigEndian.Uint32(data))
-		}
-	}
-	return 0
 }
 
 func (self *assProcessor) dumpFont(file, out string) bool {
