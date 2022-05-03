@@ -165,7 +165,6 @@ func (self *assProcessor) parse() bool {
 		for k, v := range m {
 			if v != "" {
 				if ___reg.MatchString(v) {
-					___reg.ReplaceAllLiteralString(v, "")
 					v += "0123456789"
 				}
 				self.m[k] = new(fontInfo)
