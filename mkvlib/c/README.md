@@ -57,9 +57,9 @@
     //return: 缓存失败字体的json格式的数组
     ```
 - ```c
-    char* CopyFontsFromCache(char* subs, char* dist, logCallback lcb);
+    char* CopyFontsFromCache(char* asses, char* dist, logCallback lcb);
     //从缓存复制字幕所需的字体
-    //subs: 字体文件目录
+    //asses: 字幕文件路径的json的数组
     //dist: 字体文件保存目录
     //return: 是否全部导出
     ```
@@ -167,9 +167,9 @@
     //return: 是否全程无错
     ```
 - ```c
-    char* GetFontsList(char* dir, logCallback lcb);
-    //取得指定目录内所有字幕需要的全部字体
-    //dir: 字幕文件所在的目录
+    char* GetFontsList(char* files, logCallback lcb);
+    //取得数组内字幕需要的全部字体
+    //files: 字幕文件路径的json的数组
     //return: json格式的数组
     ```
   - ```c

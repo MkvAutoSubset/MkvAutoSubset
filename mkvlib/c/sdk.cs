@@ -41,7 +41,7 @@ public static class mkvlib
     static extern void A2P(bool a2p, bool apc, IntPtr pr, IntPtr pf);
 
     [DllImport("mkvlib.so")]
-    static extern IntPtr GetFontsList(IntPtr dir, logCallback lcb);
+    static extern IntPtr GetFontsList(IntPtr files, logCallback lcb);
 
     [DllImport("mkvlib.so")]
     static extern void Cache(IntPtr ccs);
@@ -59,7 +59,7 @@ public static class mkvlib
     static extern IntPtr CreateFontsCache(IntPtr dir, IntPtr output, logCallback lcb);
 
     [DllImport("mkvlib.so")]
-    static extern bool CopyFontsFromCache(IntPtr subs, IntPtr dist, logCallback lcb);
+    static extern bool CopyFontsFromCache(IntPtr asses, IntPtr dist, logCallback lcb);
 
     [DllImport("mkvlib.so")]
     static extern IntPtr GetFontInfo(IntPtr p);
@@ -130,9 +130,10 @@ public static class mkvlib
         A2P(a2p, apc, cs(pr), cs(pf));
     }
 
-    public static string[] GetFontsList(string dir, Action<string> lcb)
+    public static string[] GetFontsList([]string files, Action<string> lcb)
     {
-        string result = css(GetFontsList(cs(dir), _lcb(lcb)));
+        string _files = JsonSerializer.Serialize<string[]>(files);
+        string result = css(GetFontsList(cs(_files), _lcb(lcb)));
         return JsonSerializer.Deserialize<string[]>(result);
     }
 
@@ -168,9 +169,10 @@ public static class mkvlib
         return JsonSerializer.Deserialize<string[]>(result);
     }
 
-    public static bool CopyFontsFromCache(string subs, string dist, Action<string> lcb)
+    public static bool CopyFontsFromCache([]string asses, string dist, Action<string> lcb)
     {
-        return CopyFontsFromCache(cs(subs), cs(dist), _lcb(lcb));
+        string _files = JsonSerializer.Serialize<string[]>(asses);
+        return CopyFontsFromCache(cs(_files), cs(dist), _lcb(lcb));
     }
 
     delegate void logCallback(IntPtr ptr);

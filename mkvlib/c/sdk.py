@@ -73,16 +73,18 @@ def a2p(en, apc, pr, pf):
     call(en, apc, pr.encode(), pf.encode())
 
 
-def getFontsList(dir, lcb):
+def getFontsList(files, lcb):
     call = lib.GetFontsList
     call.restype = c_char_p
-    return loads(call(dir.encode(), lcb).decode())
+    _files = dumps(files)
+    return loads(call(_files.encode(), lcb).decode())
 
 
 def cache(ccs):
     call = lib.Cache
     _ccs = dumps(ccs)
     call(_ccs.encode())
+
 
 def getFontInfo(p):
     call = lib.GetFontInfo
@@ -96,9 +98,10 @@ def createFontsCache(dir, output, lcb):
     return loads(call(dir.encode(), output.encode(), lcb).decode())
 
 
-def copyFontsFromCache(subs, dist, lcb):
+def copyFontsFromCache(asses, dist, lcb):
     call = lib.CopyFontsFromCache
-    return call(subs.encode(), dist.encode(), lcb)
+    _files = dumps(asses)
+    return call(_files.encode(), dist.encode(), lcb)
 
 
 def mks(en):

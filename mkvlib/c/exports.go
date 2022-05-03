@@ -132,13 +132,18 @@ func A2P(a2p, apc bool, pr, pf string) {
 }
 
 //export GetFontsList
-func GetFontsList(dir *C.char, lcb C.logCallback) *C.char {
+func GetFontsList(files *C.char, lcb C.logCallback) *C.char {
 	if !checkInstance() {
 		return cs("")
 	}
-	list := getter.GetProcessorInstance().GetFontsList(gs(dir), _lcb(lcb))
-	data, _ := json.Marshal(list)
-	return cs(string(data))
+	obj := make([]string, 0)
+	if json.Unmarshal([]byte(gs(files)), &obj) == nil {
+		_files := obj
+		list := getter.GetProcessorInstance().GetFontsList(_files, _lcb(lcb))
+		data, _ := json.Marshal(list)
+		return cs(string(data))
+	}
+	return cs("")
 }
 
 //export CreateFontsCache
@@ -152,11 +157,16 @@ func CreateFontsCache(dir, output *C.char, lcb C.logCallback) *C.char {
 }
 
 //export CopyFontsFromCache
-func CopyFontsFromCache(subs, dist *C.char, lcb C.logCallback) bool {
+func CopyFontsFromCache(asses, dist *C.char, lcb C.logCallback) bool {
 	if !checkInstance() {
 		return false
 	}
-	return getter.GetProcessorInstance().CopyFontsFromCache(gs(subs), gs(dist), _lcb(lcb))
+	obj := make([]string, 0)
+	if json.Unmarshal([]byte(gs(asses)), &obj) == nil {
+		_files := obj
+		return getter.GetProcessorInstance().CopyFontsFromCache(_files, gs(dist), _lcb(lcb))
+	}
+	return false
 }
 
 //export Cache
