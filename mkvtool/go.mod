@@ -2,7 +2,7 @@ module github.com/KurenaiRyu/MkvAutoSubset/mkvtool
 
 go 1.18
 
-require github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20220502133632-afb20ca3e795
+require github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20220503050011-aa9747d0d43f
 
 require github.com/google/uuid v1.3.0
 
