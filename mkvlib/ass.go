@@ -167,6 +167,7 @@ func (self *assProcessor) parse() bool {
 				if ___reg.MatchString(v) {
 					v += "0123456789"
 				}
+				v += "\u0020\u00a0"
 				self.m[k] = new(fontInfo)
 				self.m[k].runes = []rune(v)
 				self.m[k].oldName = strings.Split(k, "^")[0]
@@ -266,14 +267,22 @@ func (self *assProcessor) getFontName(p string) [][]map[string]bool {
 					for i := 0; i < l; i++ {
 						_f, err := c.Font(i)
 						if err == nil {
-							fonts = append(fonts, _f)
+							if g, _ := _f.GlyphIndex(nil, '\u0020'); g == 0 {
+								printLog(self.lcb, `Font: "%s"[%d] is not defined '\u0020',skip.`, p, i)
+							} else {
+								fonts = append(fonts, _f)
+							}
 						}
 					}
 				}
 			} else {
 				_f, err := sfnt.Parse(data)
 				if err == nil {
-					fonts = append(fonts, _f)
+					if g, _ := _f.GlyphIndex(nil, '\u0020'); g == 0 {
+						printLog(self.lcb, `Font: "%s" is not defined '\u0020',skip.`, p)
+					} else {
+						fonts = append(fonts, _f)
+					}
 				}
 			}
 			for _, _font := range fonts {
@@ -322,12 +331,16 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 			} else {
 				_font, _ = sfnt.Parse(data)
 			}
+			_m := make(map[rune]bool)
 			if _font != nil {
 				for _, r := range f.runes {
 					n, _ := _font.GlyphIndex(nil, r)
 					if n == 0 {
 						if r == '\u0020' || r == '\u00a0' {
-							_runes = append(_runes, r)
+							if !_m[r] {
+								_m[r] = true
+								_runes = append(_runes, r)
+							}
 						} else {
 							_str += string(r)
 						}
@@ -473,7 +486,6 @@ func (self *assProcessor) reMap() {
 		} else {
 			m[v.newName].runes = append(m[v.newName].runes, v.runes...)
 		}
-		m[v.newName].runes = append(m[v.newName].runes, '\u00a0', '\u0020')
 	}
 	self.m = m
 }
