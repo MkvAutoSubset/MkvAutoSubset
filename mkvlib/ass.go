@@ -733,7 +733,7 @@ func (self *assProcessor) createFontCache(p string) *fontCache {
 		}
 		_types[k] = _list
 	}
-	if len(_fonts) > 0 && len(_types) > 0 {
+	if len(_fonts) > 0 {
 		return &fontCache{p, _fonts, _types}
 	}
 	return nil
