@@ -165,15 +165,15 @@
     //output: 成品输出文件夹路径
     //dirSafe: 是否把成品输出到"${output}/subsetted"文件夹里(为了安全建议设置为true)
     //return: 是否全程无错
-    ```
+  ```
 - ```c
     char* GetFontsList(char* files, logCallback lcb);
     //取得数组内字幕需要的全部字体
     //files: 字幕文件路径的json的数组
     //return: json格式的数组
-    ```
-  - ```c
-    void NRename(bool n);
-    //子集化时不重命名字体
-    //n: 是否不重命名
-    ```
+  ```
+- ```c
+  void NRename(bool n);
+  //子集化时不重命名字体
+  //n: 是否不重命名
+   ```
