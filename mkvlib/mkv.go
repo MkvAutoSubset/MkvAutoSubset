@@ -344,8 +344,7 @@ func (self *mkvProcessor) ass2Pgs(input []string, resolution, frameRate, fontsDi
 	return self.a2p && ass2Pgs(input, resolution, frameRate, fontsDir, output, lcb)
 }
 
-func (self *mkvProcessor) GetFontsList(input string, lcb logCallback) []string {
-	files, _ := findPath(input, `\.ass$`)
+func (self *mkvProcessor) GetFontsList(files []string, lcb logCallback) []string {
 	if len(files) > 0 {
 		obj := new(assProcessor)
 		obj.files = files
@@ -364,8 +363,7 @@ func (self *mkvProcessor) CreateFontsCache(dir, output string, lcb logCallback) 
 	return obj.createFontsCache(output)
 }
 
-func (self *mkvProcessor) CopyFontsFromCache(subs, dist string, lcb logCallback) bool {
-	asses, _ := findPath(subs, `\.ass$`)
+func (self *mkvProcessor) CopyFontsFromCache(asses []string, dist string, lcb logCallback) bool {
 	obj := new(assProcessor)
 	obj.lcb = lcb
 	obj.files = asses
