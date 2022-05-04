@@ -484,7 +484,7 @@ func (self *assProcessor) reMap() {
 		if _, ok := m[v.file]; !ok {
 			m[v.file] = v
 		} else {
-			m[v.file].runes = append(m[v.newName].runes, v.runes...)
+			m[v.file].runes = append(m[v.file].runes, v.runes...)
 		}
 	}
 	self.m = m
