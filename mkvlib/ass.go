@@ -481,10 +481,10 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string) bool {
 func (self *assProcessor) reMap() {
 	m := make(map[string]*fontInfo)
 	for _, v := range self.m {
-		if _, ok := m[v.newName]; !ok {
-			m[v.newName] = v
+		if _, ok := m[v.file]; !ok {
+			m[v.file] = v
 		} else {
-			m[v.newName].runes = append(m[v.newName].runes, v.runes...)
+			m[v.file].runes = append(m[v.newName].runes, v.runes...)
 		}
 	}
 	self.m = m
@@ -508,7 +508,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		if !self.rename {
 			n = font.oldName
 		}
-		_fn := fmt.Sprintf("%s.ttf", n)
+		_fn := fmt.Sprintf("%s.%s.ttf", n, randomStr(8))
 		_fn = path.Join(self.output, _fn)
 		args := make([]string, 0)
 		args = append(args, "--text-file="+fn)
