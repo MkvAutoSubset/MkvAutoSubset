@@ -319,7 +319,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	_runes := make([]rune, 0)
 	_f, err := os.Open(f.file)
 	if err == nil {
-		defer func() { _ = _f.Name() }()
+		defer func() { _ = _f.Close() }()
 		data, err := ioutil.ReadAll(_f)
 		if err == nil {
 			var _font *sfnt.Font
@@ -495,11 +495,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	fn := fmt.Sprintf(`%s.txt`, randomStr(8))
 	_, fn, _, _ = splitPath(fn)
 	fn = path.Join(os.TempDir(), fn)
-	_, n, e, _ := splitPath(font.file)
-	if strings.ToLower(e) == ".ttc" {
-		e = ".ttf"
-	}
-	e = strings.ToLower(e)
+	_, n, _, _ := splitPath(font.file)
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
 		printLog(self.lcb, "Failed to create the output folder.")
 		return false
@@ -507,14 +503,12 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	str := string(font.runes)
 	str = stringDeduplication(str)
 	if os.WriteFile(fn, []byte(str), os.ModePerm) == nil {
-		defer func() {
-			_ = os.Remove(fn)
-		}()
+		defer func() { _ = os.Remove(fn) }()
 		n := font.newName
 		if !self.rename {
 			n = font.oldName
 		}
-		_fn := fmt.Sprintf("%s%s", n, e)
+		_fn := fmt.Sprintf("%s.ttf", n)
 		_fn = path.Join(self.output, _fn)
 		args := make([]string, 0)
 		args = append(args, "--text-file="+fn)
