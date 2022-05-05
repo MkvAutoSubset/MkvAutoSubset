@@ -759,7 +759,7 @@ func (f *Font) initializeTables(offset int, isDfont bool) (buf1 []byte, finalTab
 		if first {
 			first = false
 		} else if tag <= prevTag {
-			return nil, 0, false, errInvalidTableTagOrder
+			//return nil, 0, false, errInvalidTableTagOrder
 		}
 		prevTag = tag
 
