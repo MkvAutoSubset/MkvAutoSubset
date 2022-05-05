@@ -61,6 +61,33 @@ type assProcessor struct {
 	strict    bool
 }
 
+func (self *assProcessor) getLength(p string) time.Duration {
+	f, err := openFile(p, true, false)
+	if err != nil {
+		return 0
+	}
+	data, err := io.ReadAll(f)
+	if err != nil {
+		return 0
+	}
+	str := string(data)
+	opt := parser.SSAOptions{}
+	subtitle, err := parser.ReadFromSSAWithOptions(strings.NewReader(str), opt)
+	if err == nil {
+		var s, e time.Duration
+		for _, v := range subtitle.Items {
+			if v.StartAt < s {
+				s = v.StartAt
+			}
+			if v.EndAt > e {
+				e = v.EndAt
+			}
+		}
+		return e - s
+	}
+	return 0
+}
+
 func (self *assProcessor) parse() bool {
 	ec := 0
 	self.seps = []string{"-", " "}
@@ -70,7 +97,7 @@ func (self *assProcessor) parse() bool {
 		if err != nil {
 			ec++
 		} else {
-			data, _ := io.ReadAll(f)
+			data, err := io.ReadAll(f)
 			str := string(data)
 			if err == nil {
 				self.subtitles[file] = str

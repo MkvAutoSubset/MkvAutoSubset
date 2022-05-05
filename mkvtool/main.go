@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
@@ -12,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
@@ -66,6 +64,7 @@ func main() {
 	mks := false
 	ck := false
 	cks := false
+	t := false
 	sl, st := "", ""
 	af, ao := "", ""
 	flog := ""
@@ -191,6 +190,17 @@ func main() {
 	if len(*asses) > 0 {
 		if !processer.ASSFontSubset(*asses, af, ao, !ans, nil) {
 			ec++
+		} else if t {
+			d, _, _, _ := splitPath((*asses)[0])
+			if ao == "" {
+				ao = path.Join(d, "subsetted")
+			}
+			_asses, _ := findPath(ao, `\.ass$`)
+			if len(_asses) > 0 {
+				p := fmt.Sprintf("test-%s.a", randomStr(8))
+				p = path.Join(d, p)
+				processer.CreateTestVideo(_asses, ao, "nvenc_h264", p, nil)
+			}
 		}
 		return
 	}
@@ -271,35 +281,4 @@ func getLatestTag() {
 			}
 		}
 	}
-}
-
-func findPath(path, expr string) (list []string, err error) {
-	list = make([]string, 0)
-	reg, e := regexp.Compile(expr)
-	if e != nil {
-		err = e
-		return
-	}
-	err = queryPath(path, func(path string) bool {
-		if expr == "" || reg.MatchString(path) {
-			list = append(list, path)
-		}
-		return true
-	})
-	return
-}
-
-func queryPath(path string, cb func(string) bool) error {
-	return filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
-		if f == nil {
-			return err
-		}
-		if f.IsDir() {
-			return nil
-		}
-		if cb(path) {
-			return nil
-		}
-		return errors.New("call cb return false")
-	})
 }

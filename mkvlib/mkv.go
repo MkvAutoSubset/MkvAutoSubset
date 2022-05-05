@@ -8,6 +8,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 )
 
 const (
@@ -393,4 +394,59 @@ func (self *mkvProcessor) Check(check, strict bool) {
 
 func (self *mkvProcessor) NRename(nrename bool) {
 	self.nrename = nrename
+}
+
+func (self *mkvProcessor) CreateTestVideo(asses []string, fonts, enc, output string, lcb logCallback) bool {
+	_obj := new(assProcessor)
+	args := make([]string, 0)
+	args = append(args, "-hide_banner", "-loglevel", "quiet")
+	args = append(args, "-y", "-f", "lavfi")
+	args = append(args, "-i", fmt.Sprintf("color=c=0x000000:s=%s:r=%s", self.pr, self.pf))
+	var t time.Duration
+	_s := len(asses) == 1
+	if _s {
+		t = _obj.getLength(asses[0])
+		fonts = strings.ReplaceAll(fonts, `\`, `/`)
+		fonts = strings.ReplaceAll(fonts, `:`, `\\:`)
+		asses[0] = strings.ReplaceAll(asses[0], `\`, `/`)
+		asses[0] = strings.ReplaceAll(asses[0], `:`, `\\:`)
+		args = append(args, "-vf", fmt.Sprintf("subtitles=%s:fontsdir=%s", asses[0], fonts))
+	} else {
+		for _, v := range asses {
+			length := _obj.getLength(v)
+			if length > t {
+				t = length
+			}
+		}
+	}
+	if t == 0 {
+		return false
+	}
+	args = append(args, "-t", fmt.Sprintf("%dms", t.Milliseconds()))
+	args = append(args, "-c:v", enc)
+	args = append(args, "-c:s", "copy")
+	d, _, _, ne := splitPath(output)
+	_output := path.Join(d, fmt.Sprintf("%s.mp4", ne))
+	args = append(args, _output)
+	if p, err := newProcess(nil, os.Stdout, os.Stderr, "", "ffmpeg", args...); err == nil {
+		s, err := p.Wait()
+		ok := err == nil && s.ExitCode() == 0
+		if ok && !_s {
+			_fonts := findFonts(fonts)
+			if len(_fonts) > 0 {
+				__output := path.Join(d, fmt.Sprintf("%s.mkv", ne))
+				ok = self.CreateMKV(_output, asses, _fonts, __output, "", "", false)
+			} else {
+				ok = false
+			}
+		}
+		if !ok || !_s {
+			_ = os.Remove(_output)
+		}
+		if !ok {
+			printLog(lcb, "Failed to create the test video file.")
+		}
+		return ok
+	}
+	return false
 }
