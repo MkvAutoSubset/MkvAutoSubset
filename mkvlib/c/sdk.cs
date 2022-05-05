@@ -46,14 +46,14 @@ public static class mkvlib
     [DllImport("mkvlib.so")]
     static extern void Cache(IntPtr ccs);
 
-    [DllImport("mkvlib.so")]
-    static extern void MKS(bool mks);
+    [DllImport("mkvlib.so", EntryPoint = "MKS")]
+    static extern void _MKS(bool mks);
 
-    [DllImport("mkvlib.so")]
-    static extern void NRename(bool n);
+    [DllImport("mkvlib.so", EntryPoint = "NRename")]
+    static extern void _NRename(bool n);
 
-    [DllImport("mkvlib.so")]
-    static extern void Check(bool check, bool strict);
+    [DllImport("mkvlib.so", EntryPoint = "Check")]
+    static extern void _Check(bool check, bool strict);
 
     [DllImport("mkvlib.so")]
     static extern IntPtr CreateFontsCache(IntPtr dir, IntPtr output, logCallback lcb);
@@ -145,17 +145,17 @@ public static class mkvlib
 
     public static void MKS(bool mks)
     {
-        MKS(mks);
+        _MKS(mks);
     }
 
     public static void NRename(bool n)
     {
-        NRename(n);
+        _NRename(n);
     }
 
     public static void Check(bool check, bool strict)
     {
-        Check(check, strict);
+        _Check(check, strict);
     }
 
     public static string GetFontInfo(string p)
@@ -171,7 +171,7 @@ public static class mkvlib
 
     public static bool CopyFontsFromCache(string[] asses, string dist, Action<string> lcb)
     {
-        string _files = JsonSerializer.Serialize<string[]>(asses);
+        string _files = JsonSerializer.Serialize(asses);
         return CopyFontsFromCache(cs(_files), cs(dist), _lcb(lcb));
     }
 
