@@ -130,7 +130,7 @@ public static class mkvlib
         A2P(a2p, apc, cs(pr), cs(pf));
     }
 
-    public static string[] GetFontsList([]string files, Action<string> lcb)
+    public static string[] GetFontsList(string[] files, Action<string> lcb)
     {
         string _files = JsonSerializer.Serialize<string[]>(files);
         string result = css(GetFontsList(cs(_files), _lcb(lcb)));
@@ -169,7 +169,7 @@ public static class mkvlib
         return JsonSerializer.Deserialize<string[]>(result);
     }
 
-    public static bool CopyFontsFromCache([]string asses, string dist, Action<string> lcb)
+    public static bool CopyFontsFromCache(string[] asses, string dist, Action<string> lcb)
     {
         string _files = JsonSerializer.Serialize<string[]>(asses);
         return CopyFontsFromCache(cs(_files), cs(dist), _lcb(lcb));
