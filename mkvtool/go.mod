@@ -3,7 +3,7 @@ module github.com/MkvAutoSubset/MkvAutoSubset/mkvtool
 go 1.18
 
 require (
-	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20220506062939-b9c36db2e76f
+	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20220506111355-2978cfb6c703
 	github.com/google/uuid v1.3.0
 )
 
