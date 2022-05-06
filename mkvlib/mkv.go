@@ -15,6 +15,7 @@ const (
 	mkvmerge   = `mkvmerge`
 	mkvextract = `mkvextract`
 	ass2bdnxml = `ass2bdnxml`
+	ffmpeg     = `ffmpeg`
 )
 
 type mkvInfo struct {
@@ -43,6 +44,7 @@ type mkvProcessor struct {
 	pf         string
 	caches     []string
 	ass2bdnxml bool
+	ffmpeg     bool
 	nrename    bool
 	check      bool
 	strict     bool
@@ -396,57 +398,101 @@ func (self *mkvProcessor) NRename(nrename bool) {
 	self.nrename = nrename
 }
 
-func (self *mkvProcessor) CreateTestVideo(asses []string, fonts, enc, output string, lcb logCallback) bool {
-	_obj := new(assProcessor)
-	args := make([]string, 0)
-	args = append(args, "-hide_banner", "-loglevel", "quiet")
-	args = append(args, "-y", "-f", "lavfi")
-	args = append(args, "-i", fmt.Sprintf("color=c=0x000000:s=%s:r=%s", self.pr, self.pf))
-	var t time.Duration
-	_s := len(asses) == 1
-	if _s {
-		t = _obj.getLength(asses[0])
-		fonts = strings.ReplaceAll(fonts, `\`, `/`)
-		fonts = strings.ReplaceAll(fonts, `:`, `\\:`)
-		asses[0] = strings.ReplaceAll(asses[0], `\`, `/`)
-		asses[0] = strings.ReplaceAll(asses[0], `:`, `\\:`)
-		args = append(args, "-vf", fmt.Sprintf("subtitles=%s:fontsdir=%s", asses[0], fonts))
-	} else {
-		for _, v := range asses {
-			length := _obj.getLength(v)
-			if length > t {
-				t = length
-			}
-		}
-	}
-	if t == 0 {
+func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, output string) bool {
+	if !self.ffmpeg {
 		return false
 	}
-	args = append(args, "-t", fmt.Sprintf("%dms", t.Milliseconds()))
-	args = append(args, "-c:v", enc)
-	args = append(args, "-c:s", "copy")
-	d, _, _, ne := splitPath(output)
-	_output := path.Join(d, fmt.Sprintf("%s.mp4", ne))
-	args = append(args, _output)
-	if p, err := newProcess(nil, os.Stdout, os.Stderr, "", "ffmpeg", args...); err == nil {
+	args := make([]string, 0)
+	args = append(args, "-y", "-hide_banner", "-loglevel", "quiet")
+	if enc == "" {
+		enc = "libx264"
+	}
+	if s == "" {
+		args = append(args, "-f", "lavfi")
+		args = append(args, "-i", fmt.Sprintf("color=c=0x000000:s=%s:r=%s", self.pr, self.pf))
+	} else {
+		args = append(args, "-i", s)
+	}
+	if ass != "" && fontdir != "" {
+		t = new(assProcessor).getLength(ass).Milliseconds()
+		fontdir = strings.ReplaceAll(fontdir, `\`, `/`)
+		fontdir = strings.ReplaceAll(fontdir, `:`, `\\:`)
+		ass = strings.ReplaceAll(ass, `\`, `/`)
+		ass = strings.ReplaceAll(ass, `:`, `\\:`)
+		args = append(args, "-vf", fmt.Sprintf("subtitles=%s:fontsdir=%s", ass, fontdir))
+	}
+	if s == "" {
+		if t > 0 {
+			args = append(args, "-t", fmt.Sprintf("%dms", t))
+		} else {
+			return false
+		}
+	}
+	args = append(args, "-pix_fmt", "nv12", "-crf", "18")
+	args = append(args, "-vcodec", enc)
+	args = append(args, output)
+	if p, err := newProcess(nil, nil, nil, "", ffmpeg, args...); err == nil {
 		s, err := p.Wait()
-		ok := err == nil && s.ExitCode() == 0
-		if ok && !_s {
-			_fonts := findFonts(fonts)
-			if len(_fonts) > 0 {
-				__output := path.Join(d, fmt.Sprintf("%s.mkv", ne))
-				ok = self.CreateMKV(_output, asses, _fonts, __output, "", "", false)
-			} else {
-				ok = false
-			}
-		}
-		if !ok || !_s {
-			_ = os.Remove(_output)
-		}
-		if !ok {
-			printLog(lcb, "Failed to create the test video file.")
-		}
-		return ok
+		return err == nil && s.ExitCode() == 0
 	}
 	return false
+}
+
+func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string, burn bool, lcb logCallback) bool {
+	if s == "-" {
+		s = ""
+	}
+	l := len(asses)
+	if l == 0 {
+		return false
+	}
+	if burn {
+		ec := 0
+		for i, v := range asses {
+			d, _, _, ne := splitPath(v)
+			_output := path.Join(d, fmt.Sprintf("%s-test.mp4", ne))
+			ok := self.CreateBlankOrBurnVideo(0, s, enc, v, fontdir, _output)
+			if !ok {
+				ec++
+				printLog(lcb, `Failed to create the test video file: "%s"`, _output)
+			}
+			printLog(lcb, "CT (%d/%d) done.", i+1, l)
+		}
+		return ec == 0
+	}
+	_obj := new(assProcessor)
+	var t time.Duration
+	for _, v := range asses {
+		_t := _obj.getLength(v)
+		if _t > t {
+			t = _t
+		}
+	}
+	ok := true
+	_fonts := findFonts(fontdir)
+	if len(_fonts) > 0 {
+		d, _, _, _ := splitPath(asses[0])
+		n := randomStr(8)
+		_t := s == ""
+		if _t {
+			s = path.Join(d, fmt.Sprintf("%s.mp4", n))
+			if !self.CreateBlankOrBurnVideo(t.Milliseconds(), "", enc, "", "", s) {
+				ok = false
+				printLog(lcb, `Failed to create the temp video file: "%s".`, s)
+			}
+		}
+		if ok {
+			output := path.Join(d, fmt.Sprintf("%s.mkv", n))
+			if !self.CreateMKV(s, asses, _fonts, output, "", "", true) {
+				ok = false
+				printLog(lcb, `Failed to create the test video file: "%s".`, output)
+			}
+		}
+		if _t {
+			_ = os.Remove(s)
+		}
+	} else {
+		ok = false
+	}
+	return ok
 }

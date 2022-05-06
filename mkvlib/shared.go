@@ -11,7 +11,7 @@ import (
 )
 
 const libName = "mkvlib"
-const libVer = "v1.8.6"
+const libVer = "v1.8.7"
 
 const LibFName = libName + " " + libVer
 
@@ -52,6 +52,7 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	_, _mkvextract := exec.LookPath(mkvextract)
 	_, _mkvmerge := exec.LookPath(mkvmerge)
 	_, _ass2bdnxml := exec.LookPath(ass2bdnxml)
+	_, _ffmpeg := exec.LookPath(ffmpeg)
 	if _ttx != nil || _pyftsubset != nil {
 		printLog(lcb, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
 		ec++
@@ -66,11 +67,17 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 		//ec++
 	}
 
+	if _ffmpeg != nil {
+		printLog(lcb, `Missing dependency: ffmpeg.`)
+		//ec++
+	}
+
 	r := ec == 0
 	if r {
 		self.checked = true
 		self.instance = new(mkvProcessor)
 		self.instance.ass2bdnxml = _ass2bdnxml == nil
+		self.instance.ffmpeg = _ffmpeg == nil
 	}
 
 	return r
@@ -89,6 +96,10 @@ func printLog(lcb logCallback, f string, v ...interface{}) {
 	} else {
 		log.Printf(f, v...)
 	}
+}
+
+func Version() string {
+	return libVer
 }
 
 func init() {

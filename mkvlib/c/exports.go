@@ -215,6 +215,32 @@ func GetFontInfo(p *C.char) *C.char {
 	return cs(string(data))
 }
 
+//export Version
+func Version() *C.char {
+	return cs(mkvlib.Version())
+}
+
+//export CreateBlankOrBurnVideo
+func CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, output *C.char) bool {
+	if !checkInstance() {
+		return false
+	}
+	return getter.GetProcessorInstance().CreateBlankOrBurnVideo(t, gs(s), gs(enc), gs(ass), gs(fontdir), gs(output))
+}
+
+//export CreateTestVideo
+func CreateTestVideo(asses, s, fontdir, enc *C.char, burn bool, lcb C.logCallback) bool {
+	if !checkInstance() {
+		return false
+	}
+	obj := make([]string, 0)
+	if json.Unmarshal([]byte(gs(asses)), &obj) == nil {
+		_asses := obj
+		return getter.GetProcessorInstance().CreateTestVideo(_asses, gs(s), gs(fontdir), gs(enc), burn, _lcb(lcb))
+	}
+	return false
+}
+
 func cs(gs string) *C.char {
 	return C.CString(gs)
 }

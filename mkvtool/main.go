@@ -17,7 +17,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.8.4"
+const appVer = "v3.8.5"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -64,7 +64,9 @@ func main() {
 	mks := false
 	ck := false
 	cks := false
-	t := false
+	b := false
+	t := ""
+	e := ""
 	sl, st := "", ""
 	af, ao := "", ""
 	flog := ""
@@ -103,6 +105,9 @@ func main() {
 	flag.StringVar(&flog, "log", "", "Log file path.")
 	flag.StringVar(&pf, "pf", "23.976", "PGS frame rate:23.976, 24, 25, 30, 29.97, 50, 59.94, 60 or custom fps like 15/1. (ass2pgs only)")
 	flag.StringVar(&pr, "pr", "1920*1080", "PGS resolution:720p, 1080p, 2k, or with custom resolution like 720*480. (ass2pgs only)")
+	flag.StringVar(&t, "t", "", `Create test video source path(enter "-" for blank video).`)
+	flag.BoolVar(&b, "b", false, `Create test video with burn subtitle.`)
+	flag.StringVar(&e, "e", "libx264", `Create test video use encoder.`)
 	flag.BoolVar(&v, "v", false, "Show app info.")
 	flag.Parse()
 
@@ -190,16 +195,14 @@ func main() {
 	if len(*asses) > 0 {
 		if !processer.ASSFontSubset(*asses, af, ao, !ans, nil) {
 			ec++
-		} else if t {
+		} else if t != "" {
 			d, _, _, _ := splitPath((*asses)[0])
 			if ao == "" {
 				ao = path.Join(d, "subsetted")
 			}
 			_asses, _ := findPath(ao, `\.ass$`)
 			if len(_asses) > 0 {
-				p := fmt.Sprintf("test-%s.a", randomStr(8))
-				p = path.Join(d, p)
-				processer.CreateTestVideo(_asses, ao, "nvenc_h264", p, nil)
+				processer.CreateTestVideo(_asses, t, ao, e, b, nil)
 			}
 		}
 		return

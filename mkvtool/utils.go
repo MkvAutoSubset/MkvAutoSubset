@@ -2,12 +2,10 @@ package main
 
 import (
 	"errors"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 )
 
 func queryPath(path string, cb func(string) bool) error {
@@ -49,30 +47,4 @@ func splitPath(p string) (dir, name, ext, namewithoutext string) {
 		namewithoutext = name[:n]
 	}
 	return
-}
-
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
-
-func randomN(n int) int {
-	return r.Intn(n)
-}
-
-func randomNumber(min, max int) int {
-	sub := max - min + 1
-	if sub <= 1 {
-		return min
-	}
-	return min + randomN(sub)
-}
-
-func randomStr(l int) string {
-	str := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	bytes := []byte(str)
-	var result []byte
-	lstr := len(str) - 1
-	for i := 0; i < l; i++ {
-		n := randomNumber(0, lstr)
-		result = append(result, bytes[n])
-	}
-	return string(result)
 }
