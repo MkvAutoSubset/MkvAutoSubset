@@ -68,6 +68,17 @@ def makeMKVs(dir, data, output, slang, stitle, lcb):
     return call(dir.encode(), data.encode(), output.encode(), slang.encode(), stitle.encode(), lcb)
 
 
+def CreateBlankOrBurnVideo(t, s, enc, ass, fontdir, output):
+    call = lib.CreateBlankOrBurnVideo
+    call(t.encode(), s.encode(), enc.encode(), ass.encode(), fontdir.encode(), output.encode())
+
+
+def createTestVideo(asses, s, fontdir, enc, burn, lcb):
+    call = lib.CreateTestVideo
+    _files = dumps(asses)
+    call(_files.encode(), s.encode(), fontdir.encode(), enc.encode(), burn, lcb)
+
+
 def a2p(en, apc, pr, pf):
     call = lib.A2P
     call(en, apc, pr.encode(), pf.encode())

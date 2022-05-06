@@ -38,6 +38,12 @@ public static class mkvlib
     static extern bool MakeMKVs(IntPtr dir, IntPtr data, IntPtr output, IntPtr slang, IntPtr stitle, logCallback lcb);
 
     [DllImport("mkvlib.so")]
+    static extern bool CreateBlankOrBurnVideo(t long, IntPtr s, IntPtr enc, IntPtr ass, IntPtr fontdir, IntPtr output);
+
+    [DllImport("mkvlib.so")]
+    static extern bool CreateTestVideo(IntPtr asses, IntPtr s, IntPtr fontdir, IntPtr enc, bool burn, logCallback lcb);
+
+    [DllImport("mkvlib.so")]
     static extern void A2P(bool a2p, bool apc, IntPtr pr, IntPtr pf);
 
     [DllImport("mkvlib.so")]
@@ -123,6 +129,17 @@ public static class mkvlib
     public static bool MakeMKVs(string dir, string data, string output, string slang, string stitle, Action<string> lcb)
     {
         return MakeMKVs(cs(dir), cs(data), cs(output), cs(slang), cs(stitle), _lcb(lcb));
+    }
+
+    public static bool bool CreateBlankOrBurnVideo(long t, string s, string enc, string ass, string fontdir, string output);
+    {
+        return CreateBlankOrBurnVideo(t, cs(s), cs(enc), cs(ass), cs(fontdir), cs(output));
+    }
+
+    public static bool CreateTestVideo(string[] asses, string s, string fontdir, string enc, bool burn, Action<string> lcb)
+    {
+        string _asses = JsonSerializer.Serialize<string[]>(asses);
+        return CreateTestVideo(cs(_asses), cs(s), cs(fontdir), cs(enc), burn, _lcb(lcb));
     }
 
     public static void A2P(bool a2p, bool apc, string pr, string pf)
