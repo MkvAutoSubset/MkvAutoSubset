@@ -8,6 +8,9 @@ public static class mkvlib
     #region imports
 
     [DllImport("mkvlib.so")]
+    static extern IntPtr Version();
+
+    [DllImport("mkvlib.so")]
     static extern bool InitInstance(logCallback lcb);
 
     [DllImport("mkvlib.so")]
@@ -71,6 +74,11 @@ public static class mkvlib
     static extern IntPtr GetFontInfo(IntPtr p);
 
     #endregion
+
+    public static string Version()
+    {
+        return ccs(Version());
+    }
 
     public static bool InitInstance(Action<string> lcb)
     {

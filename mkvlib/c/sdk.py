@@ -10,6 +10,12 @@ def _lcb(s):
     print(s.decode())
 
 
+def version():
+    call = lib.Version
+    call.restype = c_char_p
+    return call().decode()
+
+
 def initInstance(lcb):
     call = lib.InitInstance
     return call(lcb)
