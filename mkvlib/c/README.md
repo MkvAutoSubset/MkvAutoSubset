@@ -1,5 +1,28 @@
 # C导出函数说明
 
+## 2022.05新增生成测试视频说明
+
+- ```c
+  bool CreateBlankOrBurnVideo(t long, char* s, char* enc, char* ass, char* fontdir, char* output);
+  //创建一个空视频或者烧录字幕的视频
+  //t: 视频时长
+  //s: 源视频路径(留空即生成空视频)
+  //enc: 视频编码器
+  //ass: 字幕文件路径(当s为空时,t参数自动设置为字幕时长)
+  //fontdir: 字体目录路径
+  //output: 输出文件
+  //return: 是否成功完成
+  ```
+  bool CreateTestVideo(char* asses, char* s, char* fontdir, char* enc, bool burn, logCallback lcb);
+  //创建测试视频
+  //asses: 字幕文件数组的json格式文本
+  //s: 源视频路径
+  //fontdir: 字体目录路径
+  //enc: 视频编码器
+  //burn: 是否烧录字幕
+  //return: 是否成功完成
+  ```
+
 ## 2022.04新增检查模式说明
 
 - ```c
