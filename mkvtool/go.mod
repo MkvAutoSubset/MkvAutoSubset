@@ -1,9 +1,9 @@
-module github.com/KurenaiRyu/MkvAutoSubset/mkvtool
+module github.com/MkvAutoSubset/MkvAutoSubset/mkvtool
 
 go 1.18
 
 require (
-	github.com/KurenaiRyu/MkvAutoSubset/mkvlib v0.0.0-20220506062939-b9c36db2e76f
+	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20220506062939-b9c36db2e76f
 	github.com/google/uuid v1.3.0
 )
 
@@ -18,4 +18,4 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 )
 
-// replace github.com/KurenaiRyu/MkvAutoSubset/mkvlib => ../mkvlib
+replace github.com/MkvAutoSubset/MkvAutoSubset/mkvlib => ../mkvlib

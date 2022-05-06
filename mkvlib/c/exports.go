@@ -4,7 +4,7 @@ package main
 import "C"
 import (
 	"encoding/json"
-	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
+	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib"
 )
 
 var getter = mkvlib.GetProcessorGetterInstance()

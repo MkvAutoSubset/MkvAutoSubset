@@ -1,4 +1,4 @@
-module github.com/KurenaiRyu/MkvAutoSubset/mkvlib
+module github.com/MkvAutoSubset/MkvAutoSubset/mkvlib
 
 go 1.18
 

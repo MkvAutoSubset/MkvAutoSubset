@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/KurenaiRyu/MkvAutoSubset/mkvlib"
+	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib"
 	"github.com/google/uuid"
 	"io"
 	"io/ioutil"

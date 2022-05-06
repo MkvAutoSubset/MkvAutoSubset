@@ -1,6 +1,6 @@
 # Mkv Auto Subset
 
-![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/KurenaiRyu/MkvAutoSubset?include_prereleases)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/MkvAutoSubset/MkvAutoSubset?include_prereleases)
 
 ASS字幕字体子集化 MKV批量提取/生成
 
@@ -47,7 +47,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 - 有安装Go的情况:
   ```shell
-  go install github.com/KurenaiRyu/MkvAutoSubset/mkvtool@latest #安装和更新
+  go install github.com/MkvAutoSubset/MkvAutoSubset/mkvtool@latest #安装和更新
   ```
 
 - Arch Linux用户(通过Arch User Repository):
@@ -59,7 +59,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 - 手动安装:
 
-  [点此下载](https://github.com/KurenaiRyu/MkvAutoSubset/releases/latest)
+  [点此下载](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/latest)
 
 ## mkvtool 功能及使用示例
 - 2022.04更新的ASS转PGS说明
