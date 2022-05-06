@@ -3,7 +3,7 @@
 ## 2022.05新增生成测试视频说明
 
 - ```c
-  bool CreateBlankOrBurnVideo(t long, char* s, char* enc, char* ass, char* fontdir, char* output);
+  bool CreateBlankOrBurnVideo(long t, char* s, char* enc, char* ass, char* fontdir, char* output);
   //创建一个空视频或者烧录字幕的视频
   //t: 视频时长
   //s: 源视频路径(留空即生成空视频)
