@@ -13,7 +13,7 @@
   //output: 输出文件
   //return: 是否成功完成
   ```
-  ```c
+- ```c
   bool CreateTestVideo(char* asses, char* s, char* fontdir, char* enc, bool burn, logCallback lcb);
   //创建测试视频
   //asses: 字幕文件数组的json格式文本
