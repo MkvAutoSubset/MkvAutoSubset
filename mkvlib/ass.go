@@ -98,7 +98,7 @@ func (self *assProcessor) parse() bool {
 			ec++
 		} else {
 			data, err := io.ReadAll(f)
-			str := string(data)
+			str := toUTF8(data)
 			if err == nil {
 				self.subtitles[file] = str
 			} else {

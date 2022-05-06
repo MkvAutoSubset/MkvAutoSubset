@@ -3,6 +3,9 @@ package mkvlib
 import (
 	"errors"
 	"fmt"
+	"github.com/gogs/chardet"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 	"io"
 	"math/rand"
 	"os"
@@ -212,4 +215,14 @@ func randomStr(l int) string {
 		result = append(result, bytes[n])
 	}
 	return string(result)
+}
+
+func toUTF8(data []byte) string {
+	d := chardet.NewTextDetector()
+	if r, err := d.DetectBest(data); err == nil {
+		if r.Charset == "UTF-16LE" {
+			data, _, _ = transform.Bytes(unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewDecoder(), data)
+		}
+	}
+	return string(data)
 }
