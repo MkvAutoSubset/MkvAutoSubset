@@ -18,4 +18,4 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 )
 
-replace github.com/MkvAutoSubset/MkvAutoSubset/mkvlib => ../mkvlib
+// replace github.com/MkvAutoSubset/MkvAutoSubset/mkvlib => ../mkvlib
