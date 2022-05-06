@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gogs/chardet"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/encoding/traditionalchinese"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 	"io"
@@ -220,8 +222,23 @@ func randomStr(l int) string {
 func toUTF8(data []byte) string {
 	d := chardet.NewTextDetector()
 	if r, err := d.DetectBest(data); err == nil {
-		if r.Charset == "UTF-16LE" {
+		switch r.Charset {
+		case "UTF-16LE":
 			data, _, _ = transform.Bytes(unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewDecoder(), data)
+			break
+		case "UTF-16BE":
+			data, _, _ = transform.Bytes(unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM).NewDecoder(), data)
+			break
+		case "GBK", "GB2312":
+			data, _, _ = transform.Bytes(simplifiedchinese.GBK.NewDecoder(), data)
+			break
+		case "GB18030":
+			data, _, _ = transform.Bytes(simplifiedchinese.GB18030.NewDecoder(), data)
+			break
+		case "Big5":
+			data, _, _ = transform.Bytes(traditionalchinese.Big5.NewDecoder(), data)
+			break
+
 		}
 	}
 	return string(data)
