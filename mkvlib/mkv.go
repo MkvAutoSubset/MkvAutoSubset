@@ -188,7 +188,11 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 	}
 	if p, err := newProcess(nil, nil, nil, "", mkvmerge, args...); err == nil {
 		s, err := p.Wait()
-		return err == nil && s.ExitCode() != 2
+		ok := err == nil && s.ExitCode() != 2
+		if !ok {
+			_ = os.Remove(output)
+		}
+		return ok
 	}
 	return false
 }
@@ -328,6 +332,9 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 	obj.fonts = findFonts(obj._fonts)
 	obj.loadCache(self.caches)
 	r := obj.parse() && obj.matchFonts() && obj.createFontsSubset() && obj.changeFontsName() && obj.replaceFontNameInAss()
+	if !r {
+		_ = os.RemoveAll(obj.output)
+	}
 	if r && self.a2p {
 		r = self.ass2Pgs(obj._files, self.pr, self.pf, obj.output, d, lcb)
 		if r && !self.apc {
@@ -433,7 +440,11 @@ func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, 
 	args = append(args, output)
 	if p, err := newProcess(nil, nil, nil, "", ffmpeg, args...); err == nil {
 		s, err := p.Wait()
-		return err == nil && s.ExitCode() == 0
+		ok := err == nil && s.ExitCode() == 0
+		if !ok {
+			_ = os.Remove(output)
+		}
+		return ok
 	}
 	return false
 }
