@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.8.8"
+const appVer = "v3.8.9"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -61,8 +61,8 @@ func main() {
 	cc := false
 	cfc := false
 	mks := false
-	ck := false
-	cks := false
+	nck := false
+	ncks := false
 	b := false
 	t := ""
 	e := ""
@@ -88,8 +88,8 @@ func main() {
 	flag.Var(asses, "a", "ASS files. (multiple & join ass mode)")
 	flag.BoolVar(&n, "n", false, "Not do ass font subset & not change font name.")
 	flag.BoolVar(&clean, "clean", false, "Clean original file subtitles and fonts for create mode, or clean old caches for create cache mode.")
-	flag.BoolVar(&ck, "ck", false, "Enable check mode.")
-	flag.BoolVar(&cks, "cks", false, "Enable strict mode for check.")
+	flag.BoolVar(&nck, "nck", false, "Disable check mode.")
+	flag.BoolVar(&ncks, "ncks", false, "Disable strict mode for check.")
 	flag.StringVar(&sl, "sl", "chi", "Subtitle language. (create & make mode only)")
 	flag.StringVar(&st, "st", "", "Subtitle title. (create & make mode only)")
 	flag.StringVar(&af, "af", "", "ASS fonts folder. (ass mode only)")
@@ -140,7 +140,7 @@ func main() {
 	processer.A2P(a2p, apc, pr, pf)
 	processer.MKS(mks)
 	processer.NRename(n)
-	processer.Check(ck, cks)
+	processer.Check(!nck, !ncks)
 
 	if i != "" {
 		info := processer.GetFontInfo(i)
