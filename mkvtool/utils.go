@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/md5"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -47,4 +49,11 @@ func splitPath(p string) (dir, name, ext, namewithoutext string) {
 		namewithoutext = name[:n]
 	}
 	return
+}
+
+func path2MD5(p string) string {
+	p, _ = filepath.Abs(p)
+	h := md5.New()
+	h.Write([]byte(p))
+	return fmt.Sprintf("%x", h.Sum(nil))
 }

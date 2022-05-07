@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib"
-	"github.com/google/uuid"
 	"io"
 	"io/ioutil"
 	"log"
@@ -17,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v3.8.7"
+const appVer = "v3.8.8"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -88,7 +87,7 @@ func main() {
 	flag.BoolVar(&cc, "cc", false, "Create fonts cache.")
 	flag.Var(asses, "a", "ASS files. (multiple & join ass mode)")
 	flag.BoolVar(&n, "n", false, "Not do ass font subset & not change font name.")
-	flag.BoolVar(&clean, "clean", false, "Clean original file subtitles and fonts. (create mode only)")
+	flag.BoolVar(&clean, "clean", false, "Clean original file subtitles and fonts for create mode, or clean old caches for create cache mode.")
 	flag.BoolVar(&ck, "ck", false, "Enable check mode.")
 	flag.BoolVar(&cks, "cks", false, "Enable strict mode for check.")
 	flag.StringVar(&sl, "sl", "chi", "Subtitle language. (create & make mode only)")
@@ -161,7 +160,11 @@ func main() {
 	}
 
 	if cc && s != "" {
-		list := processer.CreateFontsCache(s, path.Join(cache_p, uuid.New().String()+".cache"), nil)
+		if clean {
+			_ = os.RemoveAll(cache_p)
+		}
+		p := path.Join(cache_p, path2MD5(s)+".cache")
+		list := processer.CreateFontsCache(s, p, nil)
 		el := len(list)
 		if el > 0 {
 			ec++
