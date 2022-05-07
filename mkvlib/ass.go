@@ -442,7 +442,7 @@ func (self *assProcessor) matchFonts() bool {
 			if self.m[k].file != "" {
 				continue
 			}
-			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1])); f != "" {
+			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k); f != "" {
 				self.m[k].file, self.m[k].index = f, i
 				n := self.fg[_k[0]]
 				if n == "" {
@@ -822,7 +822,7 @@ func (self *assProcessor) copyFontsFromCache() bool {
 		l := len(self.m)
 		i := 0
 		for k, _ := range self.m {
-			ok, _ := self.matchCache(k)
+			ok, _ := self.matchCache(k, k)
 			if ok != "" {
 				_, fn, _, _ := splitPath(ok)
 				fn = path.Join(self.output, fn)
@@ -872,7 +872,7 @@ func (self *assProcessor) loadCache(ccs []string) {
 	}
 }
 
-func (self *assProcessor) matchCache(k string) (string, int) {
+func (self *assProcessor) matchCache(k, o string) (string, int) {
 	ok := ""
 	i := -1
 	_count := 0
@@ -886,7 +886,7 @@ func (self *assProcessor) matchCache(k string) (string, int) {
 					names := self.getFontName(v.File)
 					if len(names) > 0 {
 						_count++
-						if !self.checkFontMissing(self.m[k], _count, true) && self.strict {
+						if !self.checkFontMissing(self.m[o], _count, true) && self.strict {
 							ok = ""
 							i = 0
 							continue
