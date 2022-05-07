@@ -266,7 +266,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		}
 		tracks = append(tracks, subs...)
 		fn := path.Join(oDir, _f) + ".mkv"
-		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, clean) {
+		if ec == 0 && !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, clean) {
 			ec++
 		}
 		if ec > 0 {
