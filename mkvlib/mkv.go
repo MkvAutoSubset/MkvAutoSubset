@@ -486,6 +486,8 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 			if !self.CreateMKV(s, asses, _fonts, output, "", "", true) {
 				ok = false
 				printLog(lcb, `Failed to create the test video file: "%s".`, output)
+			} else {
+				printLog(lcb, "CT done.")
 			}
 		}
 		if _t {

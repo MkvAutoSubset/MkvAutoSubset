@@ -2,6 +2,7 @@ package mkvlib
 
 import (
 	"fmt"
+	"os"
 	"path"
 )
 
@@ -23,6 +24,7 @@ func ass2Pgs(input []string, resolution, frameRate, fontsDir, output string, lcb
 			r = err == nil && s.ExitCode() == 0
 			if !r {
 				printLog(lcb, fmt.Sprintf(`Failed to Ass2Pgs:"%s"`, item))
+				_ = os.Remove(fn)
 			}
 		}
 	}
