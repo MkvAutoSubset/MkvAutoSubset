@@ -410,7 +410,7 @@ func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, 
 		return false
 	}
 	args := make([]string, 0)
-	args = append(args, "-y", "-hide_banner", "-loglevel", "error")
+	args = append(args, "-y", "-hide_banner", "-loglevel", "quiet")
 	if enc == "" {
 		enc = "libx264"
 	}
