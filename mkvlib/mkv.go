@@ -410,7 +410,7 @@ func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, 
 		return false
 	}
 	args := make([]string, 0)
-	args = append(args, "-y", "-hide_banner", "-loglevel", "quiet")
+	args = append(args, "-y", "-hide_banner", "-loglevel", "error")
 	if enc == "" {
 		enc = "libx264"
 	}
@@ -430,7 +430,7 @@ func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, 
 		ass = strings.ReplaceAll(ass, `:`, `\\:`)
 		ass = strings.ReplaceAll(ass, `[`, `\[`)
 		ass = strings.ReplaceAll(ass, `]`, `\]`)
-		args = append(args, "-vf", fmt.Sprintf(`subtitles="%s":fontsdir="%s"`, ass, fontdir))
+		args = append(args, "-vf", fmt.Sprintf(`subtitles=%s:fontsdir=%s`, ass, fontdir))
 	}
 	if s == "" {
 		if t > 0 {
