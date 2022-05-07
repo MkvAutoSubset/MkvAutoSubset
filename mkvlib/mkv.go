@@ -424,9 +424,13 @@ func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, 
 		t = new(assProcessor).getLength(ass).Milliseconds()
 		fontdir = strings.ReplaceAll(fontdir, `\`, `/`)
 		fontdir = strings.ReplaceAll(fontdir, `:`, `\\:`)
+		fontdir = strings.ReplaceAll(fontdir, `[`, `\[`)
+		fontdir = strings.ReplaceAll(fontdir, `]`, `\]`)
 		ass = strings.ReplaceAll(ass, `\`, `/`)
 		ass = strings.ReplaceAll(ass, `:`, `\\:`)
-		args = append(args, "-vf", fmt.Sprintf("subtitles=%s:fontsdir=%s", ass, fontdir))
+		ass = strings.ReplaceAll(ass, `[`, `\[`)
+		ass = strings.ReplaceAll(ass, `]`, `\]`)
+		args = append(args, "-vf", fmt.Sprintf(`subtitles="%s":fontsdir="%s"`, ass, fontdir))
 	}
 	if s == "" {
 		if t > 0 {
