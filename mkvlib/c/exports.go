@@ -128,7 +128,7 @@ func A2P(a2p, apc bool, pr, pf *C.char) {
 	if !checkInstance() {
 		return
 	}
-	getter.GetProcessorInstance().A2P(a2p, apc, pr, pf)
+	getter.GetProcessorInstance().A2P(a2p, apc, gs(pr), gs(pf))
 }
 
 //export GetFontsList
