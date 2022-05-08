@@ -366,7 +366,7 @@ namespace mkvtool
                             this.FindControl<TextBlock>("ma1").Text = string.Empty;
                             this.FindControl<TextBlock>("ma2").Text = string.Empty;
                             this.FindControl<TextBlock>("ma3").Text = string.Empty;
-                            this.FindControl<TextBox>("ma4").Text = string.Empty;
+                            this.FindControl<TextBox>("ma4").Text = "chi";
                             this.FindControl<TextBox>("ma5").Text = string.Empty;
                         });
                     }
@@ -467,7 +467,7 @@ namespace mkvtool
                             this.FindControl<TextBlock>("ca2").Text = string.Empty;
                             this.FindControl<TextBlock>("ca3").Text = string.Empty;
                             this.FindControl<TextBlock>("ca4").Text = string.Empty;
-                            this.FindControl<TextBox>("ca5").Text = string.Empty;
+                            this.FindControl<TextBox>("ca5").Text = "chi";
                             this.FindControl<TextBox>("ca6").Text = string.Empty;
                             this.FindControl<ToggleSwitch>("ca7").IsChecked = false;
                         });

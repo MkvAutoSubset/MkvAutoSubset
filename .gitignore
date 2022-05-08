@@ -13,3 +13,5 @@ gen
 bin
 obj
 .vs
+*.user
+/mkvtool-gui/mkvlib.so

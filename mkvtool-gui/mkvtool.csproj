@@ -20,4 +20,9 @@
     <PackageReference Include="mameolan.Avalonia.Controlz" Version="1.0.0-CI-20211017-144151" />
     <PackageReference Include="mameolan.Avalonia.ExtendedToolkit" Version="1.0.0-CI-20211017-144151" />
    </ItemGroup>
+  <ItemGroup>
+    <None Update="mkvlib.so">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
