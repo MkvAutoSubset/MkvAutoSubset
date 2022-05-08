@@ -609,6 +609,7 @@ namespace mkvtool
                         PrintResult("Create cache", "Create cache successfully.");
                     CacheArg.Dir = string.Empty;
                     CacheArg.Clean = false;
+                    Cache();
                     DoUIThread(() =>
                 {
                     this.FindControl<TextBlock>("cca1").Text = string.Empty;
