@@ -124,7 +124,7 @@ func MakeMKVs(dir, data, output, slang, stitle *C.char, lcb C.logCallback) bool 
 }
 
 //export A2P
-func A2P(a2p, apc bool, pr, pf string) {
+func A2P(a2p, apc bool, pr, pf *C.char) {
 	if !checkInstance() {
 		return
 	}
