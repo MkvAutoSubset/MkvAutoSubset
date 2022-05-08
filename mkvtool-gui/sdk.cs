@@ -5,72 +5,74 @@ using System.Text.Json;
 public static class mkvlib
 {
 
+    const string so = "mkvlib.so";
+
     #region imports
 
-    [DllImport("mkvlib.so", EntryPoint = "Version")]
+    [DllImport(so, EntryPoint = "Version")]
     static extern IntPtr _Version();
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool InitInstance(logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern IntPtr GetMKVInfo(IntPtr ptr);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool DumpMKV(IntPtr file, IntPtr output, bool subset, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern IntPtr CheckSubset(IntPtr file, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool CreateMKV(IntPtr file, IntPtr tracks, IntPtr attachments, IntPtr output, IntPtr slang, IntPtr stitle, bool clean);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool ASSFontSubset(IntPtr files, IntPtr fonts, IntPtr output, bool dirSafe, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern IntPtr QueryFolder(IntPtr dir, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool DumpMKVs(IntPtr dir, IntPtr output, bool subset, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool CreateMKVs(IntPtr vDir, IntPtr sDir, IntPtr fDir, IntPtr tDir, IntPtr oDir, IntPtr slang, IntPtr stitle, bool clean, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool MakeMKVs(IntPtr dir, IntPtr data, IntPtr output, IntPtr slang, IntPtr stitle, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool CreateBlankOrBurnVideo(long t, IntPtr s, IntPtr enc, IntPtr ass, IntPtr fontdir, IntPtr output);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool CreateTestVideo(IntPtr asses, IntPtr s, IntPtr fontdir, IntPtr enc, bool burn, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern void A2P(bool a2p, bool apc, IntPtr pr, IntPtr pf);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern IntPtr GetFontsList(IntPtr files, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern void Cache(IntPtr ccs);
 
-    [DllImport("mkvlib.so", EntryPoint = "MKS")]
+    [DllImport(so, EntryPoint = "MKS")]
     static extern void _MKS(bool mks);
 
-    [DllImport("mkvlib.so", EntryPoint = "NRename")]
+    [DllImport(so, EntryPoint = "NRename")]
     static extern void _NRename(bool n);
 
-    [DllImport("mkvlib.so", EntryPoint = "Check")]
+    [DllImport(so, EntryPoint = "Check")]
     static extern void _Check(bool check, bool strict);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern IntPtr CreateFontsCache(IntPtr dir, IntPtr output, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern bool CopyFontsFromCache(IntPtr asses, IntPtr dist, logCallback lcb);
 
-    [DllImport("mkvlib.so")]
+    [DllImport(so)]
     static extern IntPtr GetFontInfo(IntPtr p);
 
     #endregion
