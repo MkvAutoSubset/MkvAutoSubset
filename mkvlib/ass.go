@@ -98,8 +98,8 @@ func (self *assProcessor) parse() bool {
 			ec++
 		} else {
 			data, err := io.ReadAll(f)
-			str := toUTF8(data)
 			if err == nil {
+				str := toUTF8(data)
 				self.subtitles[file] = str
 			} else {
 				ec++
@@ -108,6 +108,7 @@ func (self *assProcessor) parse() bool {
 		if ec > 0 {
 			printLog(self.lcb, `Failed to read the ass file: "%s"`, file)
 		}
+		_ = f.Close()
 	}
 	if ec == 0 {
 		opt := parser.SSAOptions{}
