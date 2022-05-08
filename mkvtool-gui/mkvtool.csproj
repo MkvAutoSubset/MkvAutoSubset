@@ -3,19 +3,20 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>Windows</DefineConstants>
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>Windows</DefineConstants>
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Remove=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.8" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.8" />
+    <PackageReference Include="Avalonia" Version="0.10.13" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.13" />
     <PackageReference Include="mameolan.Avalonia.Controlz" Version="1.0.0-CI-20211017-144151" />
     <PackageReference Include="mameolan.Avalonia.ExtendedToolkit" Version="1.0.0-CI-20211017-144151" />
    </ItemGroup>

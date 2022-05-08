@@ -4,7 +4,7 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       mc:Ignorable="d" d:DesignWidth="600"
                       d:DesignHeight="600"
-                      Width="850"
+                      Width="1050"
                       Height="670"
                       x:Class="mkvtool.MainWindow"
                       WindowStartupLocation="CenterScreen"
@@ -37,7 +37,7 @@
                                 <StackPanel Orientation="Horizontal" Margin="5">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Fonts:" />
+                                            <TextBlock Text="Extra fonts folder:" />
                                             <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                                           VerticalScrollBarVisibility="Auto">
                                                 <TextBlock Name="sa2" />
@@ -168,7 +168,7 @@
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <TextBlock Text="Default Subtitle language:" VerticalAlignment="Center"
                                                    TextAlignment="Center" />
-                                        <TextBox Name="ma4" />
+                                        <TextBox Name="ma4" Text="chi" />
                                     </StackPanel>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5">
@@ -211,7 +211,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="Fonts folder:" />
+                                        <TextBlock Text="Extra fonts folder:" />
                                         <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                                       VerticalScrollBarVisibility="Auto">
                                             <TextBlock Name="ca3" />
@@ -233,7 +233,7 @@
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <TextBlock Text="Default Subtitle language:" VerticalAlignment="Center"
                                                    TextAlignment="Center" />
-                                        <TextBox Name="ca5" />
+                                        <TextBox Name="ca5" Text="chi" />
                                     </StackPanel>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5">
@@ -250,6 +250,58 @@
                         </Controlz:GroupBox>
                     </StackPanel>
                 </TabItem>
+				<TabItem Header="Cache / Settings">
+					<StackPanel>
+						<StackPanel>
+							<Controlz:GroupBox Header="Create cache" Margin="10">
+								<StackPanel Margin="5" HorizontalAlignment="Center">
+									<StackPanel Orientation="Horizontal" Margin="5">
+										<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+											<StackPanel Orientation="Horizontal">
+												<TextBlock Text="Fonts folder:" />
+												<ScrollViewer HorizontalScrollBarVisibility="Auto"
+															  VerticalScrollBarVisibility="Auto">
+													<TextBlock Name="cca1" />
+												</ScrollViewer>
+											</StackPanel>
+										</StackPanel>
+										<Button Content="Select..." Click="CacheSelectBtns_OnClick" />
+									</StackPanel>
+									<Controls:ToggleSwitch Content="Clean old caches" IsChecked="False" Name="cca2" />
+									<Button Margin="10" Content="Go" Click="CacheBtn_OnClick"
+											HorizontalAlignment="Center" />
+								</StackPanel>
+							</Controlz:GroupBox>
+						</StackPanel>
+						<StackPanel>
+							<Controlz:GroupBox Header="Settings" Margin="10">
+								<StackPanel Margin="5" HorizontalAlignment="Center">
+									<Controls:ToggleSwitch Content="Ass to pgs" IsChecked="False" Name="ssa1" />
+									<Controls:ToggleSwitch Content="Ass and pgs coexist" IsChecked="False" Name="ssa2" />
+									<Controls:ToggleSwitch Content="Check mode" IsChecked="True" Name="ssa3" />
+									<Controls:ToggleSwitch Content="Strict for check mode" IsChecked="True" Name="ssa4" />
+									<Controls:ToggleSwitch Content="Not rename subsetted font" IsChecked="False" Name="ssa5" />
+									<StackPanel Orientation="Horizontal" Margin="5">
+										<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+											<TextBlock Text="PGS resolution:" VerticalAlignment="Center"
+													   TextAlignment="Center" />
+											<TextBox Name="ssa6" Text="1080p" />
+										</StackPanel>
+									</StackPanel>
+									<StackPanel Orientation="Horizontal" Margin="5">
+										<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+											<TextBlock Text="PGS frame rate:" VerticalAlignment="Center"
+													   TextAlignment="Center" />
+											<TextBox Name="ssa7" Text="23.976" />
+										</StackPanel>
+									</StackPanel>
+									<Button Margin="10" Content="Save" Click="SaveBtn_OnClick"
+											HorizontalAlignment="Center" />
+								</StackPanel>
+							</Controlz:GroupBox>
+						</StackPanel>
+					</StackPanel>
+				</TabItem>
             </TabControl>
             <Controls:BusyIndicator Name="busyBox" />
         </Grid>

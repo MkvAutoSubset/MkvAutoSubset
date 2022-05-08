@@ -1,4 +1,8 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -24,7 +28,7 @@ namespace mkvtool
 
         private async void CheckFileBtn_OnClick(object? sender, RoutedEventArgs e)
         {
-            string[] files = await ShowSelectFileDialog("MKV file", new string[] {"mkv"}, false);
+            string[] files = await ShowSelectFileDialog("MKV file", new string[] { "mkv" }, false);
             if (files != null && files.Length > 0)
             {
                 SetBusy(true);
@@ -69,7 +73,11 @@ namespace mkvtool
         void lcb(string str)
         {
             DoUIThread(() =>
-                this.FindControl<TextBox>("logBox").Text += str + Environment.NewLine);
+            {
+                TextBox box = this.FindControl<TextBox>("logBox");
+                box.Text += str + Environment.NewLine;
+                box.CaretIndex = box.Text.Length;
+            });
         }
 
         private async void TopLevel_OnOpened(object? sender, EventArgs e)
@@ -86,8 +94,13 @@ namespace mkvtool
                     }
                     else
                     {
-                        PrintResult("Init", "Init successfully.");
-                        DoUIThread(() => this.FindControl<Grid>("mainBox").IsEnabled = true);
+                        PrintResult("Init", $"Init mkvlib {mkvlib.Version()} successfully.");
+                        Cache();
+                        DoUIThread(() =>
+                        {
+                            SaveSettings();
+                            this.FindControl<Grid>("mainBox").IsEnabled = true;
+                        });
                     }
                 }
                 catch
@@ -109,14 +122,14 @@ namespace mkvtool
 
         private async void SubsetSelectBtns_OnClick(object? sender, RoutedEventArgs e)
         {
-            Button btn = (Button) sender;
+            Button btn = (Button)sender;
             string dir;
             switch (btn.Tag.ToString())
             {
                 case "asses":
                     SubsetArg.Asses = null;
                     this.FindControl<TextBlock>("sa1").Text = string.Empty;
-                    string[] files = await ShowSelectFileDialog("ASS file(s)", new[] {"ass"}, true);
+                    string[] files = await ShowSelectFileDialog("ASS file(s)", new[] { "ass" }, true);
                     if (files != null && files.Length > 0)
                     {
                         SubsetArg.Asses = files;
@@ -163,8 +176,7 @@ namespace mkvtool
 
         private async void DoSubsetBtn_OnClick(object? sender, RoutedEventArgs e)
         {
-            if (SubsetArg.Asses != null && SubsetArg.Asses.Length > 0 && !string.IsNullOrEmpty(SubsetArg.Fonts) &&
-                !string.IsNullOrEmpty(SubsetArg.Output))
+            if (SubsetArg.Asses != null && SubsetArg.Asses.Length > 0)
             {
                 SetBusy(true);
                 SubsetArg.DirSafe = this.FindControl<ToggleSwitch>("sa4").IsChecked == true;
@@ -203,7 +215,7 @@ namespace mkvtool
 
         private async void DumpSelectBtns_OnClick(object? sender, RoutedEventArgs e)
         {
-            Button btn = (Button) sender;
+            Button btn = (Button)sender;
             string dir;
             switch (btn.Tag.ToString())
             {
@@ -212,7 +224,7 @@ namespace mkvtool
                     DumpArg.Dir = false;
                     this.FindControl<TextBlock>("da1").Text = string.Empty;
                     string[] files = await ShowSelectFileDialog("MKV file",
-                        new[] {"mkv"},
+                        new[] { "mkv" },
                         false);
                     if (files != null && files.Length > 0)
                     {
@@ -291,7 +303,7 @@ namespace mkvtool
 
         private async void MakeSelectBtns_OnClick(object? sender, RoutedEventArgs e)
         {
-            Button btn = (Button) sender;
+            Button btn = (Button)sender;
             string dir;
             switch (btn.Tag.ToString())
             {
@@ -379,7 +391,7 @@ namespace mkvtool
 
         private async void CreateSelectBtns_OnClick(object? sender, RoutedEventArgs e)
         {
-            Button btn = (Button) sender;
+            Button btn = (Button)sender;
             string dir;
             switch (btn.Tag.ToString())
             {
@@ -432,8 +444,7 @@ namespace mkvtool
 
         private async void DoCreateBtn_OnClick(object? sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(CreateArg.vDir) && !string.IsNullOrEmpty(CreateArg.sDir) &&
-                !string.IsNullOrEmpty(CreateArg.fDir) && !string.IsNullOrEmpty(CreateArg.oDir))
+            if (!string.IsNullOrEmpty(CreateArg.vDir) && !string.IsNullOrEmpty(CreateArg.sDir) && !string.IsNullOrEmpty(CreateArg.oDir))
             {
                 CreateArg.slang = this.FindControl<TextBox>("ca5").Text;
                 CreateArg.stitle = this.FindControl<TextBox>("ca6").Text;
@@ -478,7 +489,7 @@ namespace mkvtool
 
         private async void WorkflowSelectBtns_OnClick(object? sender, RoutedEventArgs e)
         {
-            Button btn = (Button) sender;
+            Button btn = (Button)sender;
             string dir;
             switch (btn.Tag.ToString())
             {
@@ -548,10 +559,100 @@ namespace mkvtool
             }
         }
 
+        private async void SaveBtn_OnClick(object? sender, RoutedEventArgs e)
+        {
+            SaveSettings();
+        }
+
+        class CacheArg
+        {
+            public static string Dir { get; set; }
+            public static bool Clean { get; set; }
+        }
+
+        private async void CacheSelectBtns_OnClick(object? sender, RoutedEventArgs e)
+        {
+            WorkflowArg.Dir = string.Empty;
+            this.FindControl<TextBlock>("wa1").Text = string.Empty;
+            string dir = await new OpenFolderDialog().ShowAsync(this);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                CacheArg.Dir = dir;
+                this.FindControl<TextBlock>("cca1").Text = dir;
+            }
+        }
+        private async void CacheBtn_OnClick(object? sender, RoutedEventArgs e)
+        {
+            CacheArg.Clean = this.FindControl<ToggleSwitch>("cca2").IsChecked == true;
+            if (!string.IsNullOrEmpty(CacheArg.Dir))
+            {
+                SetBusy(true);
+                new Thread(() =>
+                {
+                    if (CacheArg.Clean)
+                        try
+                        {
+                            Directory.Delete(cache, true);
+                        }
+                        catch { }
+                    string output = $"{MD5Str(CacheArg.Dir)}.cache";
+                    output = Path.Join(cache, output);
+                    string[] el = mkvlib.CreateFontsCache(CacheArg.Dir, output, lcb);
+                    if (el.Length > 0)
+                    {
+                        lcb("Not cache font list:");
+                        lcb(" ----- Begin ----- ");
+                        lcb(string.Join(Environment.NewLine, el));
+                        lcb(" ----- End ----- ");
+                    }
+                    else
+                        PrintResult("Create cache", "Create cache successfully.");
+                    CacheArg.Dir = string.Empty;
+                    CacheArg.Clean = false;
+                    DoUIThread(() =>
+                {
+                    this.FindControl<TextBlock>("cca1").Text = string.Empty;
+                    this.FindControl<ToggleSwitch>("cca2").IsChecked = false;
+                });
+                    SetBusy(false);
+                }).Start();
+            }
+
+        }
+
+        string cache = Path.Join(Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME"), ".mkvtool", "caches");
+        void Cache()
+        {
+            string[] ccs = Directory.GetFiles(cache, "*.cache");
+            mkvlib.Cache(ccs);
+        }
+
+        void SaveSettings()
+        {
+            bool a2p = this.FindControl<ToggleSwitch>("ssa1").IsChecked == true;
+            bool apc = this.FindControl<ToggleSwitch>("ssa2").IsChecked == true;
+            bool ck = this.FindControl<ToggleSwitch>("ssa3").IsChecked == true;
+            bool cks = this.FindControl<ToggleSwitch>("ssa4").IsChecked == true;
+            bool n = this.FindControl<ToggleSwitch>("ssa5").IsChecked == true;
+            string pr = this.FindControl<TextBox>("ssa6").Text;
+            string pf = this.FindControl<TextBox>("ssa7").Text;
+            mkvlib.A2P(a2p, apc, pr, pf);
+            mkvlib.Check(ck, cks);
+            mkvlib.NRename(n);
+        }
+
         void PrintResult(string str1, string str2)
         {
             string str = $"##### {str1} result: \"{str2}\"";
             lcb(str);
+        }
+
+        string MD5Str(string str)
+        {
+            MD5 md5 = MD5.Create();
+            byte[] byteOld = Encoding.UTF8.GetBytes(str);
+            byte[] byteNew = md5.ComputeHash(byteOld);
+            return Convert.ToHexString(byteNew).ToLower();
         }
 
         async void DoUIThread(Action action)
