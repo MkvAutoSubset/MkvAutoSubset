@@ -195,7 +195,7 @@ func (self *assProcessor) parse() bool {
 				if ___reg.MatchString(v) {
 					v += "0123456789"
 				}
-				v += "\u0020\u00a0"
+				v += "a\u0020\u00a0"
 				self.m[k] = new(fontInfo)
 				self.m[k].runes = []rune(v)
 				self.m[k].oldName = strings.Split(k, "^")[0]
