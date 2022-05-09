@@ -377,8 +377,12 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 						}
 					}
 				}
+			} else {
+				return false
 			}
 		}
+	} else {
+		return false
 	}
 	h := "N"
 	if c {
@@ -887,7 +891,12 @@ func (self *assProcessor) matchCache(k, o string) (string, int) {
 					names := self.getFontName(v.File)
 					if len(names) > 0 {
 						_count++
-						if !self.checkFontMissing(self.m[o], _count, true) && self.strict {
+						f := new(fontInfo)
+						f.oldName = _k[0]
+						f.file = ok
+						f.index = i
+						f.runes = self.m[o].runes
+						if !self.checkFontMissing(f, _count, true) && self.strict {
 							ok = ""
 							i = 0
 							continue
