@@ -886,6 +886,7 @@ func (self *assProcessor) matchCache(k, o string) (string, int) {
 	i := -1
 	_count := 0
 	_k := strings.Split(k, "^")
+	otf := ""
 	for _, v := range self.cache {
 		for q, list := range v.Names {
 			if self.matchFontName(list, _k) {
@@ -912,9 +913,19 @@ func (self *assProcessor) matchCache(k, o string) (string, int) {
 				break
 			}
 		}
+		_, _, e, _ := splitPath(ok)
+		e = strings.ToLower(e)
+		if e == ".otf" && otf == "" {
+			otf = ok
+			ok = ""
+		}
 		if ok != "" {
 			break
 		}
+	}
+	if ok == "" && otf != "" {
+		ok = otf
+		i = 0
 	}
 	if _, err := os.Stat(ok); err != nil {
 		ok = ""
