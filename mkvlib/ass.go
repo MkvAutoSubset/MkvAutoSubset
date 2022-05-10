@@ -530,7 +530,11 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	fn := fmt.Sprintf(`%s.txt`, randomStr(8))
 	_, fn, _, _ = splitPath(fn)
 	fn = path.Join(os.TempDir(), fn)
-	_, n, _, _ := splitPath(font.file)
+	_, n, e, _ := splitPath(font.file)
+	e = strings.ToLower(e)
+	if e == ".ttc" {
+		e = ".ttf"
+	}
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
 		printLog(self.lcb, "Failed to create the output folder.")
 		return false
@@ -543,7 +547,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		if !self.rename {
 			n = font.oldName
 		}
-		_fn := fmt.Sprintf("%s.%s.ttf", n, randomStr(8))
+		_fn := fmt.Sprintf("%s.%s%s", n, randomStr(8), e)
 		_fn = path.Join(self.output, _fn)
 		args := make([]string, 0)
 		args = append(args, "--text-file="+fn)
