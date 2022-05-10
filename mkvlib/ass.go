@@ -658,7 +658,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 					}
 				}
 			} else {
-				printLog(self.lcb, `Faild to change the font name: "%s".`, font.oldName)
+				printLog(self.lcb, `Failed to change the font name: "%s".`, font.oldName)
 			}
 		}
 	}
