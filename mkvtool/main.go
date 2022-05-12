@@ -187,6 +187,8 @@ func main() {
 			fmt.Printf("Need list: \t%s\n", strings.Join(list[0], "\n\t\t"))
 			if len(list[1]) > 0 {
 				fmt.Printf("\nMissing list: \t%s\n", strings.Join(list[1], "\t"))
+			} else {
+				fmt.Println("\n*** All included fonts are found. ***")
 			}
 		}
 		if cfc {
