@@ -186,7 +186,7 @@ func main() {
 		if len(list[0]) > 0 {
 			fmt.Printf("Need list: \t%s\n", strings.Join(list[0], "\n\t\t"))
 			if len(list[1]) > 0 {
-				fmt.Printf("Missing list: \t%s\n", strings.Join(list[1], "\t"))
+				fmt.Printf("\nMissing list: \t%s\n", strings.Join(list[1], "\t"))
 			}
 		}
 		if cfc {
