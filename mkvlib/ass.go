@@ -390,7 +390,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	}
 	if _str != "" {
 		_str = stringDeduplication(_str)
-		printLog(self.lcb, `{%s%02d}Font [%s] missing nomal char(s): "%s"`, h, i, f.oldName, _str)
+		printLog(self.lcb, `{%s%02d}Font [%s] missing normal char(s): "%s"`, h, i, f.oldName, _str)
 	}
 	if len(_runes) > 0 {
 		_str = ""
@@ -415,12 +415,12 @@ func (self *assProcessor) matchFonts() bool {
 				continue
 			}
 			if fb {
-				printLog(self.lcb, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
+				printLog(self.lcb, `#Warning# Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
 				_k[1] = "Regular"
 			}
 			for __k, v := range m {
 				for ___k, _v := range v {
-					if self.matchFontName(_v, _k) {
+					if self.matchFontName(_v, _k, fb) {
 						self.m[k].file = __k
 						self.m[k].index = ___k
 						if self.check {
@@ -447,7 +447,7 @@ func (self *assProcessor) matchFonts() bool {
 			if self.m[k].file != "" {
 				continue
 			}
-			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k); f != "" {
+			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k, fb); f != "" {
 				self.m[k].file, self.m[k].index = f, i
 				n := self.fg[_k[0]]
 				if n == "" {
@@ -483,7 +483,7 @@ func (self *assProcessor) fontNameToMap(m []map[string]bool) map[string]map[stri
 	return _m
 }
 
-func (self *assProcessor) matchFontName(m []map[string]bool, _k []string) bool {
+func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool) bool {
 	names := make(map[string]string)
 
 	names[_k[0]] = _k[1]
@@ -501,8 +501,25 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string) bool {
 		}
 	}
 	for name, _ := range m[0] {
-		if len(m[1]) == 0 {
-			return _k[0] == name
+		if _k[0] == name && (len(m[1]) == 0 || b) {
+			if b {
+				fmailies := make([]string, 0)
+				for family, _ := range m[1] {
+					if family == "" {
+						continue
+					}
+					fmailies = append(fmailies, family)
+				}
+				if len(fmailies) > 1 {
+					printLog(self.lcb, `#!Warning!# Font bottom fallback:[%s^%s] -> [%s^(%s)]`, _k[0], _k[1], _k[0], strings.Join(fmailies, ","))
+				} else {
+					printLog(self.lcb, `#!Warning!# Font bottom fallback:[%s^%s] -> [%s^%s]`, _k[0], _k[1], _k[0], fmailies[0])
+				}
+			}
+			if len(m[1]) == 0 {
+				printLog(self.lcb, `#!Warning!# Font bottom fallback:[%s^%s] -> [%s]`, _k[0], _k[1], _k[0])
+			}
+			return true
 		}
 		for family, _ := range m[1] {
 			if name != "" && family != "" && names[name] == family {
@@ -831,7 +848,7 @@ func (self *assProcessor) copyFontsFromCache() bool {
 		l := len(self.m)
 		i := 0
 		for k, _ := range self.m {
-			ok, _ := self.matchCache(k, k)
+			ok, _ := self.matchCache(k, k, true)
 			if ok != "" {
 				_, fn, _, _ := splitPath(ok)
 				fn = path.Join(self.output, fn)
@@ -881,7 +898,7 @@ func (self *assProcessor) loadCache(ccs []string) {
 	}
 }
 
-func (self *assProcessor) matchCache(k, o string) (string, int) {
+func (self *assProcessor) matchCache(k, o string, b bool) (string, int) {
 	ok := ""
 	i := -1
 	_count := 0
@@ -889,7 +906,7 @@ func (self *assProcessor) matchCache(k, o string) (string, int) {
 	otf := ""
 	for _, v := range self.cache {
 		for q, list := range v.Names {
-			if self.matchFontName(list, _k) {
+			if self.matchFontName(list, _k, b) {
 				ok = v.File
 				i = q
 				if self.check {
