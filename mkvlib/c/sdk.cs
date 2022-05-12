@@ -50,7 +50,7 @@ public static class mkvlib
     static extern void A2P(bool a2p, bool apc, IntPtr pr, IntPtr pf);
 
     [DllImport("mkvlib.so")]
-    static extern IntPtr GetFontsList(IntPtr files, logCallback lcb);
+    static extern IntPtr GetFontsList(IntPtr files, IntPtr fonts, logCallback lcb);
 
     [DllImport("mkvlib.so")]
     static extern void Cache(IntPtr ccs);
@@ -155,11 +155,11 @@ public static class mkvlib
         A2P(a2p, apc, cs(pr), cs(pf));
     }
 
-    public static string[] GetFontsList(string[] files, Action<string> lcb)
+    public static string[][] GetFontsList(string[] files, string fonts, Action<string> lcb)
     {
         string _files = JsonSerializer.Serialize<string[]>(files);
-        string result = css(GetFontsList(cs(_files), _lcb(lcb)));
-        return JsonSerializer.Deserialize<string[]>(result);
+        string result = css(GetFontsList(cs(_files), cs(fonts), _lcb(lcb)));
+        return JsonSerializer.Deserialize<string[][]>(result);
     }
 
     public static void Cache(string[] ccs)

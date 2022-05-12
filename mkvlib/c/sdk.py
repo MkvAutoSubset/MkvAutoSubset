@@ -90,11 +90,11 @@ def a2p(en, apc, pr, pf):
     call(en, apc, pr.encode(), pf.encode())
 
 
-def getFontsList(files, lcb):
+def getFontsList(files, fonts, lcb):
     call = lib.GetFontsList
     call.restype = c_char_p
     _files = dumps(files)
-    return loads(call(_files.encode(), lcb).decode())
+    return loads(call(_files.encode(), fonts.encode(), lcb).decode())
 
 
 def cache(ccs):

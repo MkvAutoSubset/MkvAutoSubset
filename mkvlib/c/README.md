@@ -195,10 +195,11 @@
     //return: 是否全程无错
   ```
 - ```c
-    char* GetFontsList(char* files, logCallback lcb);
-    //取得数组内字幕需要的全部字体
+    char* GetFontsList(char* files, char* fonts, logCallback lcb);
+    //取得数组内字幕需要的全部字体,如果设置了Check则会试图匹配字体,并输出匹配失败的列表.
     //files: 字幕文件路径的json的数组
-    //return: json格式的数组
+    //fonts: 字体文件夹路径
+    //return: json格式的二维数组(第一个成员是需要的字体名称,第二个成员是没有匹配成功的字体名称.)
   ```
 - ```c
   void NRename(bool n);

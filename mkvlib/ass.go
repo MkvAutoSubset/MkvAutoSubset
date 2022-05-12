@@ -208,12 +208,16 @@ func (self *assProcessor) parse() bool {
 	return ec == 0
 }
 
-func (self *assProcessor) getFontsList() []string {
+func (self *assProcessor) getFontsList() [][]string {
 	list := make([]string, 0)
 	for k, _ := range self.m {
 		list = append(list, k)
 	}
-	return list
+	list2 := make([]string, 0)
+	if self.check {
+		list2 = self.matchFonts()
+	}
+	return [][]string{list, list2}
 }
 
 func (self *assProcessor) dumpFont(file, out string) bool {
@@ -403,7 +407,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	return _str == "" && len(_runes) == 0
 }
 
-func (self *assProcessor) matchFonts() bool {
+func (self *assProcessor) matchFonts() []string {
 	self.fg = make(map[string]string)
 	fonts := findFonts(self._fonts)
 	m := self.getFontsName(fonts)
@@ -460,14 +464,14 @@ func (self *assProcessor) matchFonts() bool {
 	}
 	w(false)
 	w(true)
-	ok := true
+	el := make([]string, 0)
 	for k, _ := range self.m {
 		if self.m[k].file == "" {
-			ok = false
+			el = append(el, k)
 			printLog(self.lcb, `Missing the font: "%s".`, k)
 		}
 	}
-	return ok
+	return el
 }
 
 func (self *assProcessor) fontNameToMap(m []map[string]bool) map[string]map[string]bool {

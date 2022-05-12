@@ -132,14 +132,14 @@ func A2P(a2p, apc bool, pr, pf *C.char) {
 }
 
 //export GetFontsList
-func GetFontsList(files *C.char, lcb C.logCallback) *C.char {
+func GetFontsList(files, fonts *C.char, lcb C.logCallback) *C.char {
 	if !checkInstance() {
 		return cs("")
 	}
 	obj := make([]string, 0)
 	if json.Unmarshal([]byte(gs(files)), &obj) == nil {
 		_files := obj
-		list := getter.GetProcessorInstance().GetFontsList(_files, _lcb(lcb))
+		list := getter.GetProcessorInstance().GetFontsList(_files, gs(fonts), _lcb(lcb))
 		data, _ := json.Marshal(list)
 		return cs(string(data))
 	}
