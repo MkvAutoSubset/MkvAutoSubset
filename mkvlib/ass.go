@@ -140,7 +140,12 @@ func (self *assProcessor) parse() bool {
 								if len(v) > 2 {
 									switch v[1] {
 									case "b":
-										_b = v[2] == "1"
+										i, _ := strconv.Atoi(v[2])
+										if i == 0 || (i > 1 && i < 612) {
+											_b = false
+										} else if i == 1 || i > 611 {
+											_b = true
+										}
 										break
 									case "i":
 										_i = v[2] == "1"
