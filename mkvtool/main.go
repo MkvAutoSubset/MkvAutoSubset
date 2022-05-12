@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.0.5"
+const appVer = "v4.0.6"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -187,7 +187,7 @@ func main() {
 			fmt.Printf("Need list: \t%s\n", strings.Join(list[0], "\n\t\t"))
 			if len(list[1]) > 0 {
 				fmt.Printf("\nMissing list: \t%s\n", strings.Join(list[1], "\n\t\t"))
-			} else {
+			} else if !nck {
 				fmt.Println("\n*** All included fonts are found. ***")
 			}
 		} else {
