@@ -411,10 +411,10 @@ func (self *assProcessor) matchFonts() bool {
 	w := func(fb bool) {
 		for k, _ := range self.m {
 			_k := strings.Split(k, "^")
-			if self.m[k].file != "" || (fb && _k[1] == "Regular") {
+			if self.m[k].file != "" {
 				continue
 			}
-			if fb {
+			if fb && _k[1] != "Regular" {
 				printLog(self.lcb, `#Warning# Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
 				_k[1] = "Regular"
 			}
