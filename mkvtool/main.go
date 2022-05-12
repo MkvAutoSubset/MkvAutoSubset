@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.0.0"
+const appVer = "v4.0.1"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -182,9 +182,12 @@ func main() {
 		if s != "" {
 			files, _ = findPath(s, `\.ass$`)
 		}
-		list := processer.GetFontsList(files, nil)
-		if len(list) > 0 {
-			fmt.Println(strings.Join(list, "\n"))
+		list := processer.GetFontsList(files, af, nil)
+		if len(list[0]) > 0 {
+			fmt.Printf("Need list: \t%s\n", strings.Join(list[0], "\n\t\t"))
+			if len(list[1]) > 0 {
+				fmt.Printf("Missing list: \t%s\n", strings.Join(list[1], "\t"))
+			}
 		}
 		if cfc {
 			if !processer.CopyFontsFromCache(files, co, nil) {
