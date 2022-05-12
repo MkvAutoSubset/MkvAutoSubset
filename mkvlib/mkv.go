@@ -320,7 +320,7 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 	obj.strict = self.strict
 	d, _, _, _ := splitPath(obj.files[0])
 	if obj._fonts == "" {
-		obj._fonts += path.Join(d, "fonts")
+		obj._fonts = path.Join(d, "fonts")
 	}
 	if obj.output == "" {
 		obj.output = d
@@ -360,8 +360,12 @@ func (self *mkvProcessor) GetFontsList(files []string, fonts string, lcb logCall
 		obj := new(assProcessor)
 		obj.files = files
 		obj.lcb = lcb
-		obj._fonts = fonts
+		d, _, _, _ := splitPath(obj.files[0])
+		if obj._fonts == "" {
+			obj._fonts = path.Join(d, "fonts")
+		}
 		obj.check = self.check
+		obj.strict = self.strict
 		obj.loadCache(self.caches)
 		if obj.parse() {
 			return obj.getFontsList()
