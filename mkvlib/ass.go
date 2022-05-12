@@ -394,7 +394,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	}
 	if _str != "" {
 		_str = stringDeduplication(_str)
-		printLog(self.lcb, `{%s%02d}Font [%s] missing normal char(s): "%s"`, h, i, f.oldName, _str)
+		printLog(self.lcb, `{%s%02d}Font [%s] -> "%s"[%d] missing normal char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
 	}
 	if len(_runes) > 0 {
 		_str = ""
@@ -402,7 +402,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 			_str += fmt.Sprintf(`,0x%x`, _rune)
 		}
 		_str = _str[1:]
-		printLog(self.lcb, `{%s%02d}Font [%s] missing special char(s): "%s"`, h, i, f.oldName, _str)
+		printLog(self.lcb, `{%s%02d}Font [%s] -> "%s"[%d] missing special char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
 	}
 	return _str == "" && len(_runes) == 0
 }
@@ -542,6 +542,9 @@ func (self *assProcessor) reMap() {
 		} else {
 			m[v.file].runes = append(m[v.file].runes, v.runes...)
 		}
+	}
+	for _, v := range m {
+		printLog(self.lcb, `Font selected:[%s] -> "%s"[%d]`, v.oldName, v.file, v.index)
 	}
 	self.m = m
 }
