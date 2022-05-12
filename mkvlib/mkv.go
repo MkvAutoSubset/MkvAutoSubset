@@ -361,6 +361,7 @@ func (self *mkvProcessor) GetFontsList(files []string, fonts string, lcb logCall
 		obj.files = files
 		obj.lcb = lcb
 		d, _, _, _ := splitPath(obj.files[0])
+		obj._fonts = fonts
 		if obj._fonts == "" {
 			obj._fonts = path.Join(d, "fonts")
 		}
