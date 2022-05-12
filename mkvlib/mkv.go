@@ -386,6 +386,8 @@ func (self *mkvProcessor) CopyFontsFromCache(asses []string, dist string, lcb lo
 	obj.lcb = lcb
 	obj.files = asses
 	obj.output = dist
+	obj.check = self.check
+	obj.strict = self.strict
 	obj.loadCache(self.caches)
 	return obj.copyFontsFromCache()
 }
