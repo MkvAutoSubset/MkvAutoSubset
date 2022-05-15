@@ -16,7 +16,7 @@ RUN git clone https://github.com/Masaiki/ass2bdnxml.git && \
     cd ass2bdnxml && \
     cmake -Bbuild -DCMAKE_BUILD_TYPE=Release . && \
     cmake --build build && \
-    cp build/libass2bdnxml /usr/local/bin/ && \
+    cp build/ass2bdnxml /usr/local/bin/ && \
     cd ~ && \
     rm -rf ass2bdnxml
 
