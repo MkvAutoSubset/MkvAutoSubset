@@ -12,7 +12,7 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     mv mkvtool /usr/local/bin/ && \
     mkdir fonts
 
-RUN apk add cmake make gcc && \
+RUN apk add cmake make gcc
 RUN apk add libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev
 
 RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
