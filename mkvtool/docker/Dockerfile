@@ -1,7 +1,7 @@
 FROM alpine
 
 RUN apk update && \
-    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg git cmake make gcc libc-dev libpng-dev freetype-dev
+    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg git cmake make gcc libc-dev libpng-dev freetype-dev fribidi-dev
 
 RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
@@ -12,14 +12,16 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     mv mkvtool /usr/local/bin/ && \
     mkdir fonts
 
-RUN wget https://github.com/libass/libass/releases/download/0.16.0/libass-0.16.0.tar.gz && \
-    tar -xzvf libass-0.16.0.tar.gz && \
-    cd libass-0.16.0 && \
+RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
+    VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
+    wget https://github.com/libass/libass/releases/download/${VERSION}/libass-${VERSION}.tar.gz && \
+    tar -xzvf *.tar.gz && \
+    cd libass* && \
     ./configure --prefix=/usr/local && \
     make && \
     make install && \
     cd .. && \
-    rm -rf libass-0.16.0*
+    rm -rf libass*
 
 RUN git clone https://github.com/Masaiki/ass2bdnxml.git && \
     cd ass2bdnxml && \
