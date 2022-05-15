@@ -1,7 +1,7 @@
 FROM alpine
 
 RUN apk update && \
-    apk add py3-fonttools mkvtoolnix ripgrep
+    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg
 
 RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
@@ -11,6 +11,11 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     rm *.tar.gz && \
     mv mkvtool /usr/local/bin/ && \
     mkdir fonts
+
+RUN [ $(umame -m) == "x86_64" ] && \
+    wget https://github.com/Masaiki/ass2bdnxml/releases/latest/download/ass2bdnxml -P /usr/local/bin/ && \
+    chmod +x /usr/local/bin/ass2bdnxml
+
 
 WORKDIR root
 CMD ["sh", "-c", "[ -d ~/.mkvtool/caches ] || mkvtool -cc -s /fonts ; sh"]
