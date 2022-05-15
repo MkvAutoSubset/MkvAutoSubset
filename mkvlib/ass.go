@@ -417,19 +417,21 @@ func (self *assProcessor) matchFonts() []string {
 	fonts := findFonts(self._fonts)
 	m := self.getFontsName(fonts)
 	_count := make(map[string]int)
-	w := func(fb bool) {
+	w := func(fb int) {
 		for k, _ := range self.m {
 			_k := strings.Split(k, "^")
-			if self.m[k].file != "" {
+			if self.m[k].file != "" || (fb == 1 && _k[1] == "Regular") {
 				continue
 			}
-			if fb && _k[1] != "Regular" {
-				printLog(self.lcb, `#Warning# Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
+			if fb > 0 && _k[1] != "Regular" {
+				if fb == 1 {
+					printLog(self.lcb, `#Warning# Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
+				}
 				_k[1] = "Regular"
 			}
 			for __k, v := range m {
 				for ___k, _v := range v {
-					if self.matchFontName(_v, _k, fb) {
+					if self.matchFontName(_v, _k, fb == 2) {
 						self.m[k].file = __k
 						self.m[k].index = ___k
 						if self.check {
@@ -456,7 +458,7 @@ func (self *assProcessor) matchFonts() []string {
 			if self.m[k].file != "" {
 				continue
 			}
-			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k, fb); f != "" {
+			if f, i := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k, fb == 2); f != "" {
 				self.m[k].file, self.m[k].index = f, i
 				n := self.fg[_k[0]]
 				if n == "" {
@@ -467,8 +469,9 @@ func (self *assProcessor) matchFonts() []string {
 			}
 		}
 	}
-	w(false)
-	w(true)
+	w(0)
+	w(1)
+	w(2)
 	el := make([]string, 0)
 	for k, _ := range self.m {
 		if self.m[k].file == "" {
@@ -510,12 +513,15 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 		}
 	}
 	for name, _ := range m[0] {
-		if _k[0] == name && (len(m[1]) == 0 || b) {
-			if b {
+		if _k[0] == name && b {
+			if len(m[1]) > 0 {
 				fmailies := make([]string, 0)
 				for family, _ := range m[1] {
 					if family == "" {
 						continue
+					}
+					if family == "Regular" {
+						return false
 					}
 					fmailies = append(fmailies, family)
 				}
@@ -524,8 +530,7 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 				} else {
 					printLog(self.lcb, `#!Warning!# Font bottom fallback:[%s^%s] -> [%s^%s]`, _k[0], _k[1], _k[0], fmailies[0])
 				}
-			}
-			if len(m[1]) == 0 {
+			} else {
 				printLog(self.lcb, `#!Warning!# Font bottom fallback:[%s^%s] -> [%s]`, _k[0], _k[1], _k[0])
 			}
 			return true
