@@ -17,7 +17,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 ## mkvtool 安装
 
 ### 202205新增的Docker镜像使用说明
-- 从Dockhub获取
+- 从Dockerhub获取
   ```shell
   TAGNAME=master
   FONT_DIR="/usr/share/fonts/truetype" #字体目录
