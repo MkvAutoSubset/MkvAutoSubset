@@ -17,7 +17,7 @@ RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
     wget https://github.com/libass/libass/releases/download/${VERSION}/libass-${VERSION}.tar.gz && \
     tar -xzvf *.tar.gz && \
     cd libass* && \
-    ./configure --prefix=/usr/local && \
+    ./configure && \
     make && \
     make install && \
     cd .. && \
