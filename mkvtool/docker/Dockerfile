@@ -12,10 +12,10 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     mv mkvtool /usr/local/bin/ && \
     mkdir fonts
 
-RUN [ $(umame -m) == "x86_64" ] && \
+RUN [ $(uname -m) == "x86_64" ] && \
     wget https://github.com/Masaiki/ass2bdnxml/releases/latest/download/ass2bdnxml -P /usr/local/bin/ && \
     chmod +x /usr/local/bin/ass2bdnxml
 
 
 WORKDIR root
-CMD ["sh", "-c", "[ -d ~/.mkvtool/caches ] || mkvtool -cc -s /fonts ; sh"]
+CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool -cc -s /fonts ; sh"]
