@@ -1,7 +1,10 @@
 FROM alpine
 
 RUN apk update && \
-    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg
+    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg \
+            cmake make gcc nasm \
+            libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev fontconfig-dev
+
 
 RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
@@ -11,9 +14,6 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     rm *.tar.gz && \
     mv mkvtool /usr/local/bin/ && \
     mkdir fonts
-
-RUN apk add cmake make gcc nasm
-RUN apk add libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev fontconfig-dev
 
 RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
