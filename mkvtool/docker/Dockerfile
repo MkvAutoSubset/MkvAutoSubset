@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 RUN apt-get update && \
-    apt-get install fonttools mkvtoolnix ripgrep ffmpeg
+    apt-get -y install fonttools mkvtoolnix ripgrep ffmpeg
 
 RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
