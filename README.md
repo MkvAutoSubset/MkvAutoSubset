@@ -16,6 +16,22 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 ## mkvtool 安装
 
+### 202205新增的Docker镜像使用说明
+- 镜像构建&运行
+  ```shell
+  git clone https://github.com/MkvAutoSubset/MkvAutoSubset.git #克隆项目
+  cd MkvAutoSubset #进入项目目录
+  sh docker/rebuild.sh #构建镜像
+  cp docker/run.sh docker/run_my.sh  #拷贝一份自己的运行脚本
+  vi docker/run_my.sh #修改自己的运行脚本(可选)
+  sh docker/run_my.sh #运行镜像
+  ```
+- docker/run.sh的修改说明
+  * FONT_DIR: 字体文件目录
+  * CACHE_DIR: 缓存目录
+  * OTHER_DIR: 其他目录(可选)
+    * 示例:“-v ${HOME}/v:/root/v -v ${HOME}/f:/root/f -v ${HOME}/s:/root/s -v ${HOME}/o:/root/o”
+
 ### 依赖
 
 - FontTools
