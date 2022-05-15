@@ -1,7 +1,7 @@
-FROM ubuntu:20.04
+FROM alpine
 
-RUN apt-get update && \
-    apt-get -y install fonttools mkvtoolnix ripgrep ffmpeg
+RUN apk update && \
+    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg
 
 RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
@@ -10,12 +10,7 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     tar -xzvf *.tar.gz && \
     rm *.tar.gz && \
     mv mkvtool /usr/local/bin/ && \
-    mkdir fonts
-
-RUN [ $(uname -m) == "x86_64" ] && \
-    wget https://github.com/Masaiki/ass2bdnxml/releases/latest/download/ass2bdnxml -P /usr/local/bin/ && \
-    chmod +x /usr/local/bin/ass2bdnxml
-
+    mkdir fonts \
 
 WORKDIR root
 CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool -cc -s /fonts ; sh"]
