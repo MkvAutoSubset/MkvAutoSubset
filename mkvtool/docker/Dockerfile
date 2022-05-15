@@ -1,7 +1,9 @@
 FROM alpine
 
 RUN apk update && \
-    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg git cmake make gcc libc-dev libpng-dev freetype-dev fribidi-dev
+    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg && \
+    git cmake make gcc && \
+    libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev
 
 RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
