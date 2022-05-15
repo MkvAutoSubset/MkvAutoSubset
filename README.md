@@ -30,7 +30,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   * FONT_DIR: 字体文件目录
   * CACHE_DIR: 缓存目录
   * OTHER_DIR: 其他目录(可选)
-    * 示例:“-v ${HOME}/v:/root/v -v ${HOME}/f:/root/f -v ${HOME}/s:/root/s -v ${HOME}/o:/root/o”
+    * 示例:“-v ${HOME}/work:/root/work”
 
 ### 依赖
 
