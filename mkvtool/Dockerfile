@@ -12,4 +12,4 @@ RUN wget https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/v${VER
     mkdir fonts
 
 WORKDIR ~
-CMD ["sh"]
+CMD ["sh", "-c", "[ -d ~/.mkvtool/caches ] || mkvtool -cc -s /fonts ; sh"]
