@@ -10,7 +10,7 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     tar -xzvf *.tar.gz && \
     rm *.tar.gz && \
     mv mkvtool /usr/local/bin/ && \
-    mkdir fonts \
+    mkdir fonts
 
 WORKDIR root
 CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool -cc -s /fonts ; sh"]
