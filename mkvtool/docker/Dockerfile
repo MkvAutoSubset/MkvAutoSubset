@@ -36,7 +36,7 @@ RUN wget https://api.github.com/repos/Masaiki/ass2bdnxml/releases/latest && \
     cmake --build build && \
     cp build/ass2bdnxml /usr/local/bin/ && \
     cd .. && \
-    rm -rf ass2bdnxml*
+    rm -rf ass2bdnxml* *.tar.gz
 
 WORKDIR root
 CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool -cc -s /fonts ; sh"]
