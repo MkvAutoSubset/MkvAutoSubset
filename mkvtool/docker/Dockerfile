@@ -29,6 +29,7 @@ RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
 RUN wget https://api.github.com/repos/Masaiki/ass2bdnxml/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
     rm latest && \
+    wget https://github.com/Masaiki/ass2bdnxml/archive/refs/tags/${VERSION}.tar.gz && \
     tar -xzvf *.tar.gz && \
     cd ass2bdnxml* && \
     cmake -Bbuild -DCMAKE_BUILD_TYPE=Release . && \
