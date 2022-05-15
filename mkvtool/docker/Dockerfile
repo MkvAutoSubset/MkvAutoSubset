@@ -13,7 +13,7 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     tar -xzvf *.tar.gz && \
     rm *.tar.gz && \
     mv mkvtool /usr/local/bin/ && \
-    mkdir fonts ~/work
+    mkdir fonts work
 
 RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
@@ -38,5 +38,5 @@ RUN wget https://api.github.com/repos/Masaiki/ass2bdnxml/releases/latest && \
     cd .. && \
     rm -rf ass2bdnxml* *.tar.gz
 
-WORKDIR root
+WORKDIR work
 CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool -cc -s /fonts ; sh"]
