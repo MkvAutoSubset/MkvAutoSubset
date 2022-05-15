@@ -13,7 +13,7 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     tar -xzvf *.tar.gz && \
     rm *.tar.gz && \
     mv mkvtool /usr/local/bin/ && \
-    mkdir fonts
+    mkdir fonts ~/work
 
 RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
