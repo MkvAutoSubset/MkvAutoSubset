@@ -13,7 +13,7 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     mkdir fonts
 
 RUN apk add cmake make gcc
-RUN apk add libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev
+RUN apk add libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev gettext
 
 RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
