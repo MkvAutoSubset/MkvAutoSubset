@@ -1,9 +1,7 @@
 FROM alpine
 
 RUN apk update && \
-    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg && \
-    git cmake make gcc && \
-    libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev
+    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg
 
 RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
@@ -14,24 +12,30 @@ RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/lates
     mv mkvtool /usr/local/bin/ && \
     mkdir fonts
 
+RUN apk add cmake make gcc && \
+    libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev
+
 RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
     VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
     wget https://github.com/libass/libass/releases/download/${VERSION}/libass-${VERSION}.tar.gz && \
+    rm latest && \
     tar -xzvf *.tar.gz && \
     cd libass* && \
     ./configure && \
-    make && \
     make install && \
     cd .. && \
     rm -rf libass*
 
-RUN git clone https://github.com/Masaiki/ass2bdnxml.git && \
-    cd ass2bdnxml && \
+RUN wget https://api.github.com/repos/Masaiki/ass2bdnxml/releases/latest && \
+    VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
+    rm latest && \
+    tar -xzvf *.tar.gz && \
+    cd ass2bdnxml* && \
     cmake -Bbuild -DCMAKE_BUILD_TYPE=Release . && \
     cmake --build build && \
     cp build/ass2bdnxml /usr/local/bin/ && \
-    cd ~ && \
-    rm -rf ass2bdnxml
+    cd .. && \
+    rm -rf ass2bdnxml*
 
 WORKDIR root
 CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool -cc -s /fonts ; sh"]
