@@ -1,7 +1,7 @@
 FROM alpine
 
 RUN apk update && \
-    apk add py3-fonttools mkvtoolnix ripgrep ffmpeg \
+    apk add py3-fonttools mkvtoolnix ffmpeg \
             cmake make gcc nasm \
             libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev fontconfig-dev
 
