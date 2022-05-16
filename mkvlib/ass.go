@@ -214,6 +214,9 @@ func (self *assProcessor) parse() bool {
 }
 
 func (self *assProcessor) getFontsList() [][]string {
+	if !self.parse() {
+		return nil
+	}
 	list := make([]string, 0)
 	for k, _ := range self.m {
 		list = append(list, k)
@@ -864,12 +867,12 @@ func (self *assProcessor) copyFontsFromCache() bool {
 	if self.parse() {
 		l := len(self.m)
 		i := 0
-		for k, _ := range self.m {
-			ok, _ := self.matchCache(k, k, true)
-			if ok != "" {
-				_, fn, _, _ := splitPath(ok)
+		self.matchFonts()
+		for k, v := range self.m {
+			if v.file != "" {
+				_, fn, _, _ := splitPath(v.file)
 				fn = path.Join(self.output, fn)
-				if copyFile(ok, fn) == nil {
+				if copyFile(v.file, fn) == nil {
 					i++
 					printLog(self.lcb, "Copy (%d/%d) done.", i, l)
 				}

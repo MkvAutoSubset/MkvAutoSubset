@@ -208,8 +208,9 @@ func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallb
 		if !self.DumpMKV(item, p, subset, lcb) {
 			ok = false
 			printLog(lcb, `Failed to dump the mkv file "%s".`, item)
+		} else {
+			printLog(lcb, "Dump (%d/%d) done.", i+1, l)
 		}
-		printLog(lcb, "Dump (%d/%d) done.", i+1, l)
 	}
 	return ok
 }
@@ -276,8 +277,9 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		if ec > 0 {
 			ok = false
 			printLog(lcb, `Failed to create the mkv/mks file: "%s".`, item)
+		} else {
+			printLog(lcb, "Create (%d/%d) done.", i+1, l)
 		}
-		printLog(lcb, "Create (%d/%d) done.", i+1, l)
 	}
 	_ = os.RemoveAll(tDir)
 	return ok
@@ -300,8 +302,9 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, true) {
 			ok = false
 			printLog(lcb, `Faild to make the mkv file: "%s".`, item)
+		} else {
+			printLog(lcb, "Make (%d/%d) done.", i+1, l)
 		}
-		printLog(lcb, "Make (%d/%d) done.", i+1, l)
 	}
 	return ok
 }
@@ -368,9 +371,7 @@ func (self *mkvProcessor) GetFontsList(files []string, fonts string, lcb logCall
 		obj.check = self.check
 		obj.strict = self.strict
 		obj.loadCache(self.caches)
-		if obj.parse() {
-			return obj.getFontsList()
-		}
+		return obj.getFontsList()
 	}
 	return nil
 }
@@ -480,8 +481,9 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 			if !ok {
 				ec++
 				printLog(lcb, `Failed to create the test video file: "%s"`, _output)
+			} else {
+				printLog(lcb, "CT (%d/%d) done.", i+1, l)
 			}
-			printLog(lcb, "CT (%d/%d) done.", i+1, l)
 		}
 		return ec == 0
 	}
