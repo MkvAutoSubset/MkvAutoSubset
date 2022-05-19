@@ -1,17 +1,11 @@
-### Example user template template
-### Example user template
-
 go.sum
 
 # IntelliJ project files
 .idea
-*.iml
-out
-gen
 
 # VS project files
 bin
 obj
 .vs
 *.user
-/mkvtool-gui/mkvlib.so
+mkvtool-gui/mkvlib.so
