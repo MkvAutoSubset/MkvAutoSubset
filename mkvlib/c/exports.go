@@ -216,11 +216,11 @@ func GetFontInfo(p *C.char) *C.char {
 }
 
 //export NOverwrite
-func NOverwrite(o bool) {
+func NOverwrite(n bool) {
 	if !checkInstance() {
 		return
 	}
-	getter.GetProcessorInstance().NOverwrite(o)
+	getter.GetProcessorInstance().NOverwrite(n)
 }
 
 //export Version
