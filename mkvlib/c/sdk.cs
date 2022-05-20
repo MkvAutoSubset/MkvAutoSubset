@@ -61,6 +61,9 @@ public static class mkvlib
     [DllImport("mkvlib.so", EntryPoint = "NRename")]
     static extern void _NRename(bool n);
 
+    [DllImport("mkvlib.so", EntryPoint = "Overwrite")]
+    static extern void _Overwrite(bool o);
+
     [DllImport("mkvlib.so", EntryPoint = "Check")]
     static extern void _Check(bool check, bool strict);
 
@@ -176,6 +179,11 @@ public static class mkvlib
     public static void NRename(bool n)
     {
         _NRename(n);
+    }
+
+    public static void Overwrite(bool o)
+    {
+        _Overwrite(o);
     }
 
     public static void Check(bool check, bool strict)

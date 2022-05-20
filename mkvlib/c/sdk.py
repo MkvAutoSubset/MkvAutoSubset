@@ -131,6 +131,11 @@ def nrename(n):
     call(n)
 
 
+def overwrite(o):
+    call = lib.Overwrite
+    call(o)
+
+
 def check(c, s):
     call = lib.Check
     call(c, s)

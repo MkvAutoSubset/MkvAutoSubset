@@ -215,6 +215,14 @@ func GetFontInfo(p *C.char) *C.char {
 	return cs(string(data))
 }
 
+//export Overwrite
+func Overwrite(o bool) {
+	if !checkInstance() {
+		return
+	}
+	getter.GetProcessorInstance().Overwrite(o)
+}
+
 //export Version
 func Version() *C.char {
 	return cs(mkvlib.Version())
