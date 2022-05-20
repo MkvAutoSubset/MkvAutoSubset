@@ -112,14 +112,14 @@ public static class mkvlib
 
     public static bool CreateMKV(string file, string[] tracks, string[] attachments, string output, string slang, string stitle, bool clean)
     {
-        string _tracks = JsonSerializer.Serialize<string[]>(tracks);
-        string _attachments = JsonSerializer.Serialize<string[]>(attachments);
+        string _tracks = JsonSerializer.Serialize(tracks);
+        string _attachments = JsonSerializer.Serialize(attachments);
         return CreateMKV(cs(file), cs(_tracks), cs(_attachments), cs(output), cs(slang), cs(stitle), clean);
     }
 
     public static bool ASSFontSubset(string[] files, string fonts, string output, bool dirSafe, Action<string> lcb)
     {
-        string _files = JsonSerializer.Serialize<string[]>(files);
+        string _files = JsonSerializer.Serialize(files);
         return ASSFontSubset(cs(_files), cs(fonts), cs(output), dirSafe, _lcb(lcb));
     }
 
@@ -151,7 +151,7 @@ public static class mkvlib
 
     public static bool CreateTestVideo(string[] asses, string s, string fontdir, string enc, bool burn, Action<string> lcb)
     {
-        string _asses = JsonSerializer.Serialize<string[]>(asses);
+        string _asses = JsonSerializer.Serialize(asses);
         return CreateTestVideo(cs(_asses), cs(s), cs(fontdir), cs(enc), burn, _lcb(lcb));
     }
 
@@ -162,14 +162,14 @@ public static class mkvlib
 
     public static string[][] GetFontsList(string[] files, string fonts, Action<string> lcb)
     {
-        string _files = JsonSerializer.Serialize<string[]>(files);
+        string _files = JsonSerializer.Serialize(files);
         string result = css(GetFontsList(cs(_files), cs(fonts), _lcb(lcb)));
         return JsonSerializer.Deserialize<string[][]>(result);
     }
 
     public static void Cache(string[] ccs)
     {
-        string _ccs = JsonSerializer.Serialize<string[]>(ccs);
+        string _ccs = JsonSerializer.Serialize(ccs);
         Cache(cs(_ccs));
     }
 
