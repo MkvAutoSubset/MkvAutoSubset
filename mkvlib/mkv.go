@@ -201,7 +201,8 @@ func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallb
 	ok := true
 	files := findMKVs(dir)
 	l := len(files)
-	for i, item := range files {
+	_ok := 0
+	for _, item := range files {
 		p := strings.TrimPrefix(item, dir)
 		d, _, _, f := splitPath(p)
 		p = path.Join(output, d, f)
@@ -209,7 +210,8 @@ func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallb
 			ok = false
 			printLog(lcb, `Failed to dump the mkv file "%s".`, item)
 		} else {
-			printLog(lcb, "Dump (%d/%d) done.", i+1, l)
+			_ok++
+			printLog(lcb, "Dump (%d/%d) done.", _ok, l)
 		}
 	}
 	return ok
@@ -239,7 +241,8 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 	tDir = path.Join(tDir, randomStr(8))
 	files, _ := findPath(vDir, `\.\S+$`)
 	l := len(files)
-	for i, item := range files {
+	_ok := 0
+	for _, item := range files {
 		ec := 0
 		_, _, _, _f := splitPath(item)
 		tmp, _ := findPath(sDir, fmt.Sprintf(`%s(_[\S ]*)?\.\S+$`, regexp.QuoteMeta(_f)))
@@ -278,7 +281,8 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			ok = false
 			printLog(lcb, `Failed to create the mkv/mks file: "%s".`, item)
 		} else {
-			printLog(lcb, "Create (%d/%d) done.", i+1, l)
+			_ok++
+			printLog(lcb, "Create (%d/%d) done.", _ok, l)
 		}
 	}
 	_ = os.RemoveAll(tDir)
@@ -289,7 +293,8 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 	ok := true
 	files, _ := findPath(dir, `\.\S+$`)
 	l := len(files)
-	for i, item := range files {
+	_ok := 0
+	for _, item := range files {
 		p := strings.TrimPrefix(item, dir)
 		d, n, _, f := splitPath(p)
 		p = path.Join(data, d, f)
@@ -303,7 +308,8 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 			ok = false
 			printLog(lcb, `Faild to make the mkv file: "%s".`, item)
 		} else {
-			printLog(lcb, "Make (%d/%d) done.", i+1, l)
+			_ok++
+			printLog(lcb, "Make (%d/%d) done.", _ok, l)
 		}
 	}
 	return ok
@@ -474,7 +480,8 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 	}
 	if burn {
 		ec := 0
-		for i, v := range asses {
+		_ok := 0
+		for _, v := range asses {
 			d, _, _, ne := splitPath(v)
 			_output := path.Join(d, fmt.Sprintf("%s-test.mp4", ne))
 			ok := self.CreateBlankOrBurnVideo(0, s, enc, v, fontdir, _output)
@@ -482,7 +489,8 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 				ec++
 				printLog(lcb, `Failed to create the test video file: "%s"`, _output)
 			} else {
-				printLog(lcb, "CT (%d/%d) done.", i+1, l)
+				_ok++
+				printLog(lcb, "CT (%d/%d) done.", _ok, l)
 			}
 		}
 		return ec == 0
