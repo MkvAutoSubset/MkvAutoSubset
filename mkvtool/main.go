@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.1.3"
+const appVer = "v4.1.4"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -245,7 +245,7 @@ func main() {
 				log.Printf("Has item(s).")
 				data := []byte(strings.Join(lines, "\n"))
 				if os.WriteFile("list.txt", data, os.ModePerm) != nil {
-					log.Printf("Faild to write the result file")
+					log.Printf("Failed to write the result file")
 					ec++
 				}
 			} else {
