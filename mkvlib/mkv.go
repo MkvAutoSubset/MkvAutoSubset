@@ -157,10 +157,11 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 	if clean && !self.mks {
 		args = append(args, "--no-subtitles", "--no-attachments")
 	}
+	d, _, _, ne := splitPath(output)
 	if !self.mks {
 		args = append(args, file)
+		output = path.Join(d, ne+".mkv")
 	} else {
-		d, _, _, ne := splitPath(output)
 		output = path.Join(d, ne+".mks")
 	}
 	args = append(args, "--output", output)
@@ -249,6 +250,18 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		asses := make([]string, 0)
 		subs := make([]string, 0)
 		p := path.Join(tDir, _f)
+		fn := path.Join(oDir, _f)
+		if self.mks {
+			fn += ".mks"
+		} else {
+			fn += ".mkv"
+		}
+		if _a, _ := isExists(fn); _a {
+			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, item)
+			_ok++
+			printLog(lcb, "Create (%d/%d) done.", _ok, l)
+			continue
+		}
 		for _, sub := range tmp {
 			if strings.HasSuffix(sub, ".ass") {
 				_, _, _, __f := splitPath(sub)
@@ -273,7 +286,6 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			}
 		}
 		tracks = append(tracks, subs...)
-		fn := path.Join(oDir, _f) + ".mkv"
 		if ec == 0 && !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, clean) {
 			ec++
 		}
@@ -296,14 +308,25 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 	_ok := 0
 	for _, item := range files {
 		p := strings.TrimPrefix(item, dir)
-		d, n, _, f := splitPath(p)
+		d, _, _, f := splitPath(p)
+		fn := path.Join(output, d, f)
+		if self.mks {
+			fn += ".mks"
+		} else {
+			fn += ".mkv"
+		}
+		if _a, _ := isExists(fn); _a {
+			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, item)
+			_ok++
+			printLog(lcb, "Make (%d/%d) done.", _ok, l)
+			continue
+		}
 		p = path.Join(data, d, f)
 		_p := path.Join(p, "subsetted")
 		subs, _ := findPath(p, `\.(sub)|(pgs)`)
 		asses, _ := findPath(_p, `\.ass$`)
 		attachments := findFonts(_p)
 		tracks := append(subs, asses...)
-		fn := path.Join(output, d, n)
 		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, true) {
 			ok = false
 			printLog(lcb, `Faild to make the mkv file: "%s".`, item)
@@ -488,6 +511,7 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 			if !ok {
 				ec++
 				printLog(lcb, `Failed to create the test video file: "%s"`, _output)
+				_ = os.Remove(_output)
 			} else {
 				_ok++
 				printLog(lcb, "CT (%d/%d) done.", _ok, l)
