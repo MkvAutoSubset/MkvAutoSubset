@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.1.1"
+const appVer = "v4.1.2"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -64,6 +64,7 @@ func main() {
 	nck := false
 	ncks := false
 	b := false
+	o := false
 	t := ""
 	e := ""
 	sl, st := "", ""
@@ -107,6 +108,7 @@ func main() {
 	flag.StringVar(&t, "t", "", `Create test video source path(enter "-" for blank video).`)
 	flag.BoolVar(&b, "b", false, `Create test video with burn subtitle.`)
 	flag.StringVar(&e, "e", "libx264", `Create test video use encoder.`)
+	flag.BoolVar(&o, "o", false, `Enable overwrite mode.`)
 	flag.BoolVar(&v, "v", false, "Show app info.")
 	flag.Parse()
 
@@ -141,6 +143,7 @@ func main() {
 	processer.MKS(mks)
 	processer.NRename(n)
 	processer.Check(!nck, !ncks)
+	processer.Overwrite(o)
 
 	if i != "" {
 		info := processer.GetFontInfo(i)
