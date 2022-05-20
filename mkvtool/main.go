@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.1.0"
+const appVer = "v4.1.1"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
