@@ -164,7 +164,7 @@ func (self *assProcessor) parse() bool {
 											_b = *s.InlineStyle.SSABold
 											_i = *s.InlineStyle.SSAItalic
 										} else {
-											printLog(self.lcb, `Not Found style in the ass file:"%s" [%s].`, k, v[2])
+											printLog(self.lcb, `Not found style in the ass file:"%s" [%s].`, k, v[2])
 											ec++
 										}
 										break
@@ -208,7 +208,7 @@ func (self *assProcessor) parse() bool {
 		}
 	}
 	if len(self.m) == 0 {
-		printLog(self.lcb, `Not Found item in the ass file(s): "%d"`, len(self.files))
+		printLog(self.lcb, `Not found item in the ass file(s): "%d"`, len(self.files))
 	}
 	return ec == 0
 }

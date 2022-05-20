@@ -67,7 +67,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 	ec := 0
 	obj := self.GetMKVInfo(file)
 	if obj == nil {
-		printLog(lcb, `Failed to get the mkv file info: "%s".`, file)
+		printLog(lcb, `Failed to get the file info: "%s".`, file)
 		return false
 	}
 	attachments := make([]string, 0)
@@ -124,7 +124,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 			ec++
 		}
 	} else {
-		printLog(lcb, `This mkv file is not has the subtitles & attachments: "%s"`, file)
+		printLog(lcb, `This file is not has the subtitles & attachments: "%s"`, file)
 	}
 	return ec == 0
 }
@@ -132,7 +132,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 func (self *mkvProcessor) CheckSubset(file string, lcb logCallback) (bool, bool) {
 	obj := self.GetMKVInfo(file)
 	if obj == nil {
-		printLog(lcb, `Failed to get the mkv file info: "%s".`, file)
+		printLog(lcb, `Failed to get the file info: "%s".`, file)
 		return false, true
 	}
 	ass := false
@@ -210,7 +210,7 @@ func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallb
 		p = path.Join(output, d, f)
 		if !self.DumpMKV(item, p, subset, lcb) {
 			ok = false
-			printLog(lcb, `Failed to dump the mkv file "%s".`, item)
+			printLog(lcb, `Failed to dump the file: "%s".`, item)
 		} else {
 			_ok++
 			printLog(lcb, "Dump (%d/%d) done.", _ok, l)
@@ -226,7 +226,7 @@ func (self *mkvProcessor) QueryFolder(dir string, lcb logCallback) []string {
 	for i, file := range files {
 		a, b := self.CheckSubset(file, lcb)
 		if b {
-			printLog(lcb, `Failed to check subset for mkv file "%s".`, file)
+			printLog(lcb, `Failed to check subset for file: "%s".`, file)
 		} else if !a {
 			lines = append(lines, file)
 		}
@@ -292,7 +292,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		}
 		if ec > 0 {
 			ok = false
-			printLog(lcb, `Failed to create the mkv/mks file: "%s".`, item)
+			printLog(lcb, `Failed to create the file: "%s".`, item)
 		} else {
 			_ok++
 			printLog(lcb, "Create (%d/%d) done.", _ok, l)
@@ -330,7 +330,7 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 		tracks := append(subs, asses...)
 		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, true) {
 			ok = false
-			printLog(lcb, `Faild to make the mkv file: "%s".`, item)
+			printLog(lcb, `Failed to make the file: "%s".`, item)
 		} else {
 			_ok++
 			printLog(lcb, "Make (%d/%d) done.", _ok, l)
