@@ -207,7 +207,7 @@
   //n: 是否不重命名
    ```
 - ```c
-  void Overwrite(bool o);
-  //输出时是否覆盖已存在的文件
-  //o: 是否覆盖
+  void NOverwrite(bool n);
+  //输出时是否跳过已存在的文件
+  //o: 是否跳过
    ```

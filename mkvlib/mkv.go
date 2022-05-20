@@ -48,7 +48,7 @@ type mkvProcessor struct {
 	nrename    bool
 	check      bool
 	strict     bool
-	overwrite  bool
+	noverwrite bool
 }
 
 func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
@@ -257,7 +257,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		} else {
 			fn += ".mkv"
 		}
-		if _a, _ := isExists(fn); _a && !self.overwrite {
+		if _a, _ := isExists(fn); _a && self.noverwrite {
 			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, fn)
 			_ok++
 			printLog(lcb, "Create (%d/%d) done.", _ok, l)
@@ -316,7 +316,7 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 		} else {
 			fn += ".mkv"
 		}
-		if _a, _ := isExists(fn); _a && !self.overwrite {
+		if _a, _ := isExists(fn); _a && self.noverwrite {
 			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, fn)
 			_ok++
 			printLog(lcb, "Make (%d/%d) done.", _ok, l)
@@ -446,8 +446,8 @@ func (self *mkvProcessor) NRename(nrename bool) {
 	self.nrename = nrename
 }
 
-func (self *mkvProcessor) Overwrite(o bool) {
-	self.overwrite = o
+func (self *mkvProcessor) NOverwrite(n bool) {
+	self.noverwrite = n
 }
 
 func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, output string) bool {
