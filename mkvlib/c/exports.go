@@ -215,12 +215,12 @@ func GetFontInfo(p *C.char) *C.char {
 	return cs(string(data))
 }
 
-//export Overwrite
-func Overwrite(o bool) {
+//export NOverwrite
+func NOverwrite(o bool) {
 	if !checkInstance() {
 		return
 	}
-	getter.GetProcessorInstance().Overwrite(o)
+	getter.GetProcessorInstance().NOverwrite(o)
 }
 
 //export Version
