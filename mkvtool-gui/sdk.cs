@@ -5,9 +5,9 @@ using System.Text.Json;
 public static class mkvlib
 {
 
-    const string so = "mkvlib.so";
-
     #region imports
+
+    const string so = "mkvlib.so";
 
     [DllImport(so, EntryPoint = "Version")]
     static extern IntPtr _Version();
@@ -52,7 +52,7 @@ public static class mkvlib
     static extern void A2P(bool a2p, bool apc, IntPtr pr, IntPtr pf);
 
     [DllImport(so)]
-    static extern IntPtr GetFontsList(IntPtr files, logCallback lcb);
+    static extern IntPtr GetFontsList(IntPtr files, IntPtr fonts, logCallback lcb);
 
     [DllImport(so)]
     static extern void Cache(IntPtr ccs);
@@ -62,6 +62,9 @@ public static class mkvlib
 
     [DllImport(so, EntryPoint = "NRename")]
     static extern void _NRename(bool n);
+
+    [DllImport(so, EntryPoint = "NOverwrite")]
+    static extern void _NOverwrite(bool n);
 
     [DllImport(so, EntryPoint = "Check")]
     static extern void _Check(bool check, bool strict);
@@ -157,11 +160,11 @@ public static class mkvlib
         A2P(a2p, apc, cs(pr), cs(pf));
     }
 
-    public static string[] GetFontsList(string[] files, Action<string> lcb)
+    public static string[][] GetFontsList(string[] files, string fonts, Action<string> lcb)
     {
         string _files = JsonSerializer.Serialize(files);
-        string result = css(GetFontsList(cs(_files), _lcb(lcb)));
-        return JsonSerializer.Deserialize<string[]>(result);
+        string result = css(GetFontsList(cs(_files), cs(fonts), _lcb(lcb)));
+        return JsonSerializer.Deserialize<string[][]>(result);
     }
 
     public static void Cache(string[] ccs)
@@ -178,6 +181,11 @@ public static class mkvlib
     public static void NRename(bool n)
     {
         _NRename(n);
+    }
+
+    public static void NOverwrite(bool n)
+    {
+        _NOverwrite(n);
     }
 
     public static void Check(bool check, bool strict)
@@ -221,5 +229,4 @@ public static class mkvlib
     {
         return Marshal.PtrToStringUTF8(ptr);
     }
-
 }

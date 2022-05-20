@@ -281,18 +281,19 @@
 									<Controls:ToggleSwitch Content="Check mode" IsChecked="True" Name="ssa3" />
 									<Controls:ToggleSwitch Content="Strict for check mode" IsChecked="True" Name="ssa4" />
 									<Controls:ToggleSwitch Content="Not rename subsetted font" IsChecked="False" Name="ssa5" />
+									<Controls:ToggleSwitch Content="Not overwrite existing file" IsChecked="False" Name="ssa6" />
 									<StackPanel Orientation="Horizontal" Margin="5">
 										<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 											<TextBlock Text="PGS resolution:" VerticalAlignment="Center"
 													   TextAlignment="Center" />
-											<TextBox Name="ssa6" Text="1080p" />
+											<TextBox Name="ssa7" Text="1080p" />
 										</StackPanel>
 									</StackPanel>
 									<StackPanel Orientation="Horizontal" Margin="5">
 										<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 											<TextBlock Text="PGS frame rate:" VerticalAlignment="Center"
 													   TextAlignment="Center" />
-											<TextBox Name="ssa7" Text="23.976" />
+											<TextBox Name="ssa8" Text="23.976" />
 										</StackPanel>
 									</StackPanel>
 									<Button Margin="10" Content="Save" Click="SaveBtn_OnClick"

@@ -635,11 +635,13 @@ namespace mkvtool
             bool ck = this.FindControl<ToggleSwitch>("ssa3").IsChecked == true;
             bool cks = this.FindControl<ToggleSwitch>("ssa4").IsChecked == true;
             bool n = this.FindControl<ToggleSwitch>("ssa5").IsChecked == true;
-            string pr = this.FindControl<TextBox>("ssa6").Text;
-            string pf = this.FindControl<TextBox>("ssa7").Text;
+            bool no = this.FindControl<ToggleSwitch>("ssa6").IsChecked == true;
+            string pr = this.FindControl<TextBox>("ssa7").Text;
+            string pf = this.FindControl<TextBox>("ssa8").Text;
             mkvlib.A2P(a2p, apc, pr, pf);
             mkvlib.Check(ck, cks);
             mkvlib.NRename(n);
+            mkvlib.NOverwrite(no);
         }
 
         void PrintResult(string str1, string str2)
