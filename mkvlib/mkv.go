@@ -257,7 +257,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			fn += ".mkv"
 		}
 		if _a, _ := isExists(fn); _a {
-			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, item)
+			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, fn)
 			_ok++
 			printLog(lcb, "Create (%d/%d) done.", _ok, l)
 			continue
@@ -316,7 +316,7 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 			fn += ".mkv"
 		}
 		if _a, _ := isExists(fn); _a {
-			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, item)
+			printLog(lcb, `@Warning@ Existing file: "%s",skip.`, fn)
 			_ok++
 			printLog(lcb, "Make (%d/%d) done.", _ok, l)
 			continue
