@@ -85,7 +85,9 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 手动安装:
 
   [点此下载](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/latest)
+- 适用于Win64的GUI版及动态链接库
 
+  [点此下载](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/gui)
 ## mkvtool 功能及使用示例
 - 2022.04更新的ASS转PGS说明
   ```shell
