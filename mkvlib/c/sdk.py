@@ -5,9 +5,13 @@ libpath = "./mkvlib.so"
 lib = CDLL(libpath)
 
 
-@CFUNCTYPE(None, c_char_p)
-def _lcb(s):
-    print(s.decode())
+def _lcb(lcb):
+    @CFUNCTYPE(None, c_char_p)
+    def logcallback(s):
+        if lcb:
+            lcb(s.decode())
+
+    return logcallback
 
 
 def version():
@@ -18,7 +22,7 @@ def version():
 
 def initInstance(lcb):
     call = lib.InitInstance
-    return call(lcb)
+    return call(_lcb(lcb))
 
 
 def getMKVInfo(file):
@@ -29,52 +33,52 @@ def getMKVInfo(file):
 
 def dumpMKV(file, output, subset, lcb):
     call = lib.DumpMKV
-    return call(file.encode(), output.encode(), subset, lcb)
+    return call(file.encode(), output.encode(), subset, _lcb(lcb))
 
 
 def checkSubset(file, lcb):
     call = lib.CheckSubset
     call.restype = c_char_p
-    return loads(call(file.encode(), lcb).decode())
+    return loads(call(file.encode(), _lcb(lcb)).decode())
 
 
-def createMKV(file, tracks, attachments, output, slang, stitle, clean):
+def createMKV(file, tracks, attachments, output, slang, stitle, clean, lcb):
     call = lib.CreateMKV
     _tracks = dumps(tracks)
     _attachments = dumps(attachments)
     return call(file.encode(), _tracks.encode(), _attachments.encode(), output.encode(), slang.encode(),
-                stitle.encode(), clean)
+                stitle.encode(), clean, _lcb(lcb))
 
 
 def assFontSubset(files, fonts, output, dirSafe, lcb):
     call = lib.ASSFontSubset
     _files = dumps(files)
-    return call(_files.encode(), fonts.encode(), output.encode(), dirSafe, lcb)
+    return call(_files.encode(), fonts.encode(), output.encode(), dirSafe, _lcb(lcb))
 
 
 def queryFolder(dir, lcb):
     call = lib.QueryFolder
     call.restype = c_char_p
-    return call(dir.encode(), lcb)
+    return call(dir.encode(), _lcb(lcb))
 
 
 def dumpMKVs(dir, output, subset, lcb):
     call = lib.DumpMKVs
-    return call(dir.encode(), output.encode(), subset, lcb)
+    return call(dir.encode(), output.encode(), subset, _lcb(lcb))
 
 
 def createMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle, clean, lcb):
     call = lib.CreateMKVs
     return call(vDir.encode(), sDir.encode(), fDir.encode(), tDir.encode(), oDir.encode(), slang.encode(),
-                stitle.encode(), clean, lcb)
+                stitle.encode(), clean, _lcb(lcb))
 
 
 def makeMKVs(dir, data, output, slang, stitle, lcb):
     call = lib.MakeMKVs
-    return call(dir.encode(), data.encode(), output.encode(), slang.encode(), stitle.encode(), lcb)
+    return call(dir.encode(), data.encode(), output.encode(), slang.encode(), stitle.encode(), _lcb(lcb))
 
 
-def CreateBlankOrBurnVideo(t, s, enc, ass, fontdir, output):
+def createBlankOrBurnVideo(t, s, enc, ass, fontdir, output):
     call = lib.CreateBlankOrBurnVideo
     call(t.encode(), s.encode(), enc.encode(), ass.encode(), fontdir.encode(), output.encode())
 
@@ -82,7 +86,7 @@ def CreateBlankOrBurnVideo(t, s, enc, ass, fontdir, output):
 def createTestVideo(asses, s, fontdir, enc, burn, lcb):
     call = lib.CreateTestVideo
     _files = dumps(asses)
-    call(_files.encode(), s.encode(), fontdir.encode(), enc.encode(), burn, lcb)
+    call(_files.encode(), s.encode(), fontdir.encode(), enc.encode(), burn, _lcb(lcb))
 
 
 def a2p(en, apc, pr, pf):
@@ -94,7 +98,7 @@ def getFontsList(files, fonts, lcb):
     call = lib.GetFontsList
     call.restype = c_char_p
     _files = dumps(files)
-    return loads(call(_files.encode(), fonts.encode(), lcb).decode())
+    return loads(call(_files.encode(), fonts.encode(), _lcb(lcb)).decode())
 
 
 def cache(ccs):
@@ -112,13 +116,13 @@ def getFontInfo(p):
 def createFontsCache(dir, output, lcb):
     call = lib.CreateFontsCache
     call.restype = c_char_p
-    return loads(call(dir.encode(), output.encode(), lcb).decode())
+    return loads(call(dir.encode(), output.encode(), _lcb(lcb)).decode())
 
 
 def copyFontsFromCache(asses, dist, lcb):
     call = lib.CopyFontsFromCache
     _files = dumps(asses)
-    return call(_files.encode(), dist.encode(), lcb)
+    return call(_files.encode(), dist.encode(), _lcb(lcb))
 
 
 def mks(en):
