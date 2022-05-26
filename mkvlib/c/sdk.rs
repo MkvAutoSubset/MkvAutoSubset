@@ -219,7 +219,7 @@ pub fn nrename(n: bool) {
     }
 }
 
-fn queryFolder(dir: &str, lcb: logCallback) -> Vec<String> {
+pub fn queryFolder(dir: &str, lcb: logCallback) -> Vec<String> {
     unsafe {
         let str = QueryFolder(cs(dir), lcb);
         return jtoa(str);
