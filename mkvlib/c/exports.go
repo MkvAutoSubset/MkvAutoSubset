@@ -42,18 +42,13 @@ func DumpMKV(file, output *C.char, subset bool, lcb C.logCallback) bool {
 	return getter.GetProcessorInstance().DumpMKV(gs(file), gs(output), subset, _lcb(lcb))
 }
 
-type checkSubset_R struct {
-	Subsetted bool `json:"subsetted"`
-	Error     bool `json:"error"`
-}
-
 //export CheckSubset
 func CheckSubset(file *C.char, lcb C.logCallback) *C.char {
 	if !checkInstance() {
 		return cs("")
 	}
 	a, b := getter.GetProcessorInstance().CheckSubset(gs(file), _lcb(lcb))
-	data, _ := json.Marshal(checkSubset_R{a, b})
+	data, _ := json.Marshal([]bool{a, b})
 	return cs(string(data))
 }
 

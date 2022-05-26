@@ -103,11 +103,7 @@ public static class mkvlib
     public static bool[] CheckSubset(string file, Action<string> lcb)
     {
         string json = css(CheckSubset(cs(file), _lcb(lcb)));
-        JsonDocument doc = JsonDocument.Parse(json);
-        bool[] result = new bool[2];
-        result[0] = doc.RootElement.GetProperty("subsetted").GetBoolean();
-        result[1] = doc.RootElement.GetProperty("error").GetBoolean();
-        return result;
+        return JsonSerializer.Deserialize<bool[]>(json);
     }
 
     public static bool CreateMKV(string file, string[] tracks, string[] attachments, string output, string slang, string stitle, bool clean)
