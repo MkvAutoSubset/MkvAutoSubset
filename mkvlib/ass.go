@@ -374,7 +374,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 			_m := make(map[rune]bool)
 			if _font != nil {
 				for _, r := range f.runes {
-					if r == '\u00a0' {
+					if r == '\u00a0' || r == '\u0009' {
 						continue
 					}
 					n, _ := _font.GlyphIndex(nil, r)
