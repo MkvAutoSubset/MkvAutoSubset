@@ -15,7 +15,15 @@ const libVer = "v2.1.5"
 
 const LibFName = libName + " " + libVer
 
-type logCallback func(string)
+const (
+	LogInfo = iota
+	LogWarning
+	LogSWarning
+	LogError
+	LogProgress
+)
+
+type logCallback func(int, string)
 
 type processorGetter struct {
 	checked  bool
@@ -54,21 +62,21 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	_, _ass2bdnxml := exec.LookPath(ass2bdnxml)
 	_, _ffmpeg := exec.LookPath(ffmpeg)
 	if _ttx != nil || _pyftsubset != nil {
-		printLog(lcb, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
+		printLog(lcb, LogError, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
 		ec++
 	}
 	if _mkvextract != nil || _mkvmerge != nil {
-		printLog(lcb, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
+		printLog(lcb, LogError, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
 		ec++
 	}
 
 	if _ass2bdnxml != nil {
-		printLog(lcb, `Missing dependency: ass2bdnxml.`)
+		printLog(lcb, LogWarning, `Missing dependency: ass2bdnxml.`)
 		//ec++
 	}
 
 	if _ffmpeg != nil {
-		printLog(lcb, `Missing dependency: ffmpeg.`)
+		printLog(lcb, LogWarning, `Missing dependency: ffmpeg.`)
 		//ec++
 	}
 
@@ -90,9 +98,9 @@ func (self *processorGetter) GetProcessorInstance() *mkvProcessor {
 	return nil
 }
 
-func printLog(lcb logCallback, f string, v ...interface{}) {
+func printLog(lcb logCallback, l int, f string, v ...interface{}) {
 	if lcb != nil {
-		lcb(fmt.Sprintf(f, v...))
+		lcb(l, fmt.Sprintf(f, v...))
 	} else {
 		log.Printf(f, v...)
 	}
