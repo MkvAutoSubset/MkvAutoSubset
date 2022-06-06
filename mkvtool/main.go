@@ -17,7 +17,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.1.7"
+const appVer = "v4.1.8"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -118,9 +118,11 @@ func main() {
 		if err != nil {
 			mkvlib.PrintLog(nil, mkvlib.LogError, `Failed to create log file: "%s"`, flog)
 		}
-		mw := io.MultiWriter(color.Output, lf)
+		mw := io.MultiWriter(os.Stdout, lf)
 		log.SetOutput(mw)
 		color.NoColor = true
+	} else {
+		log.SetOutput(color.Output)
 	}
 
 	ec := 0
