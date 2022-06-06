@@ -69,6 +69,11 @@ namespace mkvtool
                 }).Start();
             }
         }
+        
+        void lcb(mkvlib.LogLevel l, string str)
+        {
+            lcb(str);
+        }
 
         void lcb(string str)
         {

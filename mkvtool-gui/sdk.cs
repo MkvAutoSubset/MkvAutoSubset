@@ -85,7 +85,7 @@ public static class mkvlib
         return css(_Version());
     }
 
-    public static bool InitInstance(Action<string> lcb)
+    public static bool InitInstance(Action<LogLevel, string> lcb)
     {
         return InitInstance(_lcb(lcb));
     }
@@ -95,19 +95,15 @@ public static class mkvlib
         return css(GetMKVInfo(cs(file)));
     }
 
-    public static bool DumpMKV(string file, string output, bool subset, Action<string> lcb)
+    public static bool DumpMKV(string file, string output, bool subset, Action<LogLevel, string> lcb)
     {
         return DumpMKV(cs(file), cs(output), subset, _lcb(lcb));
     }
 
-    public static bool[] CheckSubset(string file, Action<string> lcb)
+    public static bool[] CheckSubset(string file, Action<LogLevel, string> lcb)
     {
         string json = css(CheckSubset(cs(file), _lcb(lcb)));
-        JsonDocument doc = JsonDocument.Parse(json);
-        bool[] result = new bool[2];
-        result[0] = doc.RootElement.GetProperty("subsetted").GetBoolean();
-        result[1] = doc.RootElement.GetProperty("error").GetBoolean();
-        return result;
+        return JsonSerializer.Deserialize<bool[]>(json);
     }
 
     public static bool CreateMKV(string file, string[] tracks, string[] attachments, string output, string slang, string stitle, bool clean)
@@ -117,29 +113,29 @@ public static class mkvlib
         return CreateMKV(cs(file), cs(_tracks), cs(_attachments), cs(output), cs(slang), cs(stitle), clean);
     }
 
-    public static bool ASSFontSubset(string[] files, string fonts, string output, bool dirSafe, Action<string> lcb)
+    public static bool ASSFontSubset(string[] files, string fonts, string output, bool dirSafe, Action<LogLevel, string> lcb)
     {
         string _files = JsonSerializer.Serialize(files);
         return ASSFontSubset(cs(_files), cs(fonts), cs(output), dirSafe, _lcb(lcb));
     }
 
-    public static string[] QueryFolder(string dir, Action<string> lcb)
+    public static string[] QueryFolder(string dir, Action<LogLevel, string> lcb)
     {
         string result = css(QueryFolder(cs(dir), _lcb(lcb)));
         return JsonSerializer.Deserialize<string[]>(result);
     }
 
-    public static bool DumpMKVs(string dir, string output, bool subset, Action<string> lcb)
+    public static bool DumpMKVs(string dir, string output, bool subset, Action<LogLevel, string> lcb)
     {
         return DumpMKVs(cs(dir), cs(output), subset, _lcb(lcb));
     }
 
-    public static bool CreateMKVs(string vDir, string sDir, string fDir, string tDir, string oDir, string slang, string stitle, bool clean, Action<string> lcb)
+    public static bool CreateMKVs(string vDir, string sDir, string fDir, string tDir, string oDir, string slang, string stitle, bool clean, Action<LogLevel, string> lcb)
     {
         return CreateMKVs(cs(vDir), cs(sDir), cs(fDir), cs(tDir), cs(oDir), cs(slang), cs(stitle), clean, _lcb(lcb));
     }
 
-    public static bool MakeMKVs(string dir, string data, string output, string slang, string stitle, Action<string> lcb)
+    public static bool MakeMKVs(string dir, string data, string output, string slang, string stitle, Action<LogLevel, string> lcb)
     {
         return MakeMKVs(cs(dir), cs(data), cs(output), cs(slang), cs(stitle), _lcb(lcb));
     }
@@ -149,7 +145,7 @@ public static class mkvlib
         return CreateBlankOrBurnVideo(t, cs(s), cs(enc), cs(ass), cs(fontdir), cs(output));
     }
 
-    public static bool CreateTestVideo(string[] asses, string s, string fontdir, string enc, bool burn, Action<string> lcb)
+    public static bool CreateTestVideo(string[] asses, string s, string fontdir, string enc, bool burn, Action<LogLevel, string> lcb)
     {
         string _asses = JsonSerializer.Serialize(asses);
         return CreateTestVideo(cs(_asses), cs(s), cs(fontdir), cs(enc), burn, _lcb(lcb));
@@ -160,7 +156,7 @@ public static class mkvlib
         A2P(a2p, apc, cs(pr), cs(pf));
     }
 
-    public static string[][] GetFontsList(string[] files, string fonts, Action<string> lcb)
+    public static string[][] GetFontsList(string[] files, string fonts, Action<LogLevel, string> lcb)
     {
         string _files = JsonSerializer.Serialize(files);
         string result = css(GetFontsList(cs(_files), cs(fonts), _lcb(lcb)));
@@ -198,25 +194,35 @@ public static class mkvlib
         return css(GetFontInfo(cs(p)));
     }
 
-    public static string[] CreateFontsCache(string dir, string output, Action<string> lcb)
+    public static string[] CreateFontsCache(string dir, string output, Action<LogLevel, string> lcb)
     {
         string result = css(CreateFontsCache(cs(dir), cs(output), _lcb(lcb)));
         return JsonSerializer.Deserialize<string[]>(result);
     }
 
-    public static bool CopyFontsFromCache(string[] asses, string dist, Action<string> lcb)
+    public static bool CopyFontsFromCache(string[] asses, string dist, Action<LogLevel, string> lcb)
     {
         string _files = JsonSerializer.Serialize(asses);
         return CopyFontsFromCache(cs(_files), cs(dist), _lcb(lcb));
     }
 
-    delegate void logCallback(IntPtr ptr);
-    static logCallback _lcb(Action<string> lcb)
+    delegate void logCallback(byte l, IntPtr ptr);
+
+    public enum LogLevel
     {
-        return (ptr) =>
+        Info,
+        Warning,
+        SWarning,
+        Error,
+        Progress
+    }
+
+    static logCallback _lcb(Action<LogLevel, string> lcb)
+    {
+        return (l, ptr) =>
         {
             if (lcb != null)
-                lcb(css(ptr));
+                lcb((LogLevel)l, css(ptr));
         };
     }
 
