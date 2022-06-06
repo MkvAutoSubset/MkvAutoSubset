@@ -295,7 +295,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			printLog(lcb, LogError, `Failed to create the file: "%s".`, item)
 		} else {
 			_ok++
-			printLog(lcb, LogInfo, "Create (%d/%d) done.", _ok, l)
+			printLog(lcb, LogProgress, "Create (%d/%d) done.", _ok, l)
 		}
 	}
 	_ = os.RemoveAll(tDir)
