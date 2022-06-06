@@ -1,2 +1,2 @@
-typedef void (*logCallback)(char*);
-void makeLogCallback(char*, logCallback);
+typedef void (*logCallback)(unsigned char, char*);
+void makeLogCallback(unsigned char, char*, logCallback);

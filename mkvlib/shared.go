@@ -16,14 +16,14 @@ const libVer = "v2.1.5"
 const LibFName = libName + " " + libVer
 
 const (
-	LogInfo = iota
+	LogInfo byte = iota
 	LogWarning
 	LogSWarning
 	LogError
 	LogProgress
 )
 
-type logCallback func(int, string)
+type logCallback func(byte, string)
 
 type processorGetter struct {
 	checked  bool
@@ -98,7 +98,7 @@ func (self *processorGetter) GetProcessorInstance() *mkvProcessor {
 	return nil
 }
 
-func printLog(lcb logCallback, l int, f string, v ...interface{}) {
+func printLog(lcb logCallback, l byte, f string, v ...interface{}) {
 	if lcb != nil {
 		lcb(l, fmt.Sprintf(f, v...))
 	} else {

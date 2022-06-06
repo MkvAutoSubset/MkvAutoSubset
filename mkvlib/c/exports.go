@@ -13,9 +13,9 @@ func checkInstance() bool {
 	return getter.GetProcessorInstance() != nil
 }
 
-func _lcb(lcb C.logCallback) func(string) {
-	return func(str string) {
-		C.makeLogCallback(cs(str), lcb)
+func _lcb(lcb C.logCallback) func(byte, string) {
+	return func(l byte, str string) {
+		C.makeLogCallback(C.uchar(l), cs(str), lcb)
 	}
 }
 

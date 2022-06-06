@@ -14,7 +14,8 @@ use {
 };
 
 pub type c_char = *const raw::c_char;
-pub type logCallback = Option<fn(c_char)>;
+pub type c_uchar = raw::c_uchar;
+pub type logCallback = Option<fn(c_uchar, c_char)>;
 
 extern {
     fn A2P(a2p: bool, apc: bool, pr: c_char, pf: c_char);

@@ -48,7 +48,8 @@
 
 - 原型
     ```c
-    void (*logCallback)(char* str); 
+    void (*logCallback)(unsigned char l, char* str); 
+    //l: 日志等级(0:Info, 1:Warning, 2:SWarning, 3:Error, 4:Progress)
     //str: UTF-8编码的指针,并约定所有"char*"数据类型的参数或返回值都为此.
     ```
 - 一些说明

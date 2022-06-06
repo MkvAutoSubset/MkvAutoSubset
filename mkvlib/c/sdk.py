@@ -6,10 +6,10 @@ lib = CDLL(libpath)
 
 
 def _lcb(lcb):
-    @CFUNCTYPE(None, c_char_p)
-    def logcallback(s):
+    @CFUNCTYPE(None, c_byte, c_char_p)
+    def logcallback(l, s):
         if lcb:
-            lcb(s.decode())
+            lcb(l, s.decode())
 
     return logcallback
 
