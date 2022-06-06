@@ -67,7 +67,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 	ec := 0
 	obj := self.GetMKVInfo(file)
 	if obj == nil {
-		printLog(lcb, LogError, `Failed to get the file info: "%s".`, file)
+		PrintLog(lcb, LogError, `Failed to get the file info: "%s".`, file)
 		return false
 	}
 	attachments := make([]string, 0)
@@ -124,7 +124,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 			ec++
 		}
 	} else {
-		printLog(lcb, LogInfo, `This file is not has the subtitles & attachments: "%s"`, file)
+		PrintLog(lcb, LogInfo, `This file is not has the subtitles & attachments: "%s"`, file)
 	}
 	return ec == 0
 }
@@ -132,7 +132,7 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 func (self *mkvProcessor) CheckSubset(file string, lcb logCallback) (bool, bool) {
 	obj := self.GetMKVInfo(file)
 	if obj == nil {
-		printLog(lcb, LogError, `Failed to get the file info: "%s".`, file)
+		PrintLog(lcb, LogError, `Failed to get the file info: "%s".`, file)
 		return false, true
 	}
 	ass := false
@@ -210,10 +210,10 @@ func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallb
 		p = path.Join(output, d, f)
 		if !self.DumpMKV(item, p, subset, lcb) {
 			ok = false
-			printLog(lcb, LogError, `Failed to dump the file: "%s".`, item)
+			PrintLog(lcb, LogError, `Failed to dump the file: "%s".`, item)
 		} else {
 			_ok++
-			printLog(lcb, LogProgress, "Dump (%d/%d) done.", _ok, l)
+			PrintLog(lcb, LogProgress, "Dump (%d/%d) done.", _ok, l)
 		}
 	}
 	return ok
@@ -226,11 +226,11 @@ func (self *mkvProcessor) QueryFolder(dir string, lcb logCallback) []string {
 	for i, file := range files {
 		a, b := self.CheckSubset(file, lcb)
 		if b {
-			printLog(lcb, LogError, `Failed to check subset for file: "%s".`, file)
+			PrintLog(lcb, LogError, `Failed to check subset for file: "%s".`, file)
 		} else if !a {
 			lines = append(lines, file)
 		}
-		printLog(lcb, LogProgress, "Query (%d/%d) done.", i+1, l)
+		PrintLog(lcb, LogProgress, "Query (%d/%d) done.", i+1, l)
 	}
 	return lines
 }
@@ -258,9 +258,9 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			fn += ".mkv"
 		}
 		if _a, _ := isExists(fn); _a && self.noverwrite {
-			printLog(lcb, LogInfo, `Existing file: "%s",skip.`, fn)
+			PrintLog(lcb, LogInfo, `Existing file: "%s",skip.`, fn)
 			_ok++
-			printLog(lcb, LogProgress, "Create (%d/%d) done.", _ok, l)
+			PrintLog(lcb, LogProgress, "Create (%d/%d) done.", _ok, l)
 			continue
 		}
 		for _, sub := range tmp {
@@ -292,10 +292,10 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		}
 		if ec > 0 {
 			ok = false
-			printLog(lcb, LogError, `Failed to create the file: "%s".`, item)
+			PrintLog(lcb, LogError, `Failed to create the file: "%s".`, item)
 		} else {
 			_ok++
-			printLog(lcb, LogProgress, "Create (%d/%d) done.", _ok, l)
+			PrintLog(lcb, LogProgress, "Create (%d/%d) done.", _ok, l)
 		}
 	}
 	_ = os.RemoveAll(tDir)
@@ -317,9 +317,9 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 			fn += ".mkv"
 		}
 		if _a, _ := isExists(fn); _a && self.noverwrite {
-			printLog(lcb, LogInfo, `Existing file: "%s",skip.`, fn)
+			PrintLog(lcb, LogInfo, `Existing file: "%s",skip.`, fn)
 			_ok++
-			printLog(lcb, LogProgress, "Make (%d/%d) done.", _ok, l)
+			PrintLog(lcb, LogProgress, "Make (%d/%d) done.", _ok, l)
 			continue
 		}
 		p = path.Join(data, d, f)
@@ -330,10 +330,10 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 		tracks := append(subs, asses...)
 		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, true) {
 			ok = false
-			printLog(lcb, LogError, `Failed to make the file: "%s".`, item)
+			PrintLog(lcb, LogError, `Failed to make the file: "%s".`, item)
 		} else {
 			_ok++
-			printLog(lcb, LogProgress, "Make (%d/%d) done.", _ok, l)
+			PrintLog(lcb, LogProgress, "Make (%d/%d) done.", _ok, l)
 		}
 	}
 	return ok
@@ -515,11 +515,11 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 			ok := self.CreateBlankOrBurnVideo(0, s, enc, v, fontdir, _output)
 			if !ok {
 				ec++
-				printLog(lcb, LogError, `Failed to create the test video file: "%s"`, _output)
+				PrintLog(lcb, LogError, `Failed to create the test video file: "%s"`, _output)
 				_ = os.Remove(_output)
 			} else {
 				_ok++
-				printLog(lcb, LogProgress, "CT (%d/%d) done.", _ok, l)
+				PrintLog(lcb, LogProgress, "CT (%d/%d) done.", _ok, l)
 			}
 		}
 		return ec == 0
@@ -542,16 +542,16 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 			s = path.Join(d, fmt.Sprintf("%s.mp4", n))
 			if !self.CreateBlankOrBurnVideo(t.Milliseconds(), "", enc, "", "", s) {
 				ok = false
-				printLog(lcb, LogError, `Failed to create the temp video file: "%s".`, s)
+				PrintLog(lcb, LogError, `Failed to create the temp video file: "%s".`, s)
 			}
 		}
 		if ok {
 			output := path.Join(d, fmt.Sprintf("%s.mkv", n))
 			if !self.CreateMKV(s, asses, _fonts, output, "", "", true) {
 				ok = false
-				printLog(lcb, LogError, `Failed to create the test video file: "%s".`, output)
+				PrintLog(lcb, LogError, `Failed to create the test video file: "%s".`, output)
 			} else {
-				printLog(lcb, LogProgress, "CT done.")
+				PrintLog(lcb, LogProgress, "CT done.")
 			}
 		}
 		if _t {

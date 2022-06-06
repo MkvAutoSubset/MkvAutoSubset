@@ -2,6 +2,7 @@ package mkvlib
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"log"
 	"os"
 	"os/exec"
@@ -11,7 +12,7 @@ import (
 )
 
 const libName = "mkvlib"
-const libVer = "v2.1.5"
+const libVer = "v2.1.6"
 
 const LibFName = libName + " " + libVer
 
@@ -62,21 +63,21 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	_, _ass2bdnxml := exec.LookPath(ass2bdnxml)
 	_, _ffmpeg := exec.LookPath(ffmpeg)
 	if _ttx != nil || _pyftsubset != nil {
-		printLog(lcb, LogError, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
+		PrintLog(lcb, LogError, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
 		ec++
 	}
 	if _mkvextract != nil || _mkvmerge != nil {
-		printLog(lcb, LogError, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
+		PrintLog(lcb, LogError, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
 		ec++
 	}
 
 	if _ass2bdnxml != nil {
-		printLog(lcb, LogWarning, `Missing dependency: ass2bdnxml.`)
+		PrintLog(lcb, LogWarning, `Missing dependency: ass2bdnxml.`)
 		//ec++
 	}
 
 	if _ffmpeg != nil {
-		printLog(lcb, LogWarning, `Missing dependency: ffmpeg.`)
+		PrintLog(lcb, LogWarning, `Missing dependency: ffmpeg.`)
 		//ec++
 	}
 
@@ -98,11 +99,29 @@ func (self *processorGetter) GetProcessorInstance() *mkvProcessor {
 	return nil
 }
 
-func printLog(lcb logCallback, l byte, f string, v ...interface{}) {
+func PrintLog(lcb logCallback, l byte, f string, v ...interface{}) {
+	str := fmt.Sprintf(f, v...)
 	if lcb != nil {
-		lcb(l, fmt.Sprintf(f, v...))
+		lcb(l, str)
 	} else {
-		log.Printf(f, v...)
+		switch l {
+		case LogInfo:
+			str = color.BlueString(str)
+			break
+		case LogWarning:
+			str = color.YellowString(str)
+			break
+		case LogSWarning:
+			str = color.HiYellowString(str)
+			break
+		case LogError:
+			str = color.RedString(str)
+			break
+		case LogProgress:
+			str = color.GreenString(str)
+			break
+		}
+		log.Print(str)
 	}
 }
 

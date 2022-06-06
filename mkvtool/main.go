@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib"
+	"github.com/fatih/color"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,7 +17,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.1.5"
+const appVer = "v4.1.6"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -115,22 +116,23 @@ func main() {
 	if flog != "" {
 		lf, err := os.Create(flog)
 		if err != nil {
-			log.Printf(`Failed to create log file: "%s"`, flog)
+			mkvlib.PrintLog(nil, mkvlib.LogError, `Failed to create log file: "%s"`, flog)
 		}
 		mw := io.MultiWriter(os.Stdout, lf)
 		log.SetOutput(mw)
+		color.NoColor = true
 	}
 
 	ec := 0
 	defer func() {
 		if latestTag != "" && latestTag != appVer {
-			log.Printf("New version available:%s", latestTag)
+			color.Green("New version available:%s", latestTag)
 		}
 		os.Exit(ec)
 	}()
 
 	if v {
-		log.Printf("%s (powered by %s)", appFN, mkvlib.LibFName)
+		color.Green("%s (powered by %s)", appFN, mkvlib.LibFName)
 		return
 	}
 	getter := mkvlib.GetProcessorGetterInstance()
@@ -148,15 +150,15 @@ func main() {
 	if i != "" {
 		info := processer.GetFontInfo(i)
 		if info != nil {
-			fmt.Printf("File: \t%s\n", info.File)
+			color.Blue("File: \t%s\n", info.File)
 			l := len(info.Fonts)
 			for _i := 0; _i < l; _i++ {
-				fmt.Printf("\nIndex:\t%d\n", _i)
-				fmt.Printf("\tNames:\t%s\n", strings.Join(info.Fonts[_i], "\n\t\t"))
-				fmt.Printf("\tTypes:\t%s\n", strings.Join(info.Types[_i], "\n\t\t"))
+				color.Magenta("\nIndex:\t%d\n", _i)
+				color.Green("\tNames:\t%s\n", strings.Join(info.Fonts[_i], "\n\t\t"))
+				color.HiGreen("\tTypes:\t%s\n", strings.Join(info.Types[_i], "\n\t\t"))
 			}
 		} else {
-			log.Printf("Failed to get font info: [%s]", i)
+			mkvlib.PrintLog(nil, mkvlib.LogError, "Failed to get font info: [%s]", i)
 			ec++
 		}
 		return
@@ -171,7 +173,7 @@ func main() {
 		el := len(list)
 		if el > 0 {
 			ec++
-			log.Printf("Error list:(%d)\n%s", el, strings.Join(list, "\n"))
+			mkvlib.PrintLog(nil, mkvlib.LogInfo, "Error list:(%d)\n%s", el, strings.Join(list, "\n"))
 		}
 		return
 	}
@@ -187,14 +189,14 @@ func main() {
 		}
 		list := processer.GetFontsList(files, af, nil)
 		if len(list[0]) > 0 {
-			fmt.Printf("Need list: \t%s\n", strings.Join(list[0], "\n\t\t"))
+			color.Yellow("Need list: \t%s\n", strings.Join(list[0], "\n\t\t"))
 			if len(list[1]) > 0 {
-				fmt.Printf("\nMissing list: \t%s\n", strings.Join(list[1], "\n\t\t"))
+				color.HiYellow("\nMissing list: \t%s\n", strings.Join(list[1], "\n\t\t"))
 			} else if !nck {
-				fmt.Println("\n*** All included fonts are found. ***")
+				color.Green("\n*** All included fonts are found. ***")
 			}
 		} else {
-			fmt.Println("!!! No fonts found. !!!")
+			color.Yellow("!!! No fonts found. !!!")
 		}
 		if cfc {
 			if !processer.CopyFontsFromCache(files, co, nil) {
@@ -232,7 +234,7 @@ func main() {
 			if err {
 				ec++
 			} else {
-				log.Printf("Need font subset: %v", !r)
+				mkvlib.PrintLog(nil, mkvlib.LogInfo, "Need font subset: %v", !r)
 			}
 			return
 
@@ -242,14 +244,14 @@ func main() {
 		if q {
 			lines := processer.QueryFolder(s, nil)
 			if len(lines) > 0 {
-				log.Printf("Has item(s).")
+				mkvlib.PrintLog(nil, mkvlib.LogInfo, "Has item(s).")
 				data := []byte(strings.Join(lines, "\n"))
 				if os.WriteFile("list.txt", data, os.ModePerm) != nil {
-					log.Printf("Failed to write the result file")
+					mkvlib.PrintLog(nil, mkvlib.LogError, "Failed to write the result file")
 					ec++
 				}
 			} else {
-				log.Printf("No item.")
+				mkvlib.PrintLog(nil, mkvlib.LogInfo, "No item.")
 			}
 			return
 		}
