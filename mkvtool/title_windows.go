@@ -15,7 +15,7 @@ func setWindowTitle(title string) {
 		if err == nil {
 			ptr, err := syscall.UTF16PtrFromString(title)
 			if err == nil {
-				syscall.Syscall(setConsoleTitle, 1, uintptr(unsafe.Pointer(ptr)), 0, 0)
+				syscall.SyscallN(setConsoleTitle, 1, uintptr(unsafe.Pointer(ptr)), 0, 0)
 			}
 		}
 	}

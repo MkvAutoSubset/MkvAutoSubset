@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib"
 	"github.com/fatih/color"
+	"github.com/mattn/go-colorable"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -17,7 +17,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.1.8"
+const appVer = "v4.1.9"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -116,13 +116,11 @@ func main() {
 	if flog != "" {
 		lf, err := os.Create(flog)
 		if err != nil {
-			mkvlib.PrintLog(nil, mkvlib.LogError, `Failed to create log file: "%s"`, flog)
+			color.Red(`Failed to create log file: "%s"`, flog)
 		}
-		mw := io.MultiWriter(os.Stdout, lf)
-		log.SetOutput(mw)
+		mw := io.MultiWriter(colorable.NewColorableStdout(), lf)
+		color.Output = mw
 		color.NoColor = true
-	} else {
-		log.SetOutput(color.Output)
 	}
 
 	ec := 0
@@ -160,7 +158,7 @@ func main() {
 				color.HiGreen("\tTypes:\t%s\n", strings.Join(info.Types[_i], "\n\t\t"))
 			}
 		} else {
-			mkvlib.PrintLog(nil, mkvlib.LogError, "Failed to get font info: [%s]", i)
+			color.Red("Failed to get font info: [%s]", i)
 			ec++
 		}
 		return
@@ -175,7 +173,7 @@ func main() {
 		el := len(list)
 		if el > 0 {
 			ec++
-			mkvlib.PrintLog(nil, mkvlib.LogInfo, "Error list:(%d)\n%s", el, strings.Join(list, "\n"))
+			color.Yellow("Error list:(%d)\n%s", el, strings.Join(list, "\n"))
 		}
 		return
 	}
@@ -236,7 +234,7 @@ func main() {
 			if err {
 				ec++
 			} else {
-				mkvlib.PrintLog(nil, mkvlib.LogInfo, "Need font subset: %v", !r)
+				color.Blue("Need font subset: %v", !r)
 			}
 			return
 
@@ -246,14 +244,14 @@ func main() {
 		if q {
 			lines := processer.QueryFolder(s, nil)
 			if len(lines) > 0 {
-				mkvlib.PrintLog(nil, mkvlib.LogInfo, "Has item(s).")
+				color.Blue("Has item(s).")
 				data := []byte(strings.Join(lines, "\n"))
 				if os.WriteFile("list.txt", data, os.ModePerm) != nil {
-					mkvlib.PrintLog(nil, mkvlib.LogError, "Failed to write the result file")
+					color.Red("Failed to write the result file")
 					ec++
 				}
 			} else {
-				mkvlib.PrintLog(nil, mkvlib.LogInfo, "No item.")
+				color.Blue("No item.")
 			}
 			return
 		}
