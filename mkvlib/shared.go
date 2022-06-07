@@ -3,25 +3,25 @@ package mkvlib
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 )
 
 const libName = "mkvlib"
-const libVer = "v2.1.6"
+const libVer = "v2.1.7"
 
 const LibFName = libName + " " + libVer
 
 const (
-	LogInfo byte = iota
-	LogWarning
-	LogSWarning
-	LogError
-	LogProgress
+	logInfo byte = iota
+	logWarning
+	logSWarning
+	logError
+	logProgress
 )
 
 type logCallback func(byte, string)
@@ -63,21 +63,21 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	_, _ass2bdnxml := exec.LookPath(ass2bdnxml)
 	_, _ffmpeg := exec.LookPath(ffmpeg)
 	if _ttx != nil || _pyftsubset != nil {
-		PrintLog(lcb, LogError, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
+		printLog(lcb, logError, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
 		ec++
 	}
 	if _mkvextract != nil || _mkvmerge != nil {
-		PrintLog(lcb, LogError, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
+		printLog(lcb, logError, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
 		ec++
 	}
 
 	if _ass2bdnxml != nil {
-		PrintLog(lcb, LogWarning, `Missing dependency: ass2bdnxml.`)
+		printLog(lcb, logWarning, `Missing dependency: ass2bdnxml.`)
 		//ec++
 	}
 
 	if _ffmpeg != nil {
-		PrintLog(lcb, LogWarning, `Missing dependency: ffmpeg.`)
+		printLog(lcb, logWarning, `Missing dependency: ffmpeg.`)
 		//ec++
 	}
 
@@ -99,29 +99,29 @@ func (self *processorGetter) GetProcessorInstance() *mkvProcessor {
 	return nil
 }
 
-func PrintLog(lcb logCallback, l byte, f string, v ...interface{}) {
+func printLog(lcb logCallback, l byte, f string, v ...interface{}) {
 	str := fmt.Sprintf(f, v...)
 	if lcb != nil {
 		lcb(l, str)
 	} else {
+		color.New(color.FgWhite).Print(time.Now().Format("2006/01/02 15:04:05 "))
 		switch l {
-		case LogInfo:
-			str = color.BlueString(str)
+		case logInfo:
+			color.Blue(str)
 			break
-		case LogWarning:
-			str = color.YellowString(str)
+		case logWarning:
+			color.Yellow(str)
 			break
-		case LogSWarning:
-			str = color.HiYellowString(str)
+		case logSWarning:
+			color.HiYellow(str)
 			break
-		case LogError:
-			str = color.RedString(str)
+		case logError:
+			color.Red(str)
 			break
-		case LogProgress:
-			str = color.GreenString(str)
+		case logProgress:
+			color.Green(str)
 			break
 		}
-		log.Print(str)
 	}
 }
 

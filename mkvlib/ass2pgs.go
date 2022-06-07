@@ -22,7 +22,7 @@ func ass2Pgs(input []string, resolution, frameRate, fontsDir, output string, lcb
 			s, err := p.Wait()
 			r = err == nil && s.ExitCode() == 0
 			if !r {
-				PrintLog(lcb, LogError, `Failed to Ass2Pgs:"%s"`, item)
+				printLog(lcb, logError, `Failed to Ass2Pgs:"%s"`, item)
 				_ = os.Remove(fn)
 			}
 		}

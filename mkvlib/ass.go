@@ -106,7 +106,7 @@ func (self *assProcessor) parse() bool {
 			}
 		}
 		if ec > 0 {
-			PrintLog(self.lcb, LogError, `Failed to read the ass file: "%s"`, file)
+			printLog(self.lcb, logError, `Failed to read the ass file: "%s"`, file)
 		}
 		_ = f.Close()
 	}
@@ -121,7 +121,7 @@ func (self *assProcessor) parse() bool {
 			subtitle, err := parser.ReadFromSSAWithOptions(strings.NewReader(v), opt)
 			if err != nil {
 				ec++
-				PrintLog(self.lcb, LogError, `Failed to parse the ass file: "%s" [%s]`, k, err)
+				printLog(self.lcb, logError, `Failed to parse the ass file: "%s" [%s]`, k, err)
 				continue
 			}
 			for _, item := range subtitle.Items {
@@ -164,7 +164,7 @@ func (self *assProcessor) parse() bool {
 											_b = *s.InlineStyle.SSABold
 											_i = *s.InlineStyle.SSAItalic
 										} else {
-											PrintLog(self.lcb, LogError, `Not found style in the ass file:"%s" [%s].`, k, v[2])
+											printLog(self.lcb, logError, `Not found style in the ass file:"%s" [%s].`, k, v[2])
 											ec++
 										}
 										break
@@ -207,7 +207,7 @@ func (self *assProcessor) parse() bool {
 			}
 		}
 		if len(self.m) == 0 {
-			PrintLog(self.lcb, LogWarning, `Not found item in the ass file(s): "%d"`, len(self.files))
+			printLog(self.lcb, logWarning, `Not found item in the ass file(s): "%d"`, len(self.files))
 		}
 	}
 	return ec == 0
@@ -250,7 +250,7 @@ func (self *assProcessor) dumpFont(file, out string) bool {
 		}
 	}
 	if !ok {
-		PrintLog(self.lcb, LogError, `Failed to dump font: "%s".`, n)
+		printLog(self.lcb, logError, `Failed to dump font: "%s".`, n)
 	}
 	return ok
 }
@@ -308,7 +308,7 @@ func (self *assProcessor) getFontName(p string) [][]map[string]bool {
 						_f, err := c.Font(i)
 						if err == nil {
 							if g, _ := _f.GlyphIndex(nil, '\u0020'); g == 0 {
-								PrintLog(self.lcb, LogWarning, `Font: "%s"[%d] is not defined '\u0020',skip.`, p, i)
+								printLog(self.lcb, logWarning, `Font: "%s"[%d] is not defined '\u0020',skip.`, p, i)
 							} else {
 								fonts = append(fonts, _f)
 							}
@@ -319,7 +319,7 @@ func (self *assProcessor) getFontName(p string) [][]map[string]bool {
 				_f, err := sfnt.Parse(data)
 				if err == nil {
 					if g, _ := _f.GlyphIndex(nil, '\u0020'); g == 0 {
-						PrintLog(self.lcb, LogWarning, `Font: "%s" is not defined '\u0020',skip.`, p)
+						printLog(self.lcb, logWarning, `Font: "%s" is not defined '\u0020',skip.`, p)
 					} else {
 						fonts = append(fonts, _f)
 					}
@@ -402,7 +402,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	}
 	if _str != "" {
 		_str = stringDeduplication(_str)
-		PrintLog(self.lcb, LogWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing normal char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
+		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing normal char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
 	}
 	if len(_runes) > 0 {
 		_str = ""
@@ -410,7 +410,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 			_str += fmt.Sprintf(`,0x%x`, _rune)
 		}
 		_str = _str[1:]
-		PrintLog(self.lcb, LogWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing special char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
+		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing special char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
 	}
 	return _str == "" && len(_runes) == 0
 }
@@ -428,7 +428,7 @@ func (self *assProcessor) matchFonts() []string {
 			}
 			if fb > 0 && _k[1] != "Regular" {
 				if fb == 1 {
-					PrintLog(self.lcb, LogWarning, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
+					printLog(self.lcb, logWarning, `Font fallback:[%s^%s] -> [%s^Regular]`, _k[0], _k[1], _k[0])
 				}
 				_k[1] = "Regular"
 			}
@@ -479,7 +479,7 @@ func (self *assProcessor) matchFonts() []string {
 	for k, _ := range self.m {
 		if self.m[k].file == "" {
 			el = append(el, k)
-			PrintLog(self.lcb, LogError, `Missing the font: "%s".`, k)
+			printLog(self.lcb, logError, `Missing the font: "%s".`, k)
 		}
 	}
 	return el
@@ -529,12 +529,12 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 					fmailies = append(fmailies, family)
 				}
 				if len(fmailies) > 1 {
-					PrintLog(self.lcb, LogSWarning, `Font bottom fallback:[%s^%s] -> [%s^(%s)]`, _k[0], _k[1], _k[0], strings.Join(fmailies, ","))
+					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^(%s)]`, _k[0], _k[1], _k[0], strings.Join(fmailies, ","))
 				} else {
-					PrintLog(self.lcb, LogSWarning, `Font bottom fallback:[%s^%s] -> [%s^%s]`, _k[0], _k[1], _k[0], fmailies[0])
+					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^%s]`, _k[0], _k[1], _k[0], fmailies[0])
 				}
 			} else {
-				PrintLog(self.lcb, LogSWarning, `Font bottom fallback:[%s^%s] -> [%s]`, _k[0], _k[1], _k[0])
+				printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s]`, _k[0], _k[1], _k[0])
 			}
 			return true
 		}
@@ -557,7 +557,7 @@ func (self *assProcessor) reMap() {
 		}
 	}
 	for _, v := range m {
-		PrintLog(self.lcb, LogInfo, `Font selected:[%s] -> "%s"[%d]`, v.oldName, v.file, v.index)
+		printLog(self.lcb, logInfo, `Font selected:[%s] -> "%s"[%d]`, v.oldName, v.file, v.index)
 	}
 	self.m = m
 }
@@ -573,7 +573,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 		e = ".ttf"
 	}
 	if os.MkdirAll(self.output, os.ModePerm) != nil {
-		PrintLog(self.lcb, LogError, "Failed to create the output folder.")
+		printLog(self.lcb, logError, "Failed to create the output folder.")
 		return false
 	}
 	str := string(font.runes)
@@ -597,13 +597,13 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 			ok = err == nil && s.ExitCode() == 0
 		}
 		if !ok {
-			PrintLog(self.lcb, LogError, `Failed to subset font: "%s"[%d].`, font.oldName, font.index)
+			printLog(self.lcb, logError, `Failed to subset font: "%s"[%d].`, font.oldName, font.index)
 		} else {
 			font.sFont = _fn
 		}
 
 	} else {
-		PrintLog(self.lcb, LogError, `Failed to write the font text: "%s".`, n)
+		printLog(self.lcb, logError, `Failed to write the font text: "%s".`, n)
 	}
 	return ok
 }
@@ -612,7 +612,7 @@ func (self *assProcessor) createFontsSubset() bool {
 	self.reMap()
 	err := os.RemoveAll(self.output)
 	if !(err == nil || err == os.ErrNotExist) {
-		PrintLog(self.lcb, LogError, "Failed to clean the output folder.")
+		printLog(self.lcb, logError, "Failed to clean the output folder.")
 		return false
 	}
 	ok := 0
@@ -691,11 +691,11 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 						ec++
 						_, n, _, _ := splitPath(font.sFont)
 						_ = os.Remove(font.sFont)
-						PrintLog(self.lcb, LogError, `Failed to compile the font: "%s".`, n)
+						printLog(self.lcb, logError, `Failed to compile the font: "%s".`, n)
 					}
 				}
 			} else {
-				PrintLog(self.lcb, LogError, `Failed to change the font name: "%s".`, font.oldName)
+				printLog(self.lcb, logError, `Failed to change the font name: "%s".`, font.oldName)
 			}
 		}
 	}
@@ -781,7 +781,7 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 		}
 		if !ok {
 			ec++
-			PrintLog(self.lcb, LogError, `Failed to write the new ass file: "%s".`, fn)
+			printLog(self.lcb, logError, `Failed to write the new ass file: "%s".`, fn)
 		}
 	}
 	return ec == 0
@@ -829,7 +829,7 @@ func (self *assProcessor) createFontsCache(output string) []string {
 				if c != nil {
 					ok++
 					cache = append(cache, *c)
-					PrintLog(self.lcb, LogProgress, "Cache font (%d/%d) done.", ok, l)
+					printLog(self.lcb, logProgress, "Cache font (%d/%d) done.", ok, l)
 				} else {
 					el = append(el, _item)
 				}
@@ -856,7 +856,7 @@ func (self *assProcessor) createFontsCache(output string) []string {
 		d, _, _, _ := splitPath(output)
 		_ = os.MkdirAll(d, os.ModePerm)
 		if ioutil.WriteFile(output, data, os.ModePerm) != nil {
-			PrintLog(self.lcb, LogError, `Failed to write cache file: "%s"`, output)
+			printLog(self.lcb, logError, `Failed to write cache file: "%s"`, output)
 		}
 	}
 	return el
@@ -874,11 +874,11 @@ func (self *assProcessor) copyFontsFromCache() bool {
 				fn = path.Join(self.output, fn)
 				if copyFile(v.file, fn) == nil {
 					i++
-					PrintLog(self.lcb, LogProgress, "Copy (%d/%d) done.", i, l)
+					printLog(self.lcb, logProgress, "Copy (%d/%d) done.", i, l)
 				}
 			} else {
 				ec++
-				PrintLog(self.lcb, LogError, `Missing the font: "%s".`, k)
+				printLog(self.lcb, logError, `Missing the font: "%s".`, k)
 			}
 		}
 	}
