@@ -69,7 +69,7 @@ namespace mkvtool
                 }).Start();
             }
         }
-        
+
         void lcb(mkvlib.LogLevel l, string str)
         {
             lcb(str);
@@ -629,8 +629,14 @@ namespace mkvtool
         string cache = Path.Join(Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME"), ".mkvtool", "caches");
         void Cache()
         {
-            string[] ccs = Directory.GetFiles(cache, "*.cache");
-            mkvlib.Cache(ccs);
+            try
+            {
+                if (!Directory.Exists(cache))
+                    Directory.CreateDirectory(cache);
+                string[] ccs = Directory.GetFiles(cache, "*.cache");
+                mkvlib.Cache(ccs);
+            }
+            catch { }
         }
 
         void SaveSettings()
