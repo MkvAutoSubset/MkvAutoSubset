@@ -88,6 +88,22 @@ func (self *assProcessor) getLength(p string) time.Duration {
 	return 0
 }
 
+func restoreSubsetted(str string) string {
+	reg := regexp.MustCompile(`; Font subset: (\w+) - ([\S ]+)`)
+	for _, v := range reg.FindAllStringSubmatch(str, -1) {
+		if len(v) > 2 {
+			_reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, v[1]))
+			if _reg.MatchString(str) {
+				r := fmt.Sprintf("${1}${2}%s${3}", v[2])
+				str = _reg.ReplaceAllString(str, r)
+				str = reg.ReplaceAllString(str, "; ♻ Font subset: ${1} - ${2}")
+				printLog(nil, logWarning, `Font subset restore: "%s" -> "%s".`, v[1], v[2])
+			}
+		}
+	}
+	return str
+}
+
 func (self *assProcessor) parse() bool {
 	ec := 0
 	self.seps = []string{"-", " "}
@@ -100,6 +116,7 @@ func (self *assProcessor) parse() bool {
 			data, err := io.ReadAll(f)
 			if err == nil {
 				str := toUTF8(data)
+				str = restoreSubsetted(str)
 				self.subtitles[file] = str
 			} else {
 				ec++
