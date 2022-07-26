@@ -89,14 +89,14 @@ func (self *assProcessor) getLength(p string) time.Duration {
 }
 
 func restoreSubsetted(str string) string {
-	reg := regexp.MustCompile(`; Font subset: (\w+) - ([\S ]+)`)
+	reg := regexp.MustCompile(`; Font [Ss]ubset: (\w+) - ([\S ]+)`)
 	for _, v := range reg.FindAllStringSubmatch(str, -1) {
 		if len(v) > 2 {
 			_reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, v[1]))
 			if _reg.MatchString(str) {
 				r := fmt.Sprintf("${1}${2}%s${3}", v[2])
 				str = _reg.ReplaceAllString(str, r)
-				str = reg.ReplaceAllString(str, "; ♻ Font subset: ${1} - ${2}")
+				str = reg.ReplaceAllString(str, "; Font subset restore: ${1} - ${2}")
 				printLog(nil, logWarning, `Font subset restore: "%s" -> "%s".`, v[1], v[2])
 			}
 		}
