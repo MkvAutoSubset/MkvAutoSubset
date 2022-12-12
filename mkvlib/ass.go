@@ -129,10 +129,11 @@ func (self *assProcessor) parse() bool {
 	}
 	if ec == 0 {
 		opt := parser.SSAOptions{}
-		reg, _ := regexp.Compile(`\\fn@?([^\r\n\\\}]*)`)
-		_reg, _ := regexp.Compile(`\\([bir])([^\r\n\\\}]*)`)
-		__reg, _ := regexp.Compile(`nd[xyz]?\d+`)
-		___reg, _ := regexp.Compile(`\d`)
+		reg, _ := regexp.Compile(`\\[^\r\n\\\}]+`)
+		_reg, _ := regexp.Compile(`\\fn@?(.+)`)
+		__reg, _ := regexp.Compile(`\\([bir])(.*)`)
+		___reg, _ := regexp.Compile(`nd[xyz]?\d+`)
+		____reg, _ := regexp.Compile(`\d`)
 		m := make(map[string]string)
 		for k, v := range self.subtitles {
 			subtitle, err := parser.ReadFromSSAWithOptions(strings.NewReader(v), opt)
@@ -148,45 +149,49 @@ func (self *assProcessor) parse() bool {
 				for _, _item := range item.Lines {
 					for _, __item := range _item.Items {
 						if __item.InlineStyle != nil {
-							arr := reg.FindStringSubmatch(__item.InlineStyle.SSAEffect)
-							if len(arr) > 1 {
-								name = arr[1]
-							}
-							_arr := _reg.FindAllStringSubmatch(__item.InlineStyle.SSAEffect, -1)
-							for _, v := range _arr {
-								if len(v) > 2 {
-									switch v[1] {
-									case "b":
-										i, err := strconv.Atoi(v[2])
-										if err == nil {
-											if i == 0 || (i > 1 && i < 612) {
-												_b = false
-											} else if i == 1 || i > 611 {
-												_b = true
+							items := reg.FindAllString(__item.InlineStyle.SSAEffect, -1)
+							for _, ___item := range items {
+								arr := _reg.FindStringSubmatch(___item)
+								if len(arr) > 1 {
+									name = arr[1]
+									continue
+								}
+								_arr := __reg.FindAllStringSubmatch(___item, -1)
+								for _, v := range _arr {
+									if len(v) > 2 {
+										switch v[1] {
+										case "b":
+											i, err := strconv.Atoi(v[2])
+											if err == nil {
+												if i == 0 || (i > 1 && i < 612) {
+													_b = false
+												} else if i == 1 || i > 611 {
+													_b = true
+												}
 											}
-										}
-										break
-									case "i":
-										_i = v[2] == "1"
-										break
-									case "r":
-										if __reg.MatchString(v[2]) {
+											break
+										case "i":
+											_i = v[2] == "1"
+											break
+										case "r":
+											if ___reg.MatchString(v[2]) {
+												break
+											}
+											v[2] = strings.TrimPrefix(v[2], "*")
+											if v[2] == "" {
+												name = ""
+												_b = *item.Style.InlineStyle.SSABold
+												_i = *item.Style.InlineStyle.SSAItalic
+											} else if s, ok := subtitle.Styles[v[2]]; ok {
+												name = s.InlineStyle.SSAFontName
+												_b = *s.InlineStyle.SSABold
+												_i = *s.InlineStyle.SSAItalic
+											} else {
+												printLog(self.lcb, logError, `Not found style in the ass file:"%s" [%s].`, k, v[2])
+												ec++
+											}
 											break
 										}
-										v[2] = strings.TrimPrefix(v[2], "*")
-										if v[2] == "" {
-											name = ""
-											_b = *item.Style.InlineStyle.SSABold
-											_i = *item.Style.InlineStyle.SSAItalic
-										} else if s, ok := subtitle.Styles[v[2]]; ok {
-											name = s.InlineStyle.SSAFontName
-											_b = *s.InlineStyle.SSABold
-											_i = *s.InlineStyle.SSAItalic
-										} else {
-											printLog(self.lcb, logError, `Not found style in the ass file:"%s" [%s].`, k, v[2])
-											ec++
-										}
-										break
 									}
 								}
 							}
@@ -216,7 +221,7 @@ func (self *assProcessor) parse() bool {
 		self.m = make(map[string]*fontInfo)
 		for k, v := range m {
 			if v != "" {
-				if ___reg.MatchString(v) {
+				if ____reg.MatchString(v) {
 					v += "0123456789"
 				}
 				v += "a\u0020\u00a0"
