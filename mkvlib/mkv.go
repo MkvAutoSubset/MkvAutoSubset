@@ -267,7 +267,7 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 		}
 		for _, sub := range tmp {
 			_, n, e, _ := splitPath(sub)
-			reg, _ := regexp.Compile(fmt.Sprintf(`^(%s)(_[^_]*)+\.\S+$`, regexp.QuoteMeta(_f)))
+			reg, _ := regexp.Compile(fmt.Sprintf(`^(%s)(_[^_]*)*\.\S+$`, regexp.QuoteMeta(_f)))
 			if !reg.MatchString(n) {
 				continue
 			}
