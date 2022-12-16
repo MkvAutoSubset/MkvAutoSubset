@@ -178,7 +178,7 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 			_sl = _arr[1]
 		}
 		if len(_arr) > 2 {
-			_st = _arr[2]
+			_st = strings.Join(_arr[2:], "_")
 		}
 		if _sl != "" {
 			args = append(args, "--language", "0:"+_sl)
@@ -247,11 +247,13 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 	for _, item := range files {
 		ec := 0
 		_, _, _, _f := splitPath(item)
-		tmp, _ := findPath(sDir, fmt.Sprintf(`%s(_[\S ]*)?\.\S+$`, regexp.QuoteMeta(_f)))
+		tmp, _ := findPath(sDir, `\.\S+$`)
 		asses := make([]string, 0)
 		subs := make([]string, 0)
 		p := path.Join(tDir, _f)
 		fn := path.Join(oDir, _f)
+		s1 := path.Join(p, "asses")
+		s2 := path.Join(p, "subs")
 		if self.mks {
 			fn += ".mks"
 		} else {
@@ -264,14 +266,20 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			continue
 		}
 		for _, sub := range tmp {
-			if strings.HasSuffix(sub, ".ass") {
-				_, _, _, __f := splitPath(sub)
-				_s := path.Join(p, __f) + ".ass"
-				_ = copyFileOrDir(sub, _s)
+			_, n, e, _ := splitPath(sub)
+			reg, _ := regexp.Compile(fmt.Sprintf(`^(%s)(_[^_]*)+\.\S+$`, regexp.QuoteMeta(_f)))
+			if !reg.MatchString(n) {
+				continue
+			}
+			_s := fmt.Sprintf("%s%s", randomStr(8), strings.Replace(n, _f, "", 1))
+			if e == ".ass" {
+				_s = path.Join(s1, _s)
 				asses = append(asses, _s)
 			} else {
-				subs = append(subs, sub)
+				_s = path.Join(s2, _s)
+				subs = append(subs, _s)
 			}
+			_ = copyFileOrDir(sub, _s)
 		}
 		attachments := make([]string, 0)
 		tracks := make([]string, 0)
@@ -279,8 +287,8 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			if !self.ASSFontSubset(asses, fDir, "", false, lcb) {
 				ec++
 			} else {
-				_tracks, _ := findPath(p, `\.pgs$`)
-				__p := path.Join(p, "subsetted")
+				_tracks, _ := findPath(s1, `\.pgs$`)
+				__p := path.Join(s1, "subsetted")
 				attachments = findFonts(__p)
 				tracks, _ = findPath(__p, `\.ass$`)
 				tracks = append(tracks, _tracks...)

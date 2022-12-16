@@ -1,6 +1,6 @@
 module github.com/MkvAutoSubset/MkvAutoSubset/mkvlib
 
-go 1.18
+go 1.19
 
 require (
 	github.com/antchfx/xmlquery v1.3.10

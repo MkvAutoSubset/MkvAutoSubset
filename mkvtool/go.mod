@@ -1,6 +1,6 @@
 module github.com/MkvAutoSubset/MkvAutoSubset/mkvtool
 
-go 1.18
+go 1.19
 
 require (
 	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20221212045535-9e5efd8c0622
