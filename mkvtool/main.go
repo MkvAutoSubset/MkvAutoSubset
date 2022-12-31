@@ -11,13 +11,14 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"strings"
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.2.4"
+const appVer = "v4.2.5"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -272,15 +273,29 @@ func main() {
 			return
 		}
 		if m {
-			if !processer.MakeMKVs(s, data, dist, sl, st, nil) {
+			if !processer.MakeMKVs(s, data, dist, sl, st, true, nil) {
 				ec++
 			}
 			return
 		}
-		if !processer.DumpMKVs(s, data, true, nil) {
-			ec++
-		} else if !processer.MakeMKVs(s, data, dist, sl, st, nil) {
-			ec++
+		s, _ = filepath.Abs(s)
+		dist, _ = filepath.Abs(dist)
+		files, _ := findPath(s, `\.mkv$`)
+		for _, item := range files {
+			if strings.HasPrefix(item, dist) {
+				continue
+			}
+			p := strings.TrimPrefix(item, s)
+			_d, _, _, _f := splitPath(p)
+			p = path.Join(data, _d, _f)
+			if !processer.DumpMKV(item, p, true, nil) {
+				ec++
+			}
+		}
+		if ec == 0 {
+			if !processer.MakeMKVs(s, data, dist, sl, st, true, nil) {
+				ec++
+			}
 		}
 		return
 	} else {
