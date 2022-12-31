@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -10,6 +11,7 @@ using Avalonia.ExtendedToolkit.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Microsoft.VisualBasic;
 using ToggleSwitch = Avalonia.ExtendedToolkit.Controls.ToggleSwitch;
 
 namespace mkvtool
@@ -304,6 +306,7 @@ namespace mkvtool
             public static string Output { get; set; }
             public static string slang { get; set; }
             public static string stitle { get; set; }
+            public static bool subset { get; set; }
         }
 
         private async void MakeSelectBtns_OnClick(object? sender, RoutedEventArgs e)
@@ -355,10 +358,11 @@ namespace mkvtool
             {
                 MakeArg.slang = this.FindControl<TextBox>("ma4").Text;
                 MakeArg.stitle = this.FindControl<TextBox>("ma5").Text;
+                MakeArg.subset = this.FindControl<ToggleSwitch>("ma6").IsChecked == true;
                 SetBusy(true);
                 new Thread(() =>
                 {
-                    if (mkvlib.MakeMKVs(MakeArg.Dir, MakeArg.Data, MakeArg.Output, MakeArg.slang, MakeArg.stitle, lcb))
+                    if (mkvlib.MakeMKVs(MakeArg.Dir, MakeArg.Data, MakeArg.Output, MakeArg.slang, MakeArg.stitle, MakeArg.subset, lcb))
                     {
                         PrintResult("Make", "Make successfully.");
                         MakeArg.Dir = string.Empty;
@@ -373,6 +377,7 @@ namespace mkvtool
                             this.FindControl<TextBlock>("ma3").Text = string.Empty;
                             this.FindControl<TextBox>("ma4").Text = "chi";
                             this.FindControl<TextBox>("ma5").Text = string.Empty;
+                            this.FindControl<ToggleSwitch>("ma6").IsChecked = true;
                         });
                     }
                     else
@@ -542,8 +547,29 @@ namespace mkvtool
                 SetBusy(true);
                 new Thread(() =>
                 {
-                    if (mkvlib.DumpMKVs(WorkflowArg.Dir, WorkflowArg.Data, true, lcb) &&
-                        mkvlib.MakeMKVs(WorkflowArg.Dir, WorkflowArg.Data, WorkflowArg.Dist, "", "", lcb))
+                    string[] _files = Directory.GetFiles(WorkflowArg.Dir, "*.mkv");
+                    List<string> files = new List<string>();
+                    foreach (string item in _files)
+                    {
+                        if (item.StartsWith(WorkflowArg.Dist))
+                            continue;
+                        files.Add(item);
+                    }
+                    int ec = 0;
+                    foreach (string item in files)
+                    {
+                        string p = item.Substring(WorkflowArg.Dir.Length);
+                        string? d = Path.GetDirectoryName(p);
+                        string? f = Path.GetFileNameWithoutExtension(p);
+                        p = Path.Join(WorkflowArg.Data, d, f);
+                        if (!mkvlib.DumpMKV(item, p, true, lcb))
+                        {
+                            ec++;
+                            break;
+                        }
+                    }
+                    if (ec == 0 &&
+                        mkvlib.MakeMKVs(WorkflowArg.Dir, WorkflowArg.Data, WorkflowArg.Dist, "", "", true, lcb))
                     {
                         PrintResult("Workflow", "Workflow successfully.");
                         WorkflowArg.Dir = string.Empty;

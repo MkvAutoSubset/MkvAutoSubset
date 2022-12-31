@@ -178,6 +178,7 @@
                                         <TextBox Name="ma5" />
                                     </StackPanel>
                                 </StackPanel>
+								<Controls:ToggleSwitch Content="Subset" IsChecked="True" Name="ma6" />
                                 <Button Margin="10" Content="Go" Click="DoMakeBtn_OnClick" HorizontalAlignment="Center" />
                             </StackPanel>
                         </Controlz:GroupBox>
@@ -307,7 +308,7 @@
             <Controls:BusyIndicator Name="busyBox" />
         </Grid>
         <Controlz:GroupBox Header="Log" Margin="10" DockPanel.Dock="Right">
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <TextBox IsReadOnly="True" Name="logBox" Margin="10" />
             </ScrollViewer>
         </Controlz:GroupBox>
