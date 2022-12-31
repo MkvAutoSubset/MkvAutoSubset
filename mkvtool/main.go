@@ -18,7 +18,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.2.5"
+const appVer = "v4.2.6"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -290,6 +290,7 @@ func main() {
 			p = path.Join(data, _d, _f)
 			if !processer.DumpMKV(item, p, true, nil) {
 				ec++
+				break
 			}
 		}
 		if ec == 0 {
