@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -310,9 +311,19 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 	return ok
 }
 
-func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb logCallback) bool {
+func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, subset bool, lcb logCallback) bool {
+	dir, _ = filepath.Abs(dir)
+	data, _ = filepath.Abs(data)
+	output, _ = filepath.Abs(output)
 	ok := true
-	files, _ := findPath(dir, `\.\S+$`)
+	_files, _ := findPath(dir, `\.\S+$`)
+	files := make([]string, 0)
+	for _, item := range _files {
+		if strings.HasPrefix(item, data) || strings.HasPrefix(item, output) {
+			continue
+		}
+		files = append(files, item)
+	}
 	l := len(files)
 	_ok := 0
 	for _, item := range files {
@@ -334,6 +345,14 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, lcb 
 		_p := path.Join(p, "subsetted")
 		subs, _ := findPath(p, `\.(sub)|(pgs)`)
 		asses, _ := findPath(_p, `\.ass$`)
+		if len(asses) == 0 && subset {
+			asses, _ = findPath(p, `\.ass$`)
+			if !self.ASSFontSubset(asses, "", "", false, lcb) {
+				ok = false
+				continue
+			}
+			asses, _ = findPath(_p, `\.ass$`)
+		}
 		attachments := findFonts(_p)
 		tracks := append(subs, asses...)
 		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, true) {
