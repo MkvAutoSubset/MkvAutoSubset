@@ -40,7 +40,7 @@ public static class mkvlib
     static extern bool CreateMKVs(IntPtr vDir, IntPtr sDir, IntPtr fDir, IntPtr tDir, IntPtr oDir, IntPtr slang, IntPtr stitle, bool clean, logCallback lcb);
 
     [DllImport(so)]
-    static extern bool MakeMKVs(IntPtr dir, IntPtr data, IntPtr output, IntPtr slang, IntPtr stitle, logCallback lcb);
+    static extern bool MakeMKVs(IntPtr dir, IntPtr data, IntPtr output, IntPtr slang, IntPtr stitle, bool subset, logCallback lcb);
 
     [DllImport(so)]
     static extern bool CreateBlankOrBurnVideo(long t, IntPtr s, IntPtr enc, IntPtr ass, IntPtr fontdir, IntPtr output);
@@ -135,9 +135,9 @@ public static class mkvlib
         return CreateMKVs(cs(vDir), cs(sDir), cs(fDir), cs(tDir), cs(oDir), cs(slang), cs(stitle), clean, _lcb(lcb));
     }
 
-    public static bool MakeMKVs(string dir, string data, string output, string slang, string stitle, Action<LogLevel, string> lcb)
+    public static bool MakeMKVs(string dir, string data, string output, string slang, string stitle, bool subset, Action<LogLevel, string> lcb)
     {
-        return MakeMKVs(cs(dir), cs(data), cs(output), cs(slang), cs(stitle), _lcb(lcb));
+        return MakeMKVs(cs(dir), cs(data), cs(output), cs(slang), cs(stitle), subset, _lcb(lcb));
     }
 
     public static bool CreateBlankOrBurnVideo(long t, string s, string enc, string ass, string fontdir, string output)

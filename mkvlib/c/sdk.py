@@ -73,9 +73,9 @@ def createMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle, clean, lcb):
                 stitle.encode(), clean, _lcb(lcb))
 
 
-def makeMKVs(dir, data, output, slang, stitle, lcb):
+def makeMKVs(dir, data, output, slang, stitle, subset, lcb):
     call = lib.MakeMKVs
-    return call(dir.encode(), data.encode(), output.encode(), slang.encode(), stitle.encode(), _lcb(lcb))
+    return call(dir.encode(), data.encode(), output.encode(), slang.encode(), stitle.encode(), subset, _lcb(lcb))
 
 
 def createBlankOrBurnVideo(t, s, enc, ass, fontdir, output):

@@ -36,7 +36,7 @@ extern {
     fn GetMKVInfo(file: c_char) -> c_char;
     fn InitInstance(lcb: logCallback) -> bool;
     fn MKS(mks: bool);
-    fn MakeMKVs(dir: c_char, data: c_char, output: c_char, slang: c_char, stitle: c_char, lcb: logCallback) -> bool;
+    fn MakeMKVs(dir: c_char, data: c_char, output: c_char, slang: c_char, stitle: c_char, subset: bool, lcb: logCallback) -> bool;
     fn NOverwrite(n: bool);
     fn NRename(n: bool);
     fn QueryFolder(dir: c_char, lcb: logCallback) -> c_char;
@@ -202,9 +202,9 @@ pub fn mks(mks: bool) {
     }
 }
 
-pub fn makeMKVs(dir: &str, data: &str, output: &str, slang: &str, stitle: &str, lcb: logCallback) -> bool {
+pub fn makeMKVs(dir: &str, data: &str, output: &str, slang: &str, stitle: &str, subset: bool, lcb: logCallback) -> bool {
     unsafe {
-        return MakeMKVs(cs(dir), cs(data), cs(output), cs(slang), cs(stitle), lcb);
+        return MakeMKVs(cs(dir), cs(data), cs(output), cs(slang), cs(stitle), subset, lcb);
     }
 }
 

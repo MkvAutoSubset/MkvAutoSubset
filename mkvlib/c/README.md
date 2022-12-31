@@ -172,13 +172,14 @@
   ```
     - 关于字幕的命名方式请参考[这里](https://github.com/MkvAutoSubset/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 - ```c
-  bool MakeMKVs(char* dir, char* data, char* output, char* slang, char* stitle, logCallback lcb);
+  bool MakeMKVs(char* dir, char* data, char* output, char* slang, char* stitle, bool subset, logCallback lcb);
   //用子集化后的数据目录替代原有的字幕和字体
   //dir: 源mkv集合文件夹路径
   //data: 子集化后的数据文件夹路径
   //output: 新mkv集合输出文件夹路径
   //slang: 默认字幕语言
   //stitle: 默认字幕标题
+  //subset: 是否进行子集化
   //return: 是否全程无错
   ```
     - 输出文件夹的目录结构请参考[这里](https://github.com/MkvAutoSubset/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)

@@ -111,11 +111,11 @@ func CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle *C.char, clean bool,
 }
 
 //export MakeMKVs
-func MakeMKVs(dir, data, output, slang, stitle *C.char, lcb C.logCallback) bool {
+func MakeMKVs(dir, data, output, slang, stitle *C.char, subset bool, lcb C.logCallback) bool {
 	if !checkInstance() {
 		return false
 	}
-	return getter.GetProcessorInstance().MakeMKVs(gs(dir), gs(data), gs(output), gs(slang), gs(stitle), _lcb(lcb))
+	return getter.GetProcessorInstance().MakeMKVs(gs(dir), gs(data), gs(output), gs(slang), gs(stitle), subset, _lcb(lcb))
 }
 
 //export A2P
