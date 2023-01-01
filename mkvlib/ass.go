@@ -130,7 +130,7 @@ func (self *assProcessor) parse() bool {
 	if ec == 0 {
 		opt := parser.SSAOptions{}
 		reg, _ := regexp.Compile(`\\[^\r\n\\\}]+`)
-		_reg, _ := regexp.Compile(`\\fn@?(.+)`)
+		_reg, _ := regexp.Compile(`\\fn@?(.*)`)
 		__reg, _ := regexp.Compile(`\\([bir])(.*)`)
 		___reg, _ := regexp.Compile(`nd[xyz]?\d+`)
 		____reg, _ := regexp.Compile(`\d`)
