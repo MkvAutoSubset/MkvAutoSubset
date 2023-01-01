@@ -343,17 +343,22 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, subs
 		}
 		p = path.Join(data, d, f)
 		_p := path.Join(p, "subsetted")
-		subs, _ := findPath(p, `\.(sub)|(pgs)`)
 		asses, _ := findPath(_p, `\.ass$`)
-		if len(asses) == 0 && subset {
-			asses, _ = findPath(p, `\.ass$`)
-			if !self.ASSFontSubset(asses, "", "", false, lcb) {
-				ok = false
-				continue
-			}
-			asses, _ = findPath(_p, `\.ass$`)
-		}
 		attachments := findFonts(_p)
+		if len(asses) == 0 {
+			asses, _ = findPath(p, `\.ass$`)
+			if subset {
+				if !self.ASSFontSubset(asses, "", "", false, lcb) {
+					ok = false
+					continue
+				}
+				asses, _ = findPath(_p, `\.ass$`)
+				attachments = findFonts(_p)
+			} else {
+				attachments = findFonts(path.Join(p, "fonts"))
+			}
+		}
+		subs, _ := findPath(p, `\.(sub)|(pgs)`)
 		tracks := append(subs, asses...)
 		if !self.CreateMKV(item, tracks, attachments, fn, slang, stitle, true) {
 			ok = false
