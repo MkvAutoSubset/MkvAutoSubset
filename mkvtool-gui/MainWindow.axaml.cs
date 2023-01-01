@@ -569,7 +569,7 @@ namespace mkvtool
                         }
                     }
                     if (ec == 0 &&
-                        mkvlib.MakeMKVs(WorkflowArg.Dir, WorkflowArg.Data, WorkflowArg.Dist, "", "", true, lcb))
+                        mkvlib.MakeMKVs(WorkflowArg.Dir, WorkflowArg.Data, WorkflowArg.Dist, "", "", false, lcb))
                     {
                         PrintResult("Workflow", "Workflow successfully.");
                         WorkflowArg.Dir = string.Empty;

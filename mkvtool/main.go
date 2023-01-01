@@ -18,7 +18,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v4.2.7"
+const appVer = "v4.2.8"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -273,7 +273,7 @@ func main() {
 			return
 		}
 		if m {
-			if !processer.MakeMKVs(s, data, dist, sl, st, true, nil) {
+			if !processer.MakeMKVs(s, data, dist, sl, st, !n, nil) {
 				ec++
 			}
 			return
@@ -294,7 +294,7 @@ func main() {
 			}
 		}
 		if ec == 0 {
-			if !processer.MakeMKVs(s, data, dist, sl, st, true, nil) {
+			if !processer.MakeMKVs(s, data, dist, sl, st, false, nil) {
 				ec++
 			}
 		}
