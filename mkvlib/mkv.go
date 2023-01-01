@@ -350,6 +350,7 @@ func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, subs
 			if subset {
 				if !self.ASSFontSubset(asses, "", "", false, lcb) {
 					ok = false
+					printLog(lcb, logError, `Failed to make the file: "%s".`, item)
 					continue
 				}
 				asses, _ = findPath(_p, `\.ass$`)
