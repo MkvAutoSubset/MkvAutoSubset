@@ -1,9 +1,9 @@
 module github.com/MkvAutoSubset/MkvAutoSubset/mkvtool
 
-go 1.19
+go 1.20
 
 require (
-	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20230101032716-f7014b4d667c
+	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20230330093944-4cd9f1006e4f
 	github.com/fatih/color v1.13.0
 	github.com/mattn/go-colorable v0.1.9
 )
