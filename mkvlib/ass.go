@@ -25,12 +25,13 @@ const (
 )
 
 type fontInfo struct {
-	file    string
-	runes   []rune
-	index   int
-	oldName string
-	newName string
-	sFont   string
+	file     string
+	runes    []rune
+	index    int
+	oldName  string
+	oldNames []string
+	newName  string
+	sFont    string
 }
 
 type fontCache struct {
@@ -576,12 +577,14 @@ func (self *assProcessor) reMap() {
 	for _, v := range self.m {
 		if _, ok := m[v.file]; !ok {
 			m[v.file] = v
+			m[v.file].oldNames = []string{v.oldName}
 		} else {
 			m[v.file].runes = append(m[v.file].runes, v.runes...)
+			m[v.file].oldNames = append(m[v.file].oldNames, v.oldName)
 		}
 	}
 	for _, v := range m {
-		printLog(self.lcb, logInfo, `Font selected:[%s] -> "%s"[%d]`, v.oldName, v.file, v.index)
+		printLog(self.lcb, logInfo, `Font selected:[%s] -> "%s"[%d]`, strings.Join(v.oldNames, ","), v.file, v.index)
 	}
 	self.m = m
 }
@@ -752,19 +755,21 @@ func (self *assProcessor) changeFontsName() bool {
 func (self *assProcessor) replaceFontNameInAss() bool {
 	ec := 0
 	m := make(map[string]map[string]bool)
-	if self.rename {
-		for _, v := range self.m {
+	for _, v := range self.m {
+		if self.rename || len(v.oldNames) > 1 {
 			for f, s := range self.subtitles {
 				if m[f] == nil {
 					m[f] = make(map[string]bool)
 				}
-				n := regexp.QuoteMeta(v.oldName)
-				reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, n))
-				if reg.MatchString(s) {
-					r := fmt.Sprintf("${1}${2}%s${3}", v.newName)
-					s = reg.ReplaceAllString(s, r)
-					m[f][v.oldName] = true
-					self.subtitles[f] = s
+				for _, _v := range v.oldNames {
+					n := regexp.QuoteMeta(_v)
+					reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, n))
+					if reg.MatchString(s) {
+						r := fmt.Sprintf("${1}${2}%s${3}", v.newName)
+						s = reg.ReplaceAllString(s, r)
+						m[f][v.oldName] = true
+						self.subtitles[f] = s
+					}
 				}
 			}
 		}
