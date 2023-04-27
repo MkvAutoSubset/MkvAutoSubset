@@ -676,6 +676,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 			n := font.newName
 			if !self.rename {
 				n = font.oldName
+				font.newName = n
 			}
 			if xml, err := xmlquery.Parse(f); err == nil {
 				for _, v := range xml.SelectElements(`ttFont/name/namerecord`) {
