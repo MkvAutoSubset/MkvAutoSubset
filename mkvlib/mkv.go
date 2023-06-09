@@ -31,8 +31,9 @@ type mkvInfo struct {
 		Type       string `json:"type"`
 		Codec      string `json:"codec"`
 		Properties struct {
-			Language  string `json:"language"`
-			TrackName string `json:"track_name"`
+			Language     string `json:"language"`
+			TrackName    string `json:"track_name"`
+			DefaultTrack bool   `json:"default_track"`
 		} `json:"properties"`
 	}
 }
@@ -78,7 +79,11 @@ func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallb
 	}
 	for _, _item := range obj.Tracks {
 		if _item.Type == "subtitles" {
-			s := fmt.Sprintf(`%d_%s_%s`, _item.ID, _item.Properties.Language, _item.Properties.TrackName)
+			s := ""
+			if _item.Properties.DefaultTrack {
+				s = "#"
+			}
+			s += fmt.Sprintf(`%d_%s_%s`, _item.ID, _item.Properties.Language, _item.Properties.TrackName)
 			if _item.Codec == "SubStationAlpha" {
 				s += ".ass"
 			} else {
@@ -187,6 +192,9 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 		if _st != "" {
 			args = append(args, "--track-name", "0:"+_st)
 		}
+		if !strings.HasPrefix(f, "#") {
+			args = append(args, "--default-track-flag", "0:no")
+		}
 		args = append(args, _item)
 	}
 	if p, err := newProcess(nil, nil, nil, "", mkvmerge, args...); err == nil {
@@ -266,13 +274,19 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 			printLog(lcb, logProgress, "Create (%d/%d) done.", _ok, l)
 			continue
 		}
-		for _, sub := range tmp {
+		for i, sub := range tmp {
 			_, n, e, _ := splitPath(sub)
-			reg, _ := regexp.Compile(fmt.Sprintf(`^(%s)(_[^_]*)*\.\S+$`, regexp.QuoteMeta(_f)))
+			reg, _ := regexp.Compile(fmt.Sprintf(`^#?(%s)(_[^_]*)*\.\S+$`, regexp.QuoteMeta(_f)))
 			if !reg.MatchString(n) {
 				continue
 			}
-			_s := fmt.Sprintf("%s%s", randomStr(8), strings.Replace(n, _f, "", 1))
+			f := strings.Replace(n, _f, "", 1)
+			g := ""
+			if strings.HasPrefix(f, "#") {
+				f = strings.TrimPrefix(f, "#")
+				g = "#"
+			}
+			_s := fmt.Sprintf("%s%d%s", g, i, f)
 			if e == ".ass" {
 				_s = path.Join(s1, _s)
 				asses = append(asses, _s)
