@@ -22,7 +22,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           distribution: goreleaser
-          version: latest
+          version: v1.18.2
           args: release --rm-dist -f ../.github/goreleaser.yml
           workdir: mkvtool
         env:
