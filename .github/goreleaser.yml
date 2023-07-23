@@ -20,7 +20,7 @@ builds:
 archives:
   - name_template: >-
       {{ .Env.PROJECT_NAME }}_
-      {{ .Version }}_
+      {{ trim .Version }}_
       {{- title .Os }}_
       {{- if eq .Arch "386" }}i386
       {{- else if eq .Arch "amd64" }}x86_64
