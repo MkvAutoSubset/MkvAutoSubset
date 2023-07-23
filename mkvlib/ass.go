@@ -13,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -250,6 +251,8 @@ func (self *assProcessor) getFontsList() [][]string {
 	if self.check {
 		list2 = self.matchFonts()
 	}
+	sort.Strings(list)
+	sort.Strings(list2)
 	return [][]string{list, list2}
 }
 
