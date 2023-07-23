@@ -286,3 +286,8 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 字幕语言代码表:
 
   [点此获取](https://www.science.co.il/language/Codes.php)
+  
+  
+## Warning
+**No escape of specsial chars and quotes to avoid string splitting and sub folders**
+Track names with `/` or other special chars will break mkvtool. Same goes for font name wirh `'!#` or other special chars. Arguments are not qouted & escaped for cli mkvmerge
