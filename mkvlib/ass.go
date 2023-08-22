@@ -587,6 +587,15 @@ func (self *assProcessor) reMap() {
 		}
 	}
 	for _, v := range m {
+		_m := make(map[rune]bool)
+		chars := make([]rune, 0)
+		for _, _v := range v.runes {
+			if _, ok := _m[_v]; !ok {
+				_m[_v] = true
+				chars = append(chars, _v)
+			}
+		}
+		m[v.file].runes = chars
 		printLog(self.lcb, logInfo, `Font selected:[%s] -> "%s"[%d]`, strings.Join(v.oldNames, ","), v.file, v.index)
 	}
 	self.m = m
