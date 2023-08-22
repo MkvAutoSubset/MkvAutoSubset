@@ -215,17 +215,19 @@ func (self *assProcessor) parse() bool {
 							arr = append(arr, "Regular")
 						}
 						_name := fmt.Sprintf("%s^%s", name, strings.Join(arr, " "))
-						m[_name] += __item.Text
-                                                if len(m[_name]) > 1000 {
-                                                        chars := make(map[rune]int)
-                                                        for _, char := range m[_name] {
-                                                                chars[char]++
-                                                        }
-                                                        m[_name] = ""
-                                                        for char := range chars {
-                                                                m[_name] += string(char)
-                                                        }
-                                                }
+						s := m[_name] + __item.Text
+						if len(s) > 1000 {
+							_m := make(map[rune]bool)
+							chars := make([]rune, 0)
+							for _, _v := range s {
+								if _, ok := _m[_v]; !ok {
+									_m[_v] = true
+									chars = append(chars, _v)
+								}
+							}
+							s = string(chars)
+						}
+						m[_name] = s
 					}
 				}
 			}
