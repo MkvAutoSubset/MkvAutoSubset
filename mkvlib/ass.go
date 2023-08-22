@@ -216,6 +216,16 @@ func (self *assProcessor) parse() bool {
 						}
 						_name := fmt.Sprintf("%s^%s", name, strings.Join(arr, " "))
 						m[_name] += __item.Text
+                                                if len(m[_name]) > 1000 {
+                                                        chars := make(map[rune]int)
+                                                        for _, char := range m[_name] {
+                                                                chars[char]++
+                                                        }
+                                                        m[_name] = ""
+                                                        for char := range chars {
+                                                                m[_name] += string(char)
+                                                        }
+                                                }
 					}
 				}
 			}
