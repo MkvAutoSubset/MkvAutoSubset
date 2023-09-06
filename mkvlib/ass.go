@@ -215,7 +215,7 @@ func (self *assProcessor) parse() bool {
 							arr = append(arr, "Regular")
 						}
 						_name := fmt.Sprintf("%s^%s", name, strings.Join(arr, " "))
-						s := m[_name] + __item.Text
+						s := m[_name] + strings.ReplaceAll(strings.ReplaceAll(__item.Text, "\\n", ""), "\\N", "")
 						if len(s) > 1000 {
 							_m := make(map[rune]bool)
 							chars := make([]rune, 0)
