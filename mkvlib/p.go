@@ -6,10 +6,17 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func newProcess(stdin io.Reader, stdout, stderr io.Writer, dir, prog string, args ...string) (p *os.Process, err error) {
 	cmd := exec.Command(prog, args...)
+
+	for index := range args {
+		args[index] = strings.ReplaceAll(args[index], "!", "\\!")
+		args[index] = "\"" + args[index] + "\""
+	}
+	
 	if dir != "" {
 		cmd.Dir = dir
 	}
