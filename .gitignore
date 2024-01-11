@@ -9,3 +9,5 @@ obj
 .vs
 *.user
 mkvtool-gui/mkvlib.so
+
+win64_assets
