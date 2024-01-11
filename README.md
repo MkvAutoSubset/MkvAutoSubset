@@ -16,6 +16,9 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 ## mkvtool 安装
 
+### 202401新增的Win64依赖打包说明
+- 见[这里](https://github.com/MkvAutoSubset/MkvAutoSubset/tree/master/win64_assets)
+
 ### 202205新增的Docker镜像使用说明
 - 从Dockerhub获取
   ```shell
