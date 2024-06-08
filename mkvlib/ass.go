@@ -25,13 +25,13 @@ const (
 )
 
 type fontInfo struct {
-	file     string
-	runes    []rune
-	index    int
-	oldName  string
-	oldNames []string
-	newName  string
-	sFont    string
+	file        string
+	runes       []rune
+	index       int
+	matchedName string
+	oldNames    []string
+	newName     string
+	sFont       string
 }
 
 type fontCache struct {
@@ -240,7 +240,6 @@ func (self *assProcessor) parse() bool {
 				v += "a\u0020\u00a0"
 				self.m[k] = new(fontInfo)
 				self.m[k].runes = []rune(v)
-				self.m[k].oldName = strings.Split(k, "^")[0]
 			}
 		}
 		if len(self.m) == 0 {
@@ -441,7 +440,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	}
 	if _str != "" {
 		_str = stringDeduplication(_str)
-		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing normal char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
+		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing normal char(s): "%s"`, h, i, f.matchedName, f.file, f.index, _str)
 	}
 	if len(_runes) > 0 {
 		_str = ""
@@ -449,7 +448,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 			_str += fmt.Sprintf(`,0x%x`, _rune)
 		}
 		_str = _str[1:]
-		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing special char(s): "%s"`, h, i, f.oldName, f.file, f.index, _str)
+		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing special char(s): "%s"`, h, i, f.matchedName, f.file, f.index, _str)
 	}
 	return _str == "" && len(_runes) == 0
 }
@@ -476,7 +475,7 @@ func (self *assProcessor) matchFonts() []string {
 					if n := self.matchFontName(_v, _k, fb == 2); n != "" {
 						self.m[k].file = __k
 						self.m[k].index = ___k
-						self.m[k].oldName = n
+						self.m[k].matchedName = n
 						if self.check {
 							_count[n]++
 							if !self.checkFontMissing(self.m[k], _count[_k[0]], false) && self.strict {
@@ -502,7 +501,7 @@ func (self *assProcessor) matchFonts() []string {
 				continue
 			}
 			if f, i, n := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k, fb == 2); f != "" {
-				self.m[k].file, self.m[k].index, self.m[k].oldName = f, i, n
+				self.m[k].file, self.m[k].index, self.m[k].matchedName = f, i, n
 				_n := self.fg[n]
 				if _n == "" {
 					_n = randomStr(8)
@@ -601,16 +600,17 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 func (self *assProcessor) reMap() {
 	m := make(map[string]*fontInfo)
 	_n := make(map[string]bool)
-	for _, v := range self.m {
+	for k, v := range self.m {
+		_k := strings.Split(k, "^")[0]
 		if _, ok := m[v.file]; !ok {
 			m[v.file] = v
-			m[v.file].oldNames = []string{v.oldName}
-			_n[v.oldName] = true
+			m[v.file].oldNames = []string{_k}
+			_n[_k] = true
 		} else {
 			m[v.file].runes = append(m[v.file].runes, v.runes...)
-			if _, ok = _n[v.oldName]; !ok {
-				_n[v.oldName] = true
-				m[v.file].oldNames = append(m[v.file].oldNames, v.oldName)
+			if _, ok = _n[_k]; !ok {
+				m[v.file].oldNames = append(m[v.file].oldNames, _k)
+				_n[_k] = true
 			}
 		}
 	}
@@ -647,9 +647,9 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	str = stringDeduplication(str)
 	if os.WriteFile(fn, []byte(str), os.ModePerm) == nil {
 		defer func() { _ = os.Remove(fn) }()
-		n := font.newName
+		n = font.newName
 		if !self.rename {
-			n = font.oldName
+			n = font.matchedName
 		}
 		_fn := fmt.Sprintf("%s.%s%s", n, randomStr(8), e)
 		_fn = path.Join(self.output, _fn)
@@ -664,7 +664,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 			ok = err == nil && s.ExitCode() == 0
 		}
 		if !ok {
-			printLog(self.lcb, logError, `Failed to subset font: "%s"[%d].`, font.oldName, font.index)
+			printLog(self.lcb, logError, `Failed to subset font: "%s"(%s)[%d].`, font.matchedName, font.file, font.index)
 		} else {
 			font.sFont = _fn
 		}
@@ -715,7 +715,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 			}()
 			n := font.newName
 			if !self.rename {
-				n = font.oldName
+				n = font.matchedName
 				font.newName = n
 			}
 			if xml, err := xmlquery.Parse(f); err == nil {
@@ -763,7 +763,7 @@ func (self *assProcessor) changeFontName(font *fontInfo) bool {
 					}
 				}
 			} else {
-				printLog(self.lcb, logError, `Failed to change the font name: "%s".`, font.oldName)
+				printLog(self.lcb, logError, `Failed to change the font name: "%s".`, font.matchedName)
 			}
 		}
 	} else {
@@ -808,7 +808,7 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 					if reg.MatchString(s) {
 						r := fmt.Sprintf("${1}${2}%s${3}", v.newName)
 						s = reg.ReplaceAllString(s, r)
-						m[f][v.oldName] = true
+						m[f][v.matchedName] = true
 						self.subtitles[f] = s
 					}
 				}
@@ -822,7 +822,7 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 			comments = append(comments, "; ----- Font subset begin -----")
 			for k, _ := range m[f] {
 				for _, v := range self.m {
-					if strings.Split(v.oldName, "^")[0] == k {
+					if v.matchedName == k {
 						comments = append(comments, fmt.Sprintf("; Font subset: %s - %s", v.newName, k))
 						break
 					}
@@ -1008,7 +1008,7 @@ func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string) 
 					if len(names) > 0 {
 						_count++
 						f := new(fontInfo)
-						f.oldName = n
+						f.matchedName = n
 						f.file = ok
 						f.index = i
 						f.runes = self.m[o].runes
