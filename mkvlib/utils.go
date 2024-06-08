@@ -166,10 +166,10 @@ func copyFileOrDir(src, dst string) error {
 	return copyFolder(src, dst)
 }
 
-var r = rand.New(rand.NewSource(time.Now().UnixNano()))
+var random = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func randomN(n int) int {
-	return r.Intn(n)
+	return random.Intn(n)
 }
 
 func randomNumber(min, max int) int {
@@ -211,9 +211,9 @@ func randomStr(l int) string {
 	str := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	bytes := []byte(str)
 	var result []byte
-	lstr := len(str) - 1
+	_l := len(str) - 1
 	for i := 0; i < l; i++ {
-		n := randomNumber(0, lstr)
+		n := randomNumber(0, _l)
 		result = append(result, bytes[n])
 	}
 	return string(result)
