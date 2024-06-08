@@ -3,7 +3,7 @@ module github.com/MkvAutoSubset/MkvAutoSubset/mkvtool
 go 1.20
 
 require (
-	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20240608101409-d7b1c580a276
+	github.com/MkvAutoSubset/MkvAutoSubset/mkvlib v0.0.0-20240608111030-3cff7c27d378
 	github.com/fatih/color v1.15.0
 	github.com/mattn/go-colorable v0.1.13
 )
