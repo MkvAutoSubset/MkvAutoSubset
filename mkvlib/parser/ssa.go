@@ -121,14 +121,6 @@ const (
 	ssaStyleFormatNameUnderline       = "Underline"
 )
 
-// SSA wrap style
-const (
-	ssaWrapStyleEndOfLineWordWrapping                   = "1"
-	ssaWrapStyleNoWordWrapping                          = "2"
-	ssaWrapStyleSmartWrapping                           = "0"
-	ssaWrapStyleSmartWrappingWithLowerLinesGettingWider = "3"
-)
-
 // SSA regexp
 var ssaRegexpEffect = regexp.MustCompile(`\{[^\{]+\}`)
 
@@ -273,7 +265,14 @@ func ReadFromSSAWithOptions(i io.Reader, opts SSAOptions) (o *Subtitles, err err
 			}
 
 			// Append item
-			o.Items = append(o.Items, item)
+			if item.Style == nil {
+				if len(item.Lines) > 1 || len(item.Lines[0].Items) > 1 || item.Lines[0].Items[0].Text != "" {
+					err = fmt.Errorf(`astisub: style "%s" not found`, e.name)
+					return
+				}
+			} else {
+				o.Items = append(o.Items, item)
+			}
 		}
 	}
 	return
@@ -1057,10 +1056,12 @@ func (e *ssaEvent) item(styles map[string]*Style) (i *Item, err error) {
 
 	// Set style
 	if len(e.style) > 0 {
-		var ok bool
-		if i.Style, ok = styles[e.style]; !ok {
-			err = fmt.Errorf("astisub: style %s not found", e.style)
-			return
+		// Sometimes there's an "*" before the style name (e.g. with ffmpeg)
+		for _, name := range []string{e.style, strings.TrimPrefix(e.style, "*")} {
+			if s, ok := styles[name]; ok {
+				i.Style = s
+				break
+			}
 		}
 	}
 
@@ -1098,35 +1099,6 @@ func (e *ssaEvent) item(styles map[string]*Style) (i *Item, err error) {
 	return
 }
 
-// updateFormat updates the format based on the non empty fields
-func (e ssaEvent) updateFormat(formatMap map[string]bool, format []string) []string {
-	if len(e.effect) > 0 {
-		format = ssaUpdateFormat(ssaEventFormatNameEffect, formatMap, format)
-	}
-	if e.layer != nil {
-		format = ssaUpdateFormat(ssaEventFormatNameLayer, formatMap, format)
-	}
-	if e.marginLeft != nil {
-		format = ssaUpdateFormat(ssaEventFormatNameMarginL, formatMap, format)
-	}
-	if e.marginRight != nil {
-		format = ssaUpdateFormat(ssaEventFormatNameMarginR, formatMap, format)
-	}
-	if e.marginVertical != nil {
-		format = ssaUpdateFormat(ssaEventFormatNameMarginV, formatMap, format)
-	}
-	if e.marked != nil {
-		format = ssaUpdateFormat(ssaEventFormatNameMarked, formatMap, format)
-	}
-	if len(e.name) > 0 {
-		format = ssaUpdateFormat(ssaEventFormatNameName, formatMap, format)
-	}
-	if len(e.style) > 0 {
-		format = ssaUpdateFormat(ssaEventFormatNameStyle, formatMap, format)
-	}
-	return format
-}
-
 // formatDurationSSA formats an .ssa duration
 func formatDurationSSA(i time.Duration) string {
 	return formatDuration(i, ".", 2)
@@ -1149,12 +1121,10 @@ func (e *ssaEvent) string(format []string) string {
 			}
 		// Marked
 		case ssaEventFormatNameMarked:
-			if e.marked != nil {
-				if *e.marked {
-					v = "Marked=1"
-				} else {
-					v = "Marked=0"
-				}
+			if e.marked != nil && *e.marked {
+				v = "Marked=1"
+			} else {
+				v = "Marked=0"
 			}
 		// Int
 		case ssaEventFormatNameLayer, ssaEventFormatNameMarginL, ssaEventFormatNameMarginR,
@@ -1170,9 +1140,10 @@ func (e *ssaEvent) string(format []string) string {
 			case ssaEventFormatNameMarginV:
 				i = e.marginVertical
 			}
-			if i != nil {
-				v = strconv.Itoa(*i)
+			if i == nil {
+				i = astikit.IntPtr(0)
 			}
+			v = strconv.Itoa(*i)
 		// String
 		case ssaEventFormatNameEffect, ssaEventFormatNameName, ssaEventFormatNameStyle, ssaEventFormatNameText:
 			switch attr {
@@ -1215,10 +1186,15 @@ func (s Subtitles) WriteToSSA(o io.Writer) (err error) {
 		return
 	}
 
+	var v4plus = s.Metadata.SSAScriptType == "v4.00+"
+
 	// Write Styles block
 	if len(s.Styles) > 0 {
 		// Header
 		var b = []byte("\n[V4 Styles]\n")
+		if v4plus {
+			b = []byte("\n[V4+ Styles]\n")
+		}
 
 		// Format
 		var formatMap = make(map[string]bool)
@@ -1252,16 +1228,24 @@ func (s Subtitles) WriteToSSA(o io.Writer) (err error) {
 		var b = []byte("\n[Events]\n")
 
 		// Format
-		var formatMap = make(map[string]bool)
+		// We need to declare those 9 columns here otherwise VLC doesn't display subtitles properly
 		var format = []string{
+			ssaEventFormatNameMarked,
 			ssaEventFormatNameStart,
 			ssaEventFormatNameEnd,
+			ssaEventFormatNameStyle,
+			ssaEventFormatNameName,
+			ssaEventFormatNameMarginL,
+			ssaEventFormatNameMarginR,
+			ssaEventFormatNameMarginV,
+			ssaEventFormatNameEffect,
+		}
+		if v4plus {
+			format[0] = ssaEventFormatNameLayer
 		}
 		var events []*ssaEvent
 		for _, i := range s.Items {
-			var e = newSSAEventFromItem(*i)
-			format = e.updateFormat(formatMap, format)
-			events = append(events, e)
+			events = append(events, newSSAEventFromItem(*i))
 		}
 		format = append(format, ssaEventFormatNameText)
 		b = append(b, []byte("Format: "+strings.Join(format, ", ")+"\n")...)

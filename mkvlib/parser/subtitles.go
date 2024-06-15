@@ -3,7 +3,6 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"github.com/asticode/go-astikit"
 	"math"
 	"os"
 	"path/filepath"
@@ -11,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/asticode/go-astikit"
 )
 
 // Bytes
@@ -54,8 +55,8 @@ var Now = func() time.Time {
 // Options represents open or write options
 type Options struct {
 	Filename string
-	/*Teletext TeletextOptions
-	STL      STLOptions*/
+	// Teletext TeletextOptions
+	// STL      STLOptions
 }
 
 // Open opens a subtitle reader based on options
@@ -70,18 +71,18 @@ func Open(o Options) (s *Subtitles, err error) {
 
 	// Parse the content
 	switch filepath.Ext(strings.ToLower(o.Filename)) {
-	/*case ".srt":
-	s, err = ReadFromSRT(f)*/
+	case ".srt":
+		// s, err = ReadFromSRT(f)
 	case ".ssa", ".ass":
 		s, err = ReadFromSSA(f)
-	/*case ".stl":
-		s, err = ReadFromSTL(f, o.STL)
+	case ".stl":
+		// s, err = ReadFromSTL(f, o.STL)
 	case ".ts":
-		s, err = ReadFromTeletext(f, o.Teletext)
+		// s, err = ReadFromTeletext(f, o.Teletext)
 	case ".ttml":
-		s, err = ReadFromTTML(f)
+		// s, err = ReadFromTTML(f)
 	case ".vtt":
-		s, err = ReadFromWebVTT(f)*/
+		// s, err = ReadFromWebVTT(f)
 	default:
 		err = ErrInvalidExtension
 	}
@@ -201,7 +202,7 @@ type StyleAttributes struct {
 	STLBoxing          *bool
 	STLItalics         *bool
 	STLJustification   *Justification
-	//STLPosition          *STLPosition
+	// STLPosition          *STLPosition
 	STLUnderline         *bool
 	TeletextColor        *Color
 	TeletextDoubleHeight *bool
@@ -235,20 +236,52 @@ type StyleAttributes struct {
 	TTMLWritingMode      *string
 	TTMLZIndex           *int
 	WebVTTAlign          string
-	WebVTTItalics        bool
 	WebVTTLine           string
 	WebVTTLines          int
 	WebVTTPosition       string
 	WebVTTRegionAnchor   string
 	WebVTTScroll         string
 	WebVTTSize           string
+	WebVTTStyles         []string
+	WebVTTTags           []WebVTTTag
 	WebVTTVertical       string
 	WebVTTViewportAnchor string
 	WebVTTWidth          string
 }
 
+type WebVTTTag struct {
+	Name       string
+	Annotation string
+	Classes    []string
+}
+
+func (t WebVTTTag) startTag() string {
+	if t.Name == "" {
+		return ""
+	}
+
+	s := t.Name
+	if len(t.Classes) > 0 {
+		s += "." + strings.Join(t.Classes, ".")
+	}
+
+	if t.Annotation != "" {
+		s += " " + t.Annotation
+	}
+
+	return "<" + s + ">"
+}
+
+func (t WebVTTTag) endTag() string {
+	if t.Name == "" {
+		return ""
+	}
+	return "</" + t.Name + ">"
+}
+
 func (sa *StyleAttributes) propagateSSAAttributes() {}
 
+/*
 func (sa *StyleAttributes) propagateSTLAttributes() {
 	if sa.STLJustification != nil {
 		switch *sa.STLJustification {
@@ -260,7 +293,20 @@ func (sa *StyleAttributes) propagateSTLAttributes() {
 			sa.WebVTTAlign = "left"
 		}
 	}
+	// converts STL vertical position (row number) to WebVTT line percentage
+	if sa.STLPosition != nil && sa.STLPosition.MaxRows > 0 {
+		// in-vision vertical position ranges from 0 to maxrows (maxrows <= 99)
+		sa.WebVTTLine = fmt.Sprintf("%d%%", sa.STLPosition.VerticalPosition*100/sa.STLPosition.MaxRows)
+		// teletext vertical position ranges from 1 to 23; as webvtt line percentage starts
+		// from the top at 0%, substract 1 to the stl position to get a better conversion.
+		// Especially apparent on Shaka player, where a single line at vp 22 would be half
+		// out of bounds at 95% (22*100/23), and fine at 91% (21*100/23)
+		if sa.STLPosition.MaxRows == 23 && sa.STLPosition.VerticalPosition > 0 {
+			sa.WebVTTLine = fmt.Sprintf("%d%%", (sa.STLPosition.VerticalPosition-1)*100/sa.STLPosition.MaxRows)
+		}
+	}
 }
+*/
 
 func (sa *StyleAttributes) propagateTeletextAttributes() {
 	if sa.TeletextColor != nil {
@@ -268,7 +314,7 @@ func (sa *StyleAttributes) propagateTeletextAttributes() {
 	}
 }
 
-//reference for migration: https://w3c.github.io/ttml-webvtt-mapping/
+// reference for migration: https://w3c.github.io/ttml-webvtt-mapping/
 func (sa *StyleAttributes) propagateTTMLAttributes() {
 	if sa.TTMLTextAlign != nil {
 		sa.WebVTTAlign = *sa.TTMLTextAlign
@@ -332,12 +378,20 @@ type Metadata struct {
 	STLCountryOfOrigin                                  string
 	STLCreationDate                                     *time.Time
 	STLDisplayStandardCode                              string
+	STLEditorContactDetails                             string
+	STLEditorName                                       string
 	STLMaximumNumberOfDisplayableCharactersInAnyTextRow *int
 	STLMaximumNumberOfDisplayableRows                   *int
+	STLOriginalEpisodeTitle                             string
 	STLPublisher                                        string
 	STLRevisionDate                                     *time.Time
+	STLRevisionNumber                                   int
 	STLSubtitleListReferenceCode                        string
 	STLTimecodeStartOfProgramme                         time.Duration
+	STLTranslatedEpisodeTitle                           string
+	STLTranslatedProgramTitle                           string
+	STLTranslatorContactDetails                         string
+	STLTranslatorName                                   string
 	Title                                               string
 	TTMLCopyright                                       string
 }
@@ -374,6 +428,7 @@ func (l Line) String() string {
 // LineItem represents a formatted line item
 type LineItem struct {
 	InlineStyle *StyleAttributes
+	StartAt     time.Duration
 	Style       *Style
 	Text        string
 }
@@ -581,7 +636,7 @@ func (s *Subtitles) Order() {
 	}
 
 	// Order
-	sort.Slice(s.Items, func(i, j int) bool {
+	sort.SliceStable(s.Items, func(i, j int) bool {
 		return s.Items[i].StartAt < s.Items[j].StartAt
 	})
 }
@@ -656,16 +711,16 @@ func (s Subtitles) Write(dst string) (err error) {
 
 	// Write the content
 	switch filepath.Ext(strings.ToLower(dst)) {
-	/*case ".srt":
-	err = s.WriteToSRT(f)*/
+	case ".srt":
+		// err = s.WriteToSRT(f)
 	case ".ssa", ".ass":
 		err = s.WriteToSSA(f)
-	/*case ".stl":
-		err = s.WriteToSTL(f)
+	case ".stl":
+		// err = s.WriteToSTL(f)
 	case ".ttml":
-		err = s.WriteToTTML(f)
+		// err = s.WriteToTTML(f)
 	case ".vtt":
-		err = s.WriteToWebVTT(f)*/
+		// err = s.WriteToWebVTT(f)
 	default:
 		err = ErrInvalidExtension
 	}
@@ -770,8 +825,8 @@ func formatDuration(i time.Duration, millisecondSep string, numberOfMillisecondD
 	s += strconv.Itoa(seconds) + millisecondSep
 
 	// Parse milliseconds
-	var milliseconds = float64(n/time.Millisecond) / float64(1000)
-	s += fmt.Sprintf("%."+strconv.Itoa(numberOfMillisecondDigits)+"f", milliseconds)[2:]
+	var milliseconds = math.Floor(float64(n) / float64(time.Millisecond) / float64(math.Pow(10, 3-float64(numberOfMillisecondDigits))))
+	s += astikit.StrPad(strconv.FormatFloat(milliseconds, 'f', 0, 64), '0', numberOfMillisecondDigits, astikit.PadLeft)
 	return
 }
 
