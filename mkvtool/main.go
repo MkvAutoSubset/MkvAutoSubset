@@ -6,7 +6,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
 	"github.com/spf13/cobra"
-	"github.com/spf13/cobra/doc"
 	"io"
 	"net/http"
 	"os"
@@ -115,7 +114,7 @@ func main() {
 		ec++
 	}
 
-	_ = doc.GenMarkdownTree(cmd, "docs")
+	//_ = doc.GenMarkdownTree(cmd, "docs")
 }
 
 func versionCmd() *cobra.Command {
