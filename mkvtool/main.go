@@ -37,16 +37,16 @@ func main() {
 
 	defer func() {
 		if latestTag != "" && latestTag != appVer {
-			os := strings.ToUpper(string(runtime.GOOS[0])) + runtime.GOOS[1:]
+			_os := strings.ToUpper(string(runtime.GOOS[0])) + runtime.GOOS[1:]
 			arch := runtime.GOARCH
 			if arch == "amd64" {
 				arch = "x86_64"
 			}
 			ext := "tar.gz"
-			if os == "Windows" || os == "Darwin" {
+			if _os == "Windows" || _os == "Darwin" {
 				ext = "zip"
 			}
-			color.Green("New version available: %s\nDownload link: https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/%s/mkvtool_%s_%s_%s.%s", latestTag, latestTag, latestTag[1:], os, arch, ext)
+			color.Green("New version available: %s\nDownload link: https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/%s/mkvtool_%s_%s_%s.%s", latestTag, latestTag, latestTag[1:], _os, arch, ext)
 		}
 		os.Exit(ec)
 	}()
