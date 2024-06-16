@@ -97,10 +97,20 @@ ASS字幕字体子集化 MKV批量提取/生成
 
   [点此下载](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/gui)
 ### 一部分中文使用说明([英文完整版](./mkvtool/docs/mkvtool.md))
-- 对单个(或文件夹内的)字幕进行子集化.
+- 对单(或多)个(或文件夹内的)字幕进行子集化.
   ```shell
   mkvtool s test.ass #单个文件
-  mkvtool s test #文件夹
+  mkvtool s 01.ass 02.ass #多个文件
+  mkvtool s subs #文件夹
+  ```
+- 查看某个字体的信息
+  ```shell
+  mkvtool i font.ttf
+  ```
+- 检测单个字体文件(或目录)需要哪些字体
+  ```shell
+  mkvtool l test.ass #单个文件
+  mkvtool l subs #目录
   ```
 - 从单个(或文件夹的)mkv文件里抽取字幕和字体*并创建子集化后的版本(可选)*
   ```shell
