@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v5.0.1"
+const appVer = "v5.0.2"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -37,7 +37,16 @@ func main() {
 
 	defer func() {
 		if latestTag != "" && latestTag != appVer {
-			color.Green("New version available: %s", latestTag)
+			os := strings.ToUpper(string(runtime.GOOS[0])) + runtime.GOOS[1:]
+			arch := runtime.GOARCH
+			if arch == "amd64" {
+				arch = "x86_64"
+			}
+			ext := "tar.gz"
+			if os == "Windows" || os == "Darwin" {
+				ext = "zip"
+			}
+			color.Green("New version available: %s\nDownload link: https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/%s/mkvtool_%s_%s_%s.%s", latestTag, latestTag, latestTag[1:], os, arch, ext)
 		}
 		os.Exit(ec)
 	}()
@@ -114,7 +123,7 @@ func main() {
 		ec++
 	}
 
-	//_ = doc.GenMarkdownTree(cmd, "docs")
+	// _ = doc.GenMarkdownTree(cmd, "docs")
 }
 
 func versionCmd() *cobra.Command {
@@ -160,7 +169,7 @@ func infoCmd() *cobra.Command {
 func listCmd() *cobra.Command {
 	f := ""
 	cmd := &cobra.Command{
-		Use:     "list <ass-file | ass-dir> [output-dir]",
+		Use:     "list <ass-file|ass-dir> [output-dir]",
 		Aliases: []string{"l"},
 		Short:   "Show list of fonts",
 		Args:    cobra.RangeArgs(1, 2),
@@ -196,7 +205,7 @@ func listCmd() *cobra.Command {
 
 func queryCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "query <mkv-file | mkv-dir> [output-=file]",
+		Use:     "query <mkv-file|mkv-dir> [output-=file]",
 		Short:   "Query folder for items",
 		Aliases: []string{"q"},
 		Args:    cobra.RangeArgs(1, 2),
@@ -351,24 +360,28 @@ func subsetCmd() *cobra.Command {
 	n := false
 	b := false
 	cmd := &cobra.Command{
-		Use:     "subset <ass-file>...",
+		Use:     "subset <ass-file...|ass-dir>",
 		Aliases: []string{"s"},
 		Args:    cobra.MinimumNArgs(1),
 		Short:   "Perform ass font subset",
 		Long:    `Subset the fonts used in ass files and optionally create test videos with the subsetted fonts.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			if !processer.ASSFontSubset(args, f, o, !n, nil) {
+			files := args
+			if i, _ := os.Stat(files[0]); i.IsDir() {
+				files, _ = findPath(files[0], `\.ass`)
+			}
+			if !processer.ASSFontSubset(files, f, o, !n, nil) {
 				ec++
 			} else if t != "" {
-				d, _, _, _ := splitPath((args)[0])
+				d, _, _, _ := splitPath((files)[0])
 				if o == "" {
 					o = path.Join(d, "subsetted")
 				} else if !n {
 					o = path.Join(o, "subsetted")
 				}
-				_asses, _ := findPath(o, `\.ass$`)
-				if len(_asses) > 0 {
-					processer.CreateTestVideo(_asses, t, o, e, b, nil)
+				files, _ = findPath(o, `\.ass$`)
+				if len(files) > 0 {
+					processer.CreateTestVideo(files, t, o, e, b, nil)
 				}
 			}
 		},
