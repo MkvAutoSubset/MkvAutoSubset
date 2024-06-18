@@ -178,7 +178,9 @@ func (self *assProcessor) parse() bool {
 											if ___reg.MatchString(v[2]) {
 												break
 											}
-											v[2] = strings.TrimPrefix(v[2], "*")
+											if v[2] == "*Default" {
+												v[2] = "Default"
+											}
 											if v[2] == "" {
 												name = ""
 												_b = *item.Style.InlineStyle.SSABold
