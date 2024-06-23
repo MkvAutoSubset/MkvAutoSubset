@@ -99,7 +99,11 @@ ASS字幕字体子集化 MKV批量提取/生成
 
   [点此下载](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/gui)
 ### 一部分中文使用说明([英文完整版](./mkvtool/docs/mkvtool.md))
-- 对单(或多)个(或文件夹内的)字幕进行子集化.
+- 旧版CLI中"标准工作流"的替代
+  ```shell
+  mkvtool d bangumi && mkvtool m bangumi #假设mkv文件在"bangymi"文件夹中
+  ```
+- 对单(或多)个(或文件夹内的)字幕进行子集化
   ```shell
   mkvtool s test.ass #单个文件
   mkvtool s 01.ass 02.ass #多个文件
@@ -121,7 +125,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   
   #可选"-n"参数:当"-n"存在时,只抽取内容,不进行子集化操作.
   ```
-- 检测单个(或文件夹的)mkv文件字幕和字体,判断是否需要子集化.
+- 检测单个(或文件夹的)mkv文件字幕和字体,判断是否需要子集化
   ```shell
   mkvtool q file.mkv #单个文件,会直接输出是否需要子集化
   mkvtool q bangumi #文件夹,会将需要子集化的文件列表输出至"${workdir}/result.txt".
