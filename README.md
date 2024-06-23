@@ -4,6 +4,8 @@
 
 ASS字幕字体子集化 MKV批量提取/生成
 
+[问题反馈](https://bbs.acgrip.com/thread-9070-13-1.html)
+
 ## 什么叫字幕字体子集化
 - 这里说的字幕特指ass(ssa)这种带有特效的文本字幕;
 - ass字幕会引用一些字体,这些字体在播放器所在的系统里可能有安装,也可能没有;
@@ -13,8 +15,6 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 综上所述,子集化的目的就是把字体拆包,找出字幕用到的那部分字形并重新打包;
 - 好处不仅限于节约存储空间,加快缓冲速度;
 - 想想看:在一个只有30Mbps上传的网络环境下,要看上面那个光字体就200M的番剧,这河里吗?
-
-### [问题反馈](https://bbs.acgrip.com/thread-9070-13-1.html)
 
 ## mkvtool 安装
 
@@ -101,7 +101,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 ### 一部分中文使用说明([英文完整版](./mkvtool/docs/mkvtool.md))
 - 旧版CLI中"标准工作流"的替代
   ```shell
-  mkvtool d bangumi && mkvtool m bangumi #假设mkv文件在"bangymi"文件夹中
+  mkvtool d bangumi && mkvtool m bangumi #假设mkv文件在"bangumi"文件夹中
   ```
 - 对单(或多)个(或文件夹内的)字幕进行子集化
   ```shell
