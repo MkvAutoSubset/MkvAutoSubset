@@ -267,7 +267,7 @@ func ReadFromSSAWithOptions(i io.Reader, opts SSAOptions) (o *Subtitles, err err
 			// Append item
 			if item.Style == nil {
 				if len(item.Lines) > 1 || len(item.Lines[0].Items) > 1 || item.Lines[0].Items[0].Text != "" {
-					err = fmt.Errorf(`astisub: style "%s" not found`, e.name)
+					err = fmt.Errorf(`astisub: style "%s" not found`, e.style)
 					return
 				}
 			} else {
