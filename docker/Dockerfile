@@ -39,4 +39,4 @@ RUN wget https://api.github.com/repos/Masaiki/ass2bdnxml/releases/latest && \
     rm -rf ass2bdnxml* *.tar.gz
 
 WORKDIR work
-CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool -cc -s /fonts ; sh"]
+CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool cache /fonts ; sh"]
