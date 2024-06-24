@@ -107,7 +107,7 @@ func restoreSubsetted(str string) string {
 
 func (self *assProcessor) parse() bool {
 	ec := 0
-	self.seps = []string{"-", " "}
+	self.seps = []string{"-"}
 	self.subtitles = make(map[string]string)
 	for _, file := range self.files {
 		f, err := openFile(file, true, false)
