@@ -548,9 +548,8 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 	if !m[1][_family] {
 		for _, v := range self.seps {
 			l := strings.LastIndex(_name, v)
-			tk := ""
 			if l > -1 && l < len(_name)-1 {
-				tk = _name[l+1:]
+				tk := _name[l+1:]
 				names[_name] = tk
 				names[strings.ToLower(_name)] = tk
 			}
