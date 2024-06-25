@@ -107,7 +107,7 @@ func restoreSubsetted(str string) string {
 
 func (self *assProcessor) parse() bool {
 	ec := 0
-	self.seps = []string{"-"}
+	self.seps = []string{"-", " "}
 	self.subtitles = make(map[string]string)
 	for _, file := range self.files {
 		f, err := openFile(file, true, false)
@@ -541,23 +541,18 @@ func (self *assProcessor) fontNameToMap(m []map[string]bool) map[string]map[stri
 
 func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool) string {
 	names := make(map[string]string)
-	_names := make(map[string]string)
-	names[_k[0]] = _k[1]
-	_names[strings.ToLower(strings.TrimSpace(_k[0]))] = _k[1]
-	for _, v := range self.seps {
-		l := strings.LastIndex(_k[0], v)
-		tk := ""
-		if l > -1 && len(_k[0]) > 1 {
-			tk = _k[0][l+1:]
-		}
-		if tk != "" {
-			k := _k[0][:l]
-			names[k] = tk
-			_names[strings.ToLower(k)] = tk
-			if !m[1][_k[1]] {
-				k = _k[0]
-				names[k] = tk
-				_names[strings.ToLower(k)] = tk
+	_name := strings.TrimSpace(_k[0])
+	_family := _k[1]
+	names[_name] = _family
+	names[strings.ToLower(_name)] = _family
+	if !m[1][_family] {
+		for _, v := range self.seps {
+			l := strings.LastIndex(_name, v)
+			tk := ""
+			if l > -1 && l < len(_name)-1 {
+				tk = _name[l+1:]
+				names[_name] = tk
+				names[strings.ToLower(_name)] = tk
 			}
 		}
 	}
@@ -567,13 +562,13 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 				if names[name] == family {
 					return name
 				}
-				if b && _names[strings.ToLower(name)] == family {
-					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^%s]`, _k[0], _k[1], name, family)
+				if b && names[strings.ToLower(name)] == family {
+					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^%s]`, _name, _family, name, family)
 					return name
 				}
 			}
 		}
-		if b && (_k[0] == name || strings.ToLower(_k[0]) == strings.ToLower(name)) {
+		if b && (_name == name || strings.ToLower(_name) == strings.ToLower(name)) {
 			if len(m[1]) > 0 {
 				families := make([]string, 0)
 				for family, _ := range m[1] {
@@ -586,12 +581,12 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 					families = append(families, family)
 				}
 				if len(families) > 1 {
-					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^(%s)]`, _k[0], _k[1], name, strings.Join(families, ","))
+					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^(%s)]`, _name, _family, name, strings.Join(families, ","))
 				} else {
-					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^%s]`, _k[0], _k[1], name, families[0])
+					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^%s]`, _name, _family, name, families[0])
 				}
 			} else {
-				printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s]`, _k[0], _k[1], name)
+				printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s]`, _name, _family, name)
 			}
 			return name
 		}
@@ -942,6 +937,7 @@ func (self *assProcessor) copyFontsFromCache() bool {
 		l := len(self.m)
 		i := 0
 		self.matchFonts()
+		self.reMap()
 		for k, v := range self.m {
 			if v.file != "" {
 				_, fn, _, _ := splitPath(v.file)
