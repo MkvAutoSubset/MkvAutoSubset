@@ -7,7 +7,7 @@ Dump mkv file(s)
 Extract subtitles and fonts from mkv file or folder containing mkv files.
 
 ```
-mkvtool dump <mkv-dir> [output-dir] [flags]
+mkvtool dump <mkv-file|mkv-dir> [output-dir] [flags]
 ```
 
 ### Options

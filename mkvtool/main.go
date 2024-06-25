@@ -244,7 +244,7 @@ func queryCmd() *cobra.Command {
 func dumpCmd() *cobra.Command {
 	n := false
 	cmd := &cobra.Command{
-		Use:     "dump <mkv-dir> [output-dir]",
+		Use:     "dump <mkv-file|mkv-dir> [output-dir]",
 		Short:   "Dump mkv file(s)",
 		Aliases: []string{"d"},
 		Args:    cobra.RangeArgs(1, 2),
