@@ -18,11 +18,6 @@ import (
 	"time"
 )
 
-const (
-	ttx        = "ttx"
-	pyftsubset = "pyftsubset"
-)
-
 type fontInfo struct {
 	file        string
 	runes       []rune
@@ -264,33 +259,6 @@ func (self *assProcessor) getFontsList() [][]string {
 	sort.Strings(list)
 	sort.Strings(list2)
 	return [][]string{list, list2}
-}
-
-func (self *assProcessor) dumpFont(file, out string) bool {
-	ok := false
-	_, n, _, _ := splitPath(file)
-	reg, _ := regexp.Compile(`[\x00-\x1f]`)
-	args := make([]string, 0)
-	args = append(args, "-q")
-	args = append(args, "-f")
-	args = append(args, "-o", out)
-	args = append(args, file)
-	if p, err := newProcess(nil, nil, nil, "", ttx, args...); err == nil {
-		s, err := p.Wait()
-		ok = err == nil && s.ExitCode() == 0
-		if ok {
-			f, err := os.ReadFile(out)
-			if err == nil {
-				str := string(f)
-				str = reg.ReplaceAllString(str, "")
-				ok = os.WriteFile(out, []byte(str), os.ModePerm) == nil
-			}
-		}
-	}
-	if !ok {
-		printLog(self.lcb, logError, `Failed to dump font: "%s".`, n)
-	}
-	return ok
 }
 
 func (self *assProcessor) getFontName(p string) [][]map[string]bool {

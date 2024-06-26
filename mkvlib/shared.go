@@ -56,16 +56,10 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	e, _ = filepath.Split(e)
 	p += e
 	_ = os.Setenv(n, p)
-	_, _ttx := exec.LookPath(ttx)
-	_, _pyftsubset := exec.LookPath(pyftsubset)
 	_, _mkvextract := exec.LookPath(mkvextract)
 	_, _mkvmerge := exec.LookPath(mkvmerge)
 	_, _ass2bdnxml := exec.LookPath(ass2bdnxml)
 	_, _ffmpeg := exec.LookPath(ffmpeg)
-	if _ttx != nil || _pyftsubset != nil {
-		printLog(lcb, logError, `Missing dependency: fonttools (need "%s" & "%s").`, ttx, pyftsubset)
-		ec++
-	}
 	if _mkvextract != nil || _mkvmerge != nil {
 		printLog(lcb, logError, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
 		ec++
