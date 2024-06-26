@@ -1,12 +1,11 @@
 package mkvlib
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib/c"
 	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib/parser"
 	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib/parser/sfnt"
-	"github.com/antchfx/xmlquery"
 	"io"
 	"os"
 	"path"
@@ -31,7 +30,6 @@ type fontInfo struct {
 	matchedName string
 	oldNames    []string
 	newName     string
-	sFont       string
 }
 
 type fontCache struct {
@@ -626,10 +624,6 @@ func (self *assProcessor) reMap() {
 }
 
 func (self *assProcessor) createFontSubset(font *fontInfo) bool {
-	ok := false
-	fn := fmt.Sprintf(`%s.txt`, randomStr(8))
-	_, fn, _, _ = splitPath(fn)
-	fn = path.Join(os.TempDir(), fn)
 	_, n, e, _ := splitPath(font.file)
 	e = strings.ToLower(e)
 	if e == ".ttc" {
@@ -641,34 +635,18 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 	}
 	str := string(font.runes)
 	str = stringDeduplication(str)
-	if os.WriteFile(fn, []byte(str), os.ModePerm) == nil {
-		defer func() { _ = os.Remove(fn) }()
-		n = font.newName
-		if !self.rename {
-			n = font.matchedName
-		}
-		_fn := fmt.Sprintf("%s.%s%s", n, randomStr(8), e)
-		_fn = path.Join(self.output, _fn)
-		args := make([]string, 0)
-		args = append(args, "--text-file="+fn)
-		args = append(args, "--output-file="+_fn)
-		args = append(args, "--name-languages="+"*")
-		args = append(args, "--font-number="+strconv.Itoa(font.index))
-		args = append(args, font.file)
-		if p, err := newProcess(nil, nil, nil, "", pyftsubset, args...); err == nil {
-			s, err := p.Wait()
-			ok = err == nil && s.ExitCode() == 0
-		}
-		if !ok {
-			printLog(self.lcb, logError, `Failed to subset font: "%s"(%s)[%d].`, font.matchedName, font.file, font.index)
-		} else {
-			font.sFont = _fn
-		}
-
-	} else {
-		printLog(self.lcb, logError, `Failed to write the font text: "%s".`, n)
+	n = font.newName
+	if !self.rename {
+		n = font.matchedName
 	}
-	return ok
+	dest := "Processed by " + LibFName + " at " + time.Now().Format("2006-01-02 15:04:05")
+	fn := fmt.Sprintf("%s.%s%s", n, randomStr(8), e)
+	fn = path.Join(self.output, fn)
+	if !c.Subset(font.file, font.index, fn, n, dest, str) {
+		printLog(self.lcb, logError, `Failed to subset font: "%s"(%s)[%d].`, font.matchedName, font.file, font.index)
+		return false
+	}
+	return true
 }
 
 func (self *assProcessor) createFontsSubset() bool {
@@ -686,97 +664,6 @@ func (self *assProcessor) createFontsSubset() bool {
 	for _, item := range self.m {
 		go func(_item *fontInfo) {
 			_ok := self.createFontSubset(_item)
-			if _ok {
-				m.Lock()
-				ok++
-				m.Unlock()
-			}
-			wg.Done()
-		}(item)
-	}
-	wg.Wait()
-	return ok == l
-}
-
-func (self *assProcessor) changeFontName(font *fontInfo) bool {
-	ec := 0
-	fn := fmt.Sprintf("%s.ttx", randomStr(8))
-	fn = path.Join(os.TempDir(), fn)
-	if self.dumpFont(font.sFont, fn) {
-		f, err := openFile(fn, true, false)
-		if err == nil {
-			defer func() {
-				_ = f.Close()
-				_ = os.Remove(fn)
-			}()
-			n := font.newName
-			if !self.rename {
-				n = font.matchedName
-				font.newName = n
-			}
-			if xml, err := xmlquery.Parse(f); err == nil {
-				for _, v := range xml.SelectElements(`ttFont/name/namerecord`) {
-					id := v.SelectAttr("nameID")
-					switch id {
-					case "0":
-						v.FirstChild.Data = "Processed by " + LibFName + " at " + time.Now().Format("2006-01-02 15:04:05")
-						break
-					case "1", "4", "6":
-						v.FirstChild.Data = n
-						break
-					}
-				}
-				str := `<?xml version="1.0" encoding="UTF-8"?>`
-				str += xml.SelectElement("ttFont").OutputXML(true)
-				if os.WriteFile(fn, []byte(str), os.ModePerm) == nil {
-					args := make([]string, 0)
-					args = append(args, "-q")
-					args = append(args, "-f")
-					args = append(args, "-o", font.sFont)
-					args = append(args, fn)
-					ok := false
-					buf := bytes.NewBufferString("")
-					if p, err := newProcess(nil, nil, buf, "", ttx, args...); err == nil {
-						r := true
-						go func() {
-							for r {
-								time.Sleep(500 * time.Millisecond)
-								if strings.Contains(buf.String(), "ERROR: Unhandled exception has occurred") {
-									_ = p.Kill()
-									break
-								}
-							}
-						}()
-						s, err := p.Wait()
-						r = false
-						ok = err == nil && s.ExitCode() == 0
-					}
-					if !ok {
-						ec++
-						_, n, _, _ := splitPath(font.sFont)
-						_ = os.Remove(font.sFont)
-						printLog(self.lcb, logError, `Failed to compile the font: "%s".`, n)
-					}
-				}
-			} else {
-				printLog(self.lcb, logError, `Failed to change the font name: "%s".`, font.matchedName)
-			}
-		}
-	} else {
-		ec++
-	}
-	return ec == 0
-}
-
-func (self *assProcessor) changeFontsName() bool {
-	ok := 0
-	l := len(self.m)
-	wg := new(sync.WaitGroup)
-	wg.Add(l)
-	m := new(sync.Mutex)
-	for _, item := range self.m {
-		go func(_item *fontInfo) {
-			_ok := self.changeFontName(_item)
 			if _ok {
 				m.Lock()
 				ok++

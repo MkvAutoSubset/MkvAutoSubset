@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "v5.0.6"
+const appVer = "next"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -33,7 +33,7 @@ var processer = mkvlib.GetProcessorGetterInstance().GetProcessorInstance()
 
 func main() {
 	setWindowTitle(tTitle)
-	go getLatestTag()
+	//go getLatestTag()
 
 	defer func() {
 		if latestTag != "" && latestTag != appVer {
