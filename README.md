@@ -16,50 +16,30 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 好处不仅限于节约存储空间,加快缓冲速度;
 - 想想看:在一个只有30Mbps上传的网络环境下,要看上面那个光字体就200M的番剧,这河里吗?
 
-## mkvtool 安装
+## next 分支
+用C重新实现了子集化功能,但丧失了方便地跨平台编译的能力.如果你有兴趣,可以尝试手动编译并使用.
 
-### Win64依赖打包说明
-- 点[这里](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/win64_assets/win64_assets.zip)下载
-- 解压到本地
-- 运行
-  ```shell 
-  intall.bat
+### 编译安装
+- 配置好gcc
+- 配置好vcpkg
+- ```shell
+  vcpkg install harfbuzz[core,experimental-api]
   ```
-
-### Docker镜像使用说明
-- 从Dockerhub获取
-  ```shell
-  TAGNAME=master
-  FONT_DIR="/usr/share/fonts/truetype" #字体目录
-  CACHE_DIR="${HOME}/.mkvtool/caches"  #缓存目录
-  OTHER_DIR="" #其他目录(可选,示例见下节.)
-  docker pull ac79b0c6/mkvtool:${TAGNAME} #拉取/更新镜像
-  docker run --rm -it -v ${FONT_DIR}:/fonts -v ${CACHE_DIR}:/root/.mkvtool/caches ${OTHER_DIR} ac79b0c6/mkvtool:${TAGNAME} #运行镜像
+- 克隆本项目
+- ```shell
+  cd mkvtool
+  VCPKG_ROOT="./vcpkg" #你的vcpkg路径
+  VCPKG_TRIPLET="triplet" #你的vcpkg triplet三元组
+  PATH_ROOT="${VCPKG_ROOT/installed/${VCPKG_TRIPLET}"
+  H_PATH_ROOT="${PATH_ROOT}/include"
+  L_PATH_ROOT="${PATH_ROOT}/lib"
+  CGO_CFLAGS="-I${H_PATH_ROOT} -Os"
+  CGO_LDFLAGS="-L${L_PATH_ROOT} -lharfbuzz-subset -lharfbuzz"
+  go build
   ```
-- 手动构建&运行
-  ```shell
-  git clone https://github.com/MkvAutoSubset/MkvAutoSubset.git #克隆项目
-  cd MkvAutoSubset #进入项目目录
-  sh docker/rebuild.sh #构建镜像
-  cp docker/run.sh docker/run_my.sh  #拷贝一份自己的运行脚本
-  vi docker/run_my.sh #修改自己的运行脚本(可选)
-  sh docker/run_my.sh #运行镜像
-  ```
-- docker/run_my.sh的修改说明
-  * FONT_DIR: 字体文件目录
-  * CACHE_DIR: 缓存目录
-  * OTHER_DIR: 其他目录(可选)
-    * 示例:“-v ${HOME}/work:/work”
 
 ### 依赖
 
-- FontTools
-  ```shell
-  apt install fonttools #Debian/Ubuntu
-  apk add py3-fonttools #Alpine
-  brew install fonttools #macOS
-  pip install fonttools #Use pip
-  ```
 - MKVToolNix
   ```shell
   apt install mkvtoolnix #Debian/Ubuntu
@@ -72,32 +52,13 @@ ASS字幕字体子集化 MKV批量提取/生成
 
 #### 关于Windows用户
 
-- 从 [这里](https://www.python.org/downloads) 下载并安装Python
-- 命令提示符(CMD)里参考上面使用pip的方式安装FontTools依赖
 - 从 [这里](https://github.com/Masaiki/ass2bdnxml/releases) 获取ass2bdnxml
 - 从 [这里](https://www.fosshub.com/MKVToolNix.html) 下载并安装MKVToolNix
-- 保证以上两个依赖项的相关可执行文件(_ttx.exe_,_pyftsubset.exe_,_mkvextract.exe_,_mkvmerge.exe_,_ass2bdnxml.exe_)在 **path** 环境变量里
+- 保证以上两个依赖项的相关可执行文件(_mkvextract.exe_,_mkvmerge.exe_,_ass2bdnxml.exe_)在 **path** 环境变量里
 
 ### 本体
 
-- 有安装Go的情况:
-  ```shell
-  go install github.com/MkvAutoSubset/MkvAutoSubset/mkvtool@latest #安装和更新
-  ```
 
-- Arch Linux用户(通过Arch User Repository):
-  - 点击[这里](https://aur.archlinux.org/packages/mkvtool/) 查看具体信息或使用AUR Helper
-  ```shell
-  yay -S mkvtool #yay
-  paru -S mkvtool #paru
-  ```
-
-- 手动安装:
-
-  [点此下载](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/latest)
-- 适用于Win64的GUI版及动态链接库
-
-  [点此下载](https://github.com/MkvAutoSubset/MkvAutoSubset/releases/gui)
 ### 一部分中文使用说明([英文完整版](./mkvtool/docs/mkvtool.md))
 - 旧版CLI中"标准工作流"的替代
   ```shell
