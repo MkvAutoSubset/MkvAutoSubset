@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib/c"
 	"os"
 	"path"
 	"path/filepath"
@@ -15,7 +16,6 @@ import (
 const (
 	mkvmerge   = `mkvmerge`
 	mkvextract = `mkvextract`
-	ass2bdnxml = `ass2bdnxml`
 	ffmpeg     = `ffmpeg`
 )
 
@@ -45,7 +45,6 @@ type mkvProcessor struct {
 	pr         string
 	pf         string
 	caches     []string
-	ass2bdnxml bool
 	ffmpeg     bool
 	nrename    bool
 	check      bool
@@ -423,14 +422,24 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 }
 
 func (self *mkvProcessor) A2P(a2p, apc bool, pr, pf string) {
-	self.a2p = self.ass2bdnxml && a2p
+	self.a2p = a2p
 	self.apc = apc
 	self.pr = pr
 	self.pf = pf
 }
 
 func (self *mkvProcessor) ass2Pgs(input []string, resolution, frameRate, fontsDir, output string, lcb logCallback) bool {
-	return self.a2p && ass2Pgs(input, resolution, frameRate, fontsDir, output, lcb)
+	r := true
+	for _, item := range input {
+		_, _, _, _f := splitPath(item)
+		fn := path.Join(output, _f+".pgs")
+		r = self.a2p && c.Ass2Pgs(item, resolution, frameRate, fontsDir, fn)
+		if !r {
+			printLog(lcb, logError, `Failed to Ass2Pgs:"%s"`, fn)
+			_ = os.Remove(fn)
+		}
+	}
+	return r
 }
 
 func (self *mkvProcessor) GetFontsList(files []string, fonts string, lcb logCallback) [][]string {
@@ -544,6 +553,9 @@ func (self *mkvProcessor) CreateBlankOrBurnVideo(t int64, s, enc, ass, fontdir, 
 }
 
 func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string, burn bool, lcb logCallback) bool {
+	if self.a2p && !self.apc {
+		return false
+	}
 	if s == "-" {
 		s = ""
 	}

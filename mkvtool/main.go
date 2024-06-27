@@ -82,7 +82,7 @@ func main() {
 	cmd.PersistentFlags().BoolVarP(&a2p, "enable-pgs-output", "", false, "Enable pgs output mode.")
 	cmd.PersistentFlags().BoolVarP(&apc, "enable-ass-pgs-coexist", "", false, "Enable pgs and ass coexistence mode.")
 	cmd.PersistentFlags().StringVarP(&pf, "framerate", "", "23.976", "Set pgs or blank video frame rate (e.g., 23.976, 24, 25, 30, 29.97, 50, 59.94, 60, or custom fps like 15/1).")
-	cmd.PersistentFlags().StringVarP(&pr, "resolution", "", "1920*1080", "Set pgs or blank video resolution (e.g., 720p, 1080p, 2k, or custom resolution like 720*480).")
+	cmd.PersistentFlags().StringVarP(&pr, "resolution", "", "1920*1080", "Set pgs or blank video resolution (e.g., 720p, 1080p, 2k, 4k, or custom resolution like 720*480).")
 
 	cmd.AddCommand(versionCmd())
 	cmd.AddCommand(infoCmd())

@@ -58,28 +58,21 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	_ = os.Setenv(n, p)
 	_, _mkvextract := exec.LookPath(mkvextract)
 	_, _mkvmerge := exec.LookPath(mkvmerge)
-	_, _ass2bdnxml := exec.LookPath(ass2bdnxml)
 	_, _ffmpeg := exec.LookPath(ffmpeg)
 	if _mkvextract != nil || _mkvmerge != nil {
-		printLog(lcb, logError, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
+		printLog(lcb, logWarning, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
 		ec++
-	}
-
-	if _ass2bdnxml != nil {
-		printLog(lcb, logWarning, `Missing dependency: ass2bdnxml.`)
-		//ec++
 	}
 
 	if _ffmpeg != nil {
 		printLog(lcb, logWarning, `Missing dependency: ffmpeg.`)
-		//ec++
+		ec++
 	}
 
 	r := ec == 0
 	if r {
 		self.checked = true
 		self.instance = new(mkvProcessor)
-		self.instance.ass2bdnxml = _ass2bdnxml == nil
 		self.instance.ffmpeg = _ffmpeg == nil
 	}
 
