@@ -24,7 +24,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 配置好gcc
 - 配置好vcpkg
 - ```shell
-  vcpkg install harfbuzz[experimental-api] libpng libass #安装harfbuzz库
+  vcpkg install harfbuzz[experimental-api] libpng libass #安装依赖库
   ```
 - 克隆本项目
 - ```shell
