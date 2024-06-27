@@ -1,7 +1,5 @@
 package c
 
-//go:generate echo "Generating code..."
-
 /*
 #include <stdlib.h>
 
