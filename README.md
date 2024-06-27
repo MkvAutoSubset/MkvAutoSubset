@@ -17,26 +17,27 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 想想看:在一个只有30Mbps上传的网络环境下,要看上面那个光字体就200M的番剧,这河里吗?
 
 ## next 分支
-用C重新实现了子集化功能,但丧失了方便地跨平台编译的能力.如果你有兴趣,可以尝试手动编译并使用.
+用C重新实现了字幕处理功能,但丧失了方便地跨平台编译的能力.如果你有兴趣,可以尝试手动编译并使用.
 
-### 手动编译
+### 手动编译过程(以Linux为例)
 - 配置好go
 - 配置好gcc
 - 配置好vcpkg
 - ```shell
-  vcpkg install harfbuzz[experimental-api] libpng libass #安装依赖库
+  VCPKG_TRIPLET="x64-linux-release" #你的vcpkg triplet三元组
+  vcpkg install harfbuzz[experimental-api] --triplet $VCPKG_TRIPLET libpng libass #安装依赖库
   ```
 - 克隆本项目
 - ```shell
-  cd mkvtool
-  VCPKG_ROOT="./vcpkg" #你的vcpkg路径
-  VCPKG_TRIPLET="triplet" #你的vcpkg triplet三元组
+  cd MkvAutoSubset/mkvtool
+  VCPKG_ROOT=~/vcpkg #你的vcpkg路径
+  VCPKG_TRIPLET="x64-linux-release" #你的vcpkg triplet三元组
   PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}"
-  H_PATH_ROOT="${PATH_ROOT}/include"
-  L_PATH_ROOT="${PATH_ROOT}/lib"
-  CGO_CFLAGS="-I${H_PATH_ROOT} -Os"
-  CGO_LDFLAGS="-L${L_PATH_ROOT} -lharfbuzz-subset -lharfbuzz"
-  go build #编译
+  H_PATH="${PATH_ROOT}/include"
+  L_PATH="${PATH_ROOT}/lib"
+  CGO_CFLAGS="-I${H_PATH} -Os -DLE_ARCH"
+  CGO_LDFLAGS="-L${L_PATH} -lass -lfreetype -lz -lfontconfig -lpng -lm -lbz2 -lfribidi -lharfbuzz -lharfbuzz-subset -lexpat -lbrotlidec -lbrotlicommon"
+  CGO_CFLAGS="$CGO_CFLAGS" CGO_LDFLAGS=${CGO_LDFLAGS} go build #编译
   ```
 
 ### 其他依赖
