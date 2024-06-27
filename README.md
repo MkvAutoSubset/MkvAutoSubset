@@ -35,7 +35,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}"
   H_PATH="${PATH_ROOT}/include"
   L_PATH="${PATH_ROOT}/lib"
-  CGO_CFLAGS="-I${H_PATH} -Os -DLE_ARCH"
+  CGO_CFLAGS="-I${H_PATH} -Os -DLE_ARCH" #LE_ARCH是小端序,如果是大端序请用BE_ARCH
   CGO_LDFLAGS="-L${L_PATH} -lass -lfreetype -lz -lfontconfig -lpng -lm -lbz2 -lfribidi -lharfbuzz -lharfbuzz-subset -lexpat -lbrotlidec -lbrotlicommon"
   CGO_CFLAGS="$CGO_CFLAGS" CGO_LDFLAGS=${CGO_LDFLAGS} go build #编译
   ```
