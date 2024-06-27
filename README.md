@@ -39,7 +39,7 @@ ASS字幕字体子集化 MKV批量提取/生成
   go build #编译
   ```
 
-### 依赖
+### 其他依赖
 
 - MKVToolNix
   ```shell
