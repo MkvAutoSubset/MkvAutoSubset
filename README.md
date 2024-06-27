@@ -20,22 +20,23 @@ ASS字幕字体子集化 MKV批量提取/生成
 用C重新实现了子集化功能,但丧失了方便地跨平台编译的能力.如果你有兴趣,可以尝试手动编译并使用.
 
 ### 编译安装
+- 配置好go
 - 配置好gcc
 - 配置好vcpkg
 - ```shell
-  vcpkg install harfbuzz[core,experimental-api]
+  vcpkg install harfbuzz[core,experimental-api] #安装harfbuzz库
   ```
 - 克隆本项目
 - ```shell
   cd mkvtool
   VCPKG_ROOT="./vcpkg" #你的vcpkg路径
   VCPKG_TRIPLET="triplet" #你的vcpkg triplet三元组
-  PATH_ROOT="${VCPKG_ROOT/installed/${VCPKG_TRIPLET}"
+  PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}"
   H_PATH_ROOT="${PATH_ROOT}/include"
   L_PATH_ROOT="${PATH_ROOT}/lib"
   CGO_CFLAGS="-I${H_PATH_ROOT} -Os"
   CGO_LDFLAGS="-L${L_PATH_ROOT} -lharfbuzz-subset -lharfbuzz"
-  go build
+  go build #编译
   ```
 
 ### 依赖
