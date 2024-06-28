@@ -38,15 +38,15 @@ ASS字幕字体子集化 MKV批量提取/生成
   CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} go build #编译
   ```
 
-### 其他依赖
+### 其他依赖 - 按需安装
 
-- MKVToolNix
+- MKVToolNix - 用于提取/混流字幕和字体
   ```shell
   apt install mkvtoolnix #Debian/Ubuntu
   apk add mkvtoolnix #Alpine
   brew install mkvtoolnix #macOS
   ```
-- ffmpeg
+- FFmpeg - 用于生成测试视频/烧录字幕
   ```shell
   apt install ffmpeg #Debian/Ubuntu
   apk add ffmpeg #Alpine
