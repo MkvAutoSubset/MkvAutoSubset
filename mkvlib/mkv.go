@@ -45,6 +45,8 @@ type mkvProcessor struct {
 	pr         string
 	pf         string
 	caches     []string
+	mkvmerge   bool
+	mkvextract bool
 	ffmpeg     bool
 	nrename    bool
 	check      bool
@@ -53,6 +55,9 @@ type mkvProcessor struct {
 }
 
 func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
+	if !self.mkvmerge {
+		return nil
+	}
 	buf := bytes.NewBufferString("")
 	if p, err := newProcess(nil, buf, nil, "", mkvmerge, "-J", file); err == nil {
 		if s, err := p.Wait(); err == nil && s.ExitCode() == 0 {
@@ -65,6 +70,9 @@ func (self *mkvProcessor) GetMKVInfo(file string) *mkvInfo {
 }
 
 func (self *mkvProcessor) DumpMKV(file, output string, subset bool, lcb logCallback) bool {
+	if !(self.mkvmerge && self.mkvextract) {
+		return false
+	}
 	ec := 0
 	obj := self.GetMKVInfo(file)
 	if obj == nil {
@@ -159,6 +167,9 @@ func (self *mkvProcessor) CheckSubset(file string, lcb logCallback) (bool, bool)
 }
 
 func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, output, slang, stitle string, clean bool) bool {
+	if !self.mkvmerge {
+		return false
+	}
 	args := make([]string, 0)
 	if clean && !self.mks {
 		args = append(args, "--no-subtitles", "--no-attachments")
@@ -208,6 +219,9 @@ func (self *mkvProcessor) CreateMKV(file string, tracks, attachments []string, o
 }
 
 func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallback) bool {
+	if !(self.mkvmerge && self.mkvextract) {
+		return false
+	}
 	ok := true
 	files := findMKVs(dir)
 	l := len(files)
@@ -228,6 +242,9 @@ func (self *mkvProcessor) DumpMKVs(dir, output string, subset bool, lcb logCallb
 }
 
 func (self *mkvProcessor) QueryFolder(dir string, lcb logCallback) []string {
+	if !self.mkvmerge {
+		return nil
+	}
 	lines := make([]string, 0)
 	files := findMKVs(dir)
 	l := len(files)
@@ -244,6 +261,9 @@ func (self *mkvProcessor) QueryFolder(dir string, lcb logCallback) []string {
 }
 
 func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle string, clean bool, lcb logCallback) bool {
+	if !self.mkvmerge {
+		return false
+	}
 	ok := true
 	if tDir == "" {
 		tDir = os.TempDir()
@@ -325,6 +345,9 @@ func (self *mkvProcessor) CreateMKVs(vDir, sDir, fDir, tDir, oDir, slang, stitle
 }
 
 func (self *mkvProcessor) MakeMKVs(dir, data, output, slang, stitle string, subset bool, lcb logCallback) bool {
+	if !self.mkvmerge {
+		return false
+	}
 	dir, _ = filepath.Abs(dir)
 	data, _ = filepath.Abs(data)
 	output, _ = filepath.Abs(output)
@@ -413,7 +436,7 @@ func (self *mkvProcessor) ASSFontSubset(files []string, fonts, output string, di
 		_ = os.RemoveAll(obj.output)
 	}
 	if r && self.a2p {
-		r = self.ass2Pgs(obj._files, self.pr, self.pf, obj.output, d, lcb)
+		r = self.Ass2Pgs(obj._files, self.pr, self.pf, obj.output, d, lcb)
 		if r && !self.apc {
 			_ = os.RemoveAll(obj.output)
 		}
@@ -428,7 +451,7 @@ func (self *mkvProcessor) A2P(a2p, apc bool, pr, pf string) {
 	self.pf = pf
 }
 
-func (self *mkvProcessor) ass2Pgs(input []string, resolution, frameRate, fontsDir, output string, lcb logCallback) bool {
+func (self *mkvProcessor) Ass2Pgs(input []string, resolution, frameRate, fontsDir, output string, lcb logCallback) bool {
 	r := true
 	for _, item := range input {
 		_, _, _, _f := splitPath(item)
@@ -559,11 +582,21 @@ func (self *mkvProcessor) CreateTestVideo(asses []string, s, fontdir, enc string
 	if s == "-" {
 		s = ""
 	}
+	if s == "" {
+		if !self.ffmpeg {
+			return false
+		}
+	} else if !self.mkvmerge {
+		return false
+	}
 	l := len(asses)
 	if l == 0 {
 		return false
 	}
 	if burn {
+		if !self.ffmpeg {
+			return false
+		}
 		ec := 0
 		_ok := 0
 		for _, v := range asses {

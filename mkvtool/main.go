@@ -29,7 +29,7 @@ var (
 	cache string
 )
 
-var processer = mkvlib.GetProcessorGetterInstance().GetProcessorInstance()
+var processer = mkvlib.GetProcessorGetterInstance().GetProcessorDummyInstance()
 
 func main() {
 	setWindowTitle(tTitle)
@@ -105,18 +105,12 @@ func main() {
 			color.NoColor = true
 		}
 
-		if !mkvlib.GetProcessorGetterInstance().InitProcessorInstance(nil) {
-			ec++
-			color.Red("Failed to init processor.")
-			return
-		} else {
-			processer = mkvlib.GetProcessorGetterInstance().GetProcessorInstance()
-			ccs, _ := findPath(cache, `\.cache$`)
-			processer.Cache(ccs)
-			processer.Check(!nck, !ncks)
-			processer.A2P(a2p, apc, pr, pf)
-			processer.NRename(n)
-		}
+		processer = mkvlib.GetProcessorGetterInstance().InitProcessorInstance(nil)
+		ccs, _ := findPath(cache, `\.cache$`)
+		processer.Cache(ccs)
+		processer.Check(!nck, !ncks)
+		processer.A2P(a2p, apc, pr, pf)
+		processer.NRename(n)
 	}
 
 	if err := cmd.Execute(); err != nil {

@@ -31,17 +31,17 @@ type processorGetter struct {
 	instance *mkvProcessor
 }
 
-var _instance = new(processorGetter)
+var _getter = new(processorGetter)
+var _processor = new(mkvProcessor)
 
 func GetProcessorGetterInstance() *processorGetter {
-	return _instance
+	return _getter
 }
 
-func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
+func (self *processorGetter) InitProcessorInstance(lcb logCallback) *mkvProcessor {
 	self.checked = false
 	self.instance = nil
 
-	ec := 0
 	n := "PATH"
 	s := ":"
 	if runtime.GOOS == "windows" {
@@ -61,28 +61,21 @@ func (self *processorGetter) InitProcessorInstance(lcb logCallback) bool {
 	_, _ffmpeg := exec.LookPath(ffmpeg)
 	if _mkvextract != nil || _mkvmerge != nil {
 		printLog(lcb, logWarning, `Missing dependency: mkvtoolnix (need "%s" & "%s").`, mkvextract, mkvmerge)
-		ec++
 	}
 
 	if _ffmpeg != nil {
 		printLog(lcb, logWarning, `Missing dependency: ffmpeg.`)
-		ec++
 	}
 
-	r := ec == 0
-	if r {
-		self.checked = true
-		self.instance = new(mkvProcessor)
-		self.instance.ffmpeg = _ffmpeg == nil
-	}
+	self.instance = _processor
+	self.instance.ffmpeg = _ffmpeg == nil
+	self.instance.mkvextract = _mkvextract == nil
+	self.instance.mkvmerge = _mkvmerge == nil
 
-	return r
+	return self.instance
 }
 
-func (self *processorGetter) GetProcessorInstance() *mkvProcessor {
-	if self.checked {
-		return self.instance
-	}
+func (self *processorGetter) GetProcessorDummyInstance() *mkvProcessor {
 	return nil
 }
 
