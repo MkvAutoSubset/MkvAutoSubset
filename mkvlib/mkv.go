@@ -451,9 +451,9 @@ func (self *mkvProcessor) A2P(a2p, apc bool, pr, pf string) {
 	self.pf = pf
 }
 
-func (self *mkvProcessor) Ass2Pgs(input []string, resolution, frameRate, fontsDir, output string, lcb logCallback) bool {
+func (self *mkvProcessor) Ass2Pgs(asses []string, resolution, frameRate, fontsDir, output string, lcb logCallback) bool {
 	r := true
-	for _, item := range input {
+	for _, item := range asses {
 		_, _, _, _f := splitPath(item)
 		fn := path.Join(output, _f+".pgs")
 		r = self.a2p && c.Ass2Pgs(item, resolution, frameRate, fontsDir, fn)

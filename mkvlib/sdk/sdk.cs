@@ -13,7 +13,7 @@ public static class mkvlib
     static extern IntPtr _Version();
 
     [DllImport(so)]
-    static extern bool InitInstance(logCallback lcb);
+    static extern void InitInstance(logCallback lcb);
 
     [DllImport(so)]
     static extern IntPtr GetMKVInfo(IntPtr ptr);
@@ -78,6 +78,9 @@ public static class mkvlib
     [DllImport(so)]
     static extern IntPtr GetFontInfo(IntPtr p);
 
+    [DllImport(so)]
+    static extern IntPtr Ass2Pgs(IntPtr asses, IntPtr resolution, IntPtr frameRate, IntPtr fontdir, IntPtr output, logCallback lcb);
+
     #endregion
 
     public static string Version()
@@ -85,9 +88,9 @@ public static class mkvlib
         return css(_Version());
     }
 
-    public static bool InitInstance(Action<LogLevel, string> lcb)
+    public static void InitInstance(Action<LogLevel, string> lcb)
     {
-        return InitInstance(_lcb(lcb));
+        InitInstance(_lcb(lcb));
     }
 
     public static string GetMKVInfo(string file)
@@ -204,6 +207,12 @@ public static class mkvlib
     {
         string _files = JsonSerializer.Serialize(asses);
         return CopyFontsFromCache(cs(_files), cs(dist), _lcb(lcb));
+    }
+
+    public static bool Ass2Pgs(string[] asses, string resolution, string frameRate, string fontdir, string output, <LogLevel, string> lcb)
+    {
+        string _files = JsonSerializer.Serialize(asses);
+        return Ass2Pgs(cs(_files), cs(resolution), cs(frameRate), cs(fontdir), cs(output), _lcb(lcb));
     }
 
     delegate void logCallback(byte l, IntPtr ptr);

@@ -29,12 +29,13 @@ extern {
     fn CreateMKV(file: c_char, tracks: c_char, attachments: c_char, output: c_char, slang: c_char, stitle: c_char, clean: bool) -> bool;
     fn CreateMKVs(vDir: c_char, sDir: c_char, fDir: c_char, tDir: c_char, oDir: c_char, slang: c_char, stitle: c_char, clean: bool, lcb: logCallback) -> bool;
     fn CreateTestVideo(asses: c_char, s: c_char, fontdir: c_char, enc: c_char, burn: bool, lcb: logCallback) -> bool;
+    fn Ass2Pgs(asses: c_char, resolution: c_char, frameRate: c_char, fontdir: c_char, output: c_char, lcb: logCallback) -> bool;
     fn DumpMKV(file: c_char, output: c_char, subset: bool, lcb: logCallback) -> bool;
     fn DumpMKVs(dir: c_char, output: c_char, subset: bool, lcb: logCallback) -> bool;
     fn GetFontInfo(p: c_char) -> c_char;
     fn GetFontsList(files: c_char, fonts: c_char, lcb: logCallback) -> c_char;
     fn GetMKVInfo(file: c_char) -> c_char;
-    fn InitInstance(lcb: logCallback) -> bool;
+    fn InitInstance(lcb: logCallback);
     fn MKS(mks: bool);
     fn MakeMKVs(dir: c_char, data: c_char, output: c_char, slang: c_char, stitle: c_char, subset: bool, lcb: logCallback) -> bool;
     fn NOverwrite(n: bool);
@@ -43,9 +44,9 @@ extern {
     fn Version() -> c_char;
 }
 
-pub fn rs(cs: c_char) -> &'static str {
+pub fn rs(cs: c_char) -> String {
     unsafe {
-        return ffi::CStr::from_ptr(cs).to_str().unwrap();
+        return ffi::CStr::from_ptr(cs).to_str().unwrap().to_owned();
     }
 }
 
@@ -141,6 +142,13 @@ pub fn createTestVideo(asses: &[&str], s: &str, fontdir: &str, enc: &str, burn: 
     }
 }
 
+pub fn ass2pgs(asses: &[&str], resolution: &str, frameRate: &str, fontdir: &str, output: &str, lcb: logCallback) -> bool {
+    unsafe {
+        let asses = json::stringify(asses);
+        return CreateTestVideo(cs(asses.as_str()), cs(s), cs(fontdir), cs(enc), burn, lcb);
+    }
+}
+
 pub fn dumpMKV(file: &str, output: &str, subset: bool, lcb: logCallback) -> bool {
     unsafe {
         return DumpMKV(cs(file), cs(output), subset, lcb);
@@ -153,7 +161,7 @@ pub fn dumpMKVs(dir: &str, output: &str, subset: bool, lcb: logCallback) -> bool
     }
 }
 
-pub fn getFontInfo(p: &str) -> &str {
+pub fn getFontInfo(p: &str) -> String {
     unsafe {
         return rs(GetFontInfo(cs(p)));
     }
@@ -184,7 +192,7 @@ pub fn getFontsList(files: &[&str], fonts: &str, lcb: logCallback) -> Vec<Vec<St
     }
 }
 
-pub fn getMKVInfo(file: &str) -> &str {
+pub fn getMKVInfo(file: &str) -> String {
     unsafe {
         return rs(GetMKVInfo(cs(file)));
     }
@@ -227,7 +235,7 @@ pub fn queryFolder(dir: &str, lcb: logCallback) -> Vec<String> {
     }
 }
 
-pub fn version() -> &'static str {
+pub fn version() -> String {
     unsafe {
         return rs(Version());
     };
