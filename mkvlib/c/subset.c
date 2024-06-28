@@ -8,19 +8,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-bool subset(const char *oldpath, int idx, const char *newpath, const char *newname, const char *dest, const char *txt) {
-#ifdef _WIN32
-    // Convert UTF-8 paths to wide char
-    wchar_t woldpath[MAX_PATH];
-    wchar_t wnewpath[MAX_PATH];
+void s(char**);
+bool subset(char *oldpath, int idx, char *newpath, const char *newname, const char *dest, const char *txt) {
+    s(&oldpath);
+    s(&newpath);
 
-    MultiByteToWideChar(CP_UTF8, 0, oldpath, -1, woldpath, MAX_PATH);
-    MultiByteToWideChar(CP_UTF8, 0, newpath, -1, wnewpath, MAX_PATH);
-
-    FILE *oldfile = _wfopen(woldpath, L"rb");
-#else
     FILE *oldfile = fopen(oldpath, "rb");
-#endif
 
     if (!oldfile) return false;
     fseek(oldfile, 0, SEEK_END);
@@ -84,11 +77,7 @@ bool subset(const char *oldpath, int idx, const char *newpath, const char *newna
     unsigned int length;
     const char *subset_data = hb_blob_get_data(subset_blob, &length);
 
-#ifdef _WIN32
-    FILE *newfile = _wfopen(wnewpath, L"wb");
-#else
     FILE *newfile = fopen(newpath, "wb");
-#endif
 
     if (!newfile) {
         hb_blob_destroy(subset_blob);

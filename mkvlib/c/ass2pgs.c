@@ -4,41 +4,44 @@
 #include "ass2bdnxml/palletize.c"
 #include "ass2bdnxml/sort.c"
 
+#include <stdlib.h>
 #include <stdbool.h>
 
-bool ass2pgs(const char *ass, const char *resolution, const char *rate, const char *fontdir, const char *output)
-{
-    // Calculate the number of arguments
+void s(char**);
+bool ass2pgs(char *ass, const char *resolution, const char *rate, char *fontdir, char *output) {
+    s(&ass);
+    s(&fontdir);
+    s(&output);
+
     int argc = 15;
 
-    // Allocate memory for argv array
     char **argv = (char **)malloc(argc * sizeof(char *));
     if (!argv) {
         return false;
     }
 
-    // Fill the argv array with arguments
-    argv[0] = NULL; // Program name
+    // Set constant arguments
+    argv[0] = NULL;
     argv[1] = "-a1";
     argv[2] = "-p1";
     argv[3] = "-z0";
     argv[4] = "-u0";
     argv[5] = "-b0";
     argv[6] = "-g";
-    argv[7] = (char *)fontdir;
+    argv[7] = fontdir;
     argv[8] = "-v";
-    argv[9] = (char *)resolution;
+    argv[9] = resolution;
     argv[10] = "-f";
-    argv[11] = (char *)rate;
+    argv[11] = rate;
     argv[12] = "-o";
-    argv[13] = (char *)output;
-    argv[14] = (char *)ass;
-    // Call the main function of ass2bdnxml
-    int result = app(argc, argv);
+    argv[13] = output;
+    argv[14] = ass;
 
-    // Free the allocated memory
+    bool success = (app(argc, argv) == 0);
+
+    // Free the argv array itself
     free(argv);
 
-    // Check the result
-    return result == 0;
+    return success;
 }
+

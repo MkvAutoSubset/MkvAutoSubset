@@ -4,8 +4,8 @@ package c
 #include <stdlib.h>
 #include <stdbool.h>
 
-bool subset(const char *oldpath, int idx, const char *newpath, const char *newname, const char *dest, const char *txt);
-bool ass2pgs(const char *ass, const char *resolution, const char *rate, const char *fontdir, const char *output);
+bool subset(char *oldpath, int idx, char *newpath, const char *newname, const char *dest, const char *txt);
+bool ass2pgs(char *ass, const char *resolution, const char *rate, char *fontdir, char *output);
 */
 import "C"
 import (
