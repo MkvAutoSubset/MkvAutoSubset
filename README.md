@@ -26,6 +26,7 @@ ASS字幕字体子集化 MKV批量提取/生成
 - 克隆本项目
 - ```shell
   cd MkvAutoSubset/mkvtool
+  go mod tidy
   VCPKG_ROOT=~/vcpkg #你的vcpkg路径
   VCPKG_TRIPLET="x64-linux-release" #你的vcpkg triplet三元组
   vcpkg install --triplet $VCPKG_TRIPLET harfbuzz[experimental-api] libpng libass #安装依赖
