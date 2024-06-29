@@ -25,19 +25,20 @@
 #include "sup.h"
 #include "abstract_lists.h"
 
-#ifdef BE_ARCH
-#define SWAP32(x) (x)
-#define SWAP16(x) (x)
-#endif
-#ifdef LE_ARCH
-#define SWAP32(x) ((int32_t)(((x & 0xff000000) >> 24) | ((x & 0xff0000) >> 8) | ((x & 0xff00) << 8) | ((x & 0xff) << 24)))
-#define SWAP16(x) ((int16_t)(((x & 0xff) << 8) | ((x & 0xff00) >> 8)))
-#endif
-#ifndef LE_ARCH
-#ifndef BE_ARCH
-#error "Please specify endian-ness with -DLE_ARCH or -DBE_ARCH."
-#endif
-#endif
+#include <stdbool.h>  // Include the stdbool.h header for bool type
+
+// Global variable to store system endianness, default to true (little-endian)
+static bool is_little_endian = true;
+
+// Function to detect system endianness
+void detect_endianness() {
+    uint16_t test = 0x1;
+    is_little_endian = *((uint8_t*)&test) == 0x1;
+}
+
+// Modify macro definitions
+#define SWAP32(x) (is_little_endian ? (int32_t)(((x & 0xff000000) >> 24) | ((x & 0xff0000) >> 8) | ((x & 0xff00) << 8) | ((x & 0xff) << 24)) : (x))
+#define SWAP16(x) (is_little_endian ? (int16_t)(((x & 0xff) << 8) | ((x & 0xff00) >> 8)) : (x))
 
 #ifndef DEBUG
 #define DEBUG 0

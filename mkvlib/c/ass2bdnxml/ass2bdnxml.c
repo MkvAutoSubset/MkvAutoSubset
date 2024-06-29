@@ -691,6 +691,7 @@ void make_sub_img(ASS_Image *img, uint8_t *sub_img, uint32_t width)
 
 int app (int argc, char *argv[])
 {
+    detect_endianness();
     struct framerate_entry_s framerates[] = { {"23.976", "23.976", 24, 0, 24000, 1001}
         /*, {"23.976d", "23.976", 24000/1001.0, 1}*/
         , {"24", "24", 24, 0, 24, 1}

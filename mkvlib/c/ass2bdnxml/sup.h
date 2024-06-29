@@ -71,3 +71,4 @@ void close_sup_writer (sup_writer_t *sw);
 
 #endif
 
+void detect_endianness();
