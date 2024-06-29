@@ -1,49 +1,5 @@
 # C导出函数说明
 
-## 2022.05新增生成测试视频说明
-
-- ```c
-  bool CreateBlankOrBurnVideo(long t, char* s, char* enc, char* ass, char* fontdir, char* output);
-  //创建一个空视频或者烧录字幕的视频
-  //t: 视频时长
-  //s: 源视频路径(留空即生成空视频)
-  //enc: 视频编码器
-  //ass: 字幕文件路径(当s为空时,t参数自动设置为字幕时长)
-  //fontdir: 字体目录路径
-  //output: 输出文件
-  //return: 是否成功完成
-  ```
-- ```c
-  bool CreateTestVideo(char* asses, char* s, char* fontdir, char* enc, bool burn, logCallback lcb);
-  //创建测试视频
-  //asses: 字幕文件数组的json格式文本
-  //s: 源视频路径
-  //fontdir: 字体目录路径
-  //enc: 视频编码器
-  //burn: 是否烧录字幕
-  //return: 是否成功完成
-  ```
-
-## 2022.04新增检查模式说明
-
-- ```c
-  void Check(bool check, bool strict);
-  //启用检查模式(影响包含子集化操作的工作流)
-  //check: 是否启用检查模式
-  //strict: 是否启用严格模式
-  ```
-
-## 2022.04更新的ASS转PGS说明
-
-- ```c
-  void A2P(bool a2p, bool apc, char* pr, char* pf);
-  //启用ass转pgs(依赖ass2bdnxml且应在执行工作流之前调用)
-  //a2p: 是否启用ass转pgs
-  //apc: 是否使ass与pgs共存
-  //pr: pgs分辨率
-  //pf: pgs帧率
-  ```
-
 ## 日志回调
 
 - 原型
@@ -64,12 +20,11 @@
 ## 初始化实例
 
 - ```c
-  bool InitInstance(logCallbac lcb);
-  //return: 是否初始化成功
+  void InitInstance(logCallbac lcb);
+  //注意:由于核心功能已内部实现,所以不再强制要求依赖,但是如果调用的相关功能缺少依赖会直接返回失败.
   ```
 - 应该被最先调用.
-- 会检测依赖,如果不满足会返回false.
-- 如果在**未**或**未成功**调用本函数的情况下调用其他函数(Version除外)会永远返回失败状态.
+- 注意:由于核心功能已内部实现,所以不再强制要求依赖,但是如果调用的相关功能缺少依赖会直接返回失败.
 
 ### 缓存相关
 
@@ -213,3 +168,54 @@
   //输出时是否跳过已存在的文件
   //o: 是否跳过
    ```
+- ```c
+
+- ```c
+  void Check(bool check, bool strict);
+  //启用检查模式(影响包含子集化操作的工作流)
+  //check: 是否启用检查模式
+  //strict: 是否启用严格模式
+  ```
+
+- ```c
+  void A2P(bool a2p, bool apc, char* pr, char* pf);
+  //启用ass转pgs(应在执行工作流之前调用)
+  //a2p: 是否启用ass转pgs
+  //apc: 是否使ass与pgs共存
+  //pr: pgs分辨率
+  //pf: pgs帧率
+  ```
+- ```c
+  bool Ass2Pgs(char *asses, char *resolution, char *rate, char *fontdir, char *output, logCallback lcb);
+  //ASS转PGS
+  //asses: 字幕文件数组的json格式文本
+  //resolution: PGS分辨率(如"1920x1080","HD"等)
+  //rate: PGS帧率(如"23.976","30000/1001"等)
+  //fontdir: 字体目录路径
+  //output: 输出目录
+  //return: 是否成功完成
+  ```
+
+## 测试相关
+
+- ```c
+  bool CreateBlankOrBurnVideo(long t, char* s, char* enc, char* ass, char* fontdir, char* output);
+  //创建一个空视频或者烧录字幕的视频
+  //t: 视频时长
+  //s: 源视频路径(留空即生成空视频)
+  //enc: 视频编码器
+  //ass: 字幕文件路径(当s为空时,t参数自动设置为字幕时长)
+  //fontdir: 字体目录路径
+  //output: 输出文件
+  //return: 是否成功完成
+  ```
+- ```c
+  bool CreateTestVideo(char* asses, char* s, char* fontdir, char* enc, bool burn, logCallback lcb);
+  //创建测试视频
+  //asses: 字幕文件数组的json格式文本
+  //s: 源视频路径
+  //fontdir: 字体目录路径
+  //enc: 视频编码器
+  //burn: 是否烧录字幕
+  //return: 是否成功完成
+  ```

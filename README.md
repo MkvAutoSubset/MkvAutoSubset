@@ -19,6 +19,17 @@ ASS字幕字体子集化 MKV批量提取/生成
 ## next 分支
 用C重新实现了字幕处理功能,但丧失了方便地跨平台编译的能力.如果你有兴趣,可以尝试手动编译并使用.
 
+### 通过根目录的脚本运行
+- 请确保已经安装了**go**,**gcc**,**vcpkg**,**dotnet**
+- 以上项目都在PATH环境变量里
+- 运行根目录的编译脚本
+- 成品在build目录下
+- #### 成品说明:
+  - __mkvtool-cli__:命令行版本可执行文件
+  - __mkvtool-gui__:GUI版本可执行文件
+  - __mkvtool.so__:可用于二次开发的动态链接库 [SDK调用文档](mkvlib/sdk/README.md)
+  - 注意:__mkvtool-gui__ 需要和 __mkvtool.so__ 在同一目录下才能正常运行,另外 __libHarfBuzzSharp__ 和 __libSkiaSharp__ 也是 __mkvtool-gui__ 的依赖库,要使用GUI版本这些文件也需要在同一目录下.
+
 ### 手动编译过程(以Linux为例)
 - 配置好go
 - 配置好gcc
