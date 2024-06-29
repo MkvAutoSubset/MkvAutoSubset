@@ -22,7 +22,7 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 ### 通过根目录的脚本编译
 - 请确保已经安装了**go**,**gcc**,**vcpkg**,**dotnet**
 - 以上项目都在PATH环境变量里
-- 将vcpkg的路径添加到环境变量VCPKG_ROOT
+- 将vcpkg的路径添加到环境变量 **VCPKG_ROOT**
 - 运行根目录的编译脚本
 - 成品在build目录下
 - #### 成品说明:

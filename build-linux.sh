@@ -22,7 +22,7 @@ cd ..
 
 cd mkvlib/sdk
 go mod tidy
-CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} go build -ldflags "${LDFLAGS}" -buildmode c-shared -o ../../build/mkvlib.so && del ../../build/mkvlib.h
+CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} go build -ldflags "${LDFLAGS}" -buildmode c-shared -o ../../build/mkvlib.so && rm ../../build/mkvlib.h
 cd ../..
 
 cd mkvtool-gui
