@@ -22,6 +22,7 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 ### 通过根目录的脚本编译
 - 请确保已经安装了**go**,**gcc**,**vcpkg**,**dotnet**
 - 以上项目都在PATH环境变量里
+- 将vcpkg的路径添加到环境变量VCPKG_ROOT
 - 运行根目录的编译脚本
 - 成品在build目录下
 - #### 成品说明:
@@ -31,10 +32,7 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
   - 注意:__mkvtool-gui__ 需要和 __mkvtool.so__ 在同一目录下才能正常运行,另外 __libHarfBuzzSharp__ 和 __libSkiaSharp__ 也是 __mkvtool-gui__ 的依赖库,要使用GUI版本这些文件也需要在同一目录下.
 
 ### 手动编译过程(以Linux为例)
-- 配置好go
-- 配置好gcc
-- 配置好vcpkg
-- 克隆本项目
+- 前置操作同上
 - ```shell
   cd MkvAutoSubset/mkvtool
   go mod tidy
