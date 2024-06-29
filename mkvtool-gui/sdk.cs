@@ -13,7 +13,7 @@ public static class mkvlib
     static extern IntPtr _Version();
 
     [DllImport(so)]
-    static extern bool InitInstance(logCallback lcb);
+    static extern void InitInstance(logCallback lcb);
 
     [DllImport(so)]
     static extern IntPtr GetMKVInfo(IntPtr ptr);
@@ -85,9 +85,9 @@ public static class mkvlib
         return css(_Version());
     }
 
-    public static bool InitInstance(Action<LogLevel, string> lcb)
+    public static void InitInstance(Action<LogLevel, string> lcb)
     {
-        return InitInstance(_lcb(lcb));
+        InitInstance(_lcb(lcb));
     }
 
     public static string GetMKVInfo(string file)

@@ -95,20 +95,14 @@ namespace mkvtool
             {
                 try
                 {
-                    if (!mkvlib.InitInstance(lcb))
+                    mkvlib.InitInstance(lcb);
+                    PrintResult("Init", $"Init mkvlib {mkvlib.Version()} successfully.");
+                    Cache();
+                    DoUIThread(() =>
                     {
-                        PrintResult("Init", "Failed to init mkvlib.");
-                    }
-                    else
-                    {
-                        PrintResult("Init", $"Init mkvlib {mkvlib.Version()} successfully.");
-                        Cache();
-                        DoUIThread(() =>
-                        {
-                            SaveSettings();
-                            this.FindControl<Grid>("mainBox").IsEnabled = true;
-                        });
-                    }
+                        SaveSettings();
+                        this.FindControl<Grid>("mainBox").IsEnabled = true;
+                    });
                 }
                 catch
                 {
