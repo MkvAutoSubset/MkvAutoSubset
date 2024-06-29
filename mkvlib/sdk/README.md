@@ -29,24 +29,24 @@
 ### 缓存相关
 
 - ```c
-    void Cache(char* ccs);
-    //设置字体缓存(应在执行工作流之前调用)
-    //p: 包含缓存文件路径的json化文本
-    ```
+  void Cache(char* ccs);
+  //设置字体缓存(应在执行工作流之前调用)
+  //p: 包含缓存文件路径的json化文本
+  ```
 - ```c
-    char* CreateFontsCache(char* dir, char* output, logCallback lcb);
-    //从字体目录创建缓存
-    //dir: 字体文件目录
-    //output: 缓存文件保存路径
-    //return: 缓存失败字体的json格式的数组
-    ```
+  char* CreateFontsCache(char* dir, char* output, logCallback lcb);
+  //从字体目录创建缓存
+  //dir: 字体文件目录
+  //output: 缓存文件保存路径
+  //return: 缓存失败字体的json格式的数组
+  ```
 - ```c
-    bool CopyFontsFromCache(char* asses, char* dist, logCallback lcb);
-    //从缓存复制字幕所需的字体
-    //asses: 字幕文件路径的json的数组
-    //dist: 字体文件保存目录
-    //return: 是否全部导出
-    ```
+  bool CopyFontsFromCache(char* asses, char* dist, logCallback lcb);
+  //从缓存复制字幕所需的字体
+  //asses: 字幕文件路径的json的数组
+  //dist: 字体文件保存目录
+  //return: 是否全部导出
+  ```
 
 ### 查询相关
 
@@ -98,7 +98,7 @@
   //subset: 是否进行子集化
   //return: 是否全程无错
   ```
-    - 输出文件夹的目录结构请参考[这里](https://github.com/MkvAutoSubset/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
+    - 输出文件夹的目录结构请参考[这里](../../README.md#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 - ```c
   bool CreateMKV(char* file, char* tracks, char* attachments, char* output, char* slang, char* stitle, bool clean);
   //将字幕和字体封进mkv文件
@@ -111,7 +111,6 @@
   //clean: 是否清除源mkv原有的字幕和字体
   //return: 是否全程无错
   ```
-    - 关于字幕的命名方式请参考[这里](https://github.com/MkvAutoSubset/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 - ```c
   bool CreateMKVs(char* vDir, char* sDir, char* fDir, char* tDir, char* oDir, char* slang, char* stitle, bool clean, logCallback lcb);
   //从一组文件夹获得情报自动生成一组mkv并自动进行子集化操作
@@ -125,7 +124,6 @@
   //clean: 是否清除源mkv原有的字幕和字体
   //return: 是否全程无错
   ```
-    - 关于字幕的命名方式请参考[这里](https://github.com/MkvAutoSubset/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 - ```c
   bool MakeMKVs(char* dir, char* data, char* output, char* slang, char* stitle, bool subset, logCallback lcb);
   //用子集化后的数据目录替代原有的字幕和字体
@@ -137,37 +135,35 @@
   //subset: 是否进行子集化
   //return: 是否全程无错
   ```
-    - 输出文件夹的目录结构请参考[这里](https://github.com/MkvAutoSubset/MkvAutoSubset#mkvtool-%E5%8A%9F%E8%83%BD%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
-    - 关于字幕的命名方式请参考[这里](https://github.com/MkvAutoSubset/MkvAutoSubset#%E4%B8%80%E4%BA%9B%E7%A2%8E%E7%A2%8E%E5%BF%B5)
 
 ### 字幕相关
 
 - ```c
-    bool ASSFontSubset(char* files, char* fonts, char* output, bool dirSafe, logCallback lcb);
-    //对字幕和字体进行子集化操作
-    //files: 字幕文件路径数组的json化文本
-    //fonts: 字体文件夹路径
-    //output: 成品输出文件夹路径
-    //dirSafe: 是否把成品输出到"${output}/subsetted"文件夹里(为了安全建议设置为true)
-    //return: 是否全程无错
+  bool ASSFontSubset(char* files, char* fonts, char* output, bool dirSafe, logCallback lcb);
+  //对字幕和字体进行子集化操作
+  //files: 字幕文件路径数组的json化文本
+  //fonts: 字体文件夹路径
+  //output: 成品输出文件夹路径
+  //dirSafe: 是否把成品输出到"${output}/subsetted"文件夹里(为了安全建议设置为true)
+  //return: 是否全程无错
   ```
 - ```c
-    char* GetFontsList(char* files, char* fonts, logCallback lcb);
-    //取得数组内字幕需要的全部字体,如果设置了Check则会试图匹配字体,并输出匹配失败的列表.
-    //files: 字幕文件路径的json的数组
-    //fonts: 字体文件夹路径
-    //return: json格式的二维数组(第一个成员是需要的字体名称,第二个成员是没有匹配成功的字体名称.)
+  char* GetFontsList(char* files, char* fonts, logCallback lcb);
+  //取得数组内字幕需要的全部字体,如果设置了Check则会试图匹配字体,并输出匹配失败的列表.
+  //files: 字幕文件路径的json的数组
+  //fonts: 字体文件夹路径
+  //return: json格式的二维数组(第一个成员是需要的字体名称,第二个成员是没有匹配成功的字体名称.)
   ```
 - ```c
   void NRename(bool n);
   //子集化时不重命名字体
   //n: 是否不重命名
-   ```
+  ```
 - ```c
   void NOverwrite(bool n);
   //输出时是否跳过已存在的文件
   //o: 是否跳过
-   ```
+  ```
 - ```c
 
 - ```c
