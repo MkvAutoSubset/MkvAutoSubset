@@ -1,5 +1,6 @@
 @echo off
 
+cd /d %~dp0
 rd /s/q build > NUL 2>&1
 md build
 

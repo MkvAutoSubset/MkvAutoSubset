@@ -1,5 +1,6 @@
 #!/usr/bin sh
 
+cd $(dirname "$0")
 rm -rf build > /dev/null 2>&1
 mkdir build
 
