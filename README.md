@@ -19,6 +19,31 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 ## next 分支
 用C重新实现了字幕处理功能,但丧失了方便地跨平台编译的能力.如果你有兴趣,可以尝试手动编译并使用.
 
+### Docker镜像使用说明
+- 从Dockerhub获取
+  ```shell
+  TAGNAME=next #使用next分支的镜像
+  FONT_DIR="/usr/share/fonts/truetype" #字体目录
+  CACHE_DIR="${HOME}/.mkvtool/caches"  #缓存目录
+  OTHER_DIR="" #其他目录(可选,示例见下节.)
+  docker pull ac79b0c6/mkvtool:${TAGNAME} #拉取/更新镜像
+  docker run --rm -it -v ${FONT_DIR}:/fonts -v ${CACHE_DIR}:/root/.mkvtool/caches ${OTHER_DIR} ac79b0c6/mkvtool:${TAGNAME} #运行镜像
+  ```
+- 手动构建&运行
+  ```shell
+  git clone https://github.com/MkvAutoSubset/MkvAutoSubset.git #克隆项目
+  cd MkvAutoSubset #进入项目目录
+  sh docker/rebuild.sh #构建镜像
+  cp docker/run.sh docker/run_my.sh  #拷贝一份自己的运行脚本
+  vi docker/run_my.sh #修改自己的运行脚本(可选)
+  sh docker/run_my.sh #运行镜像
+  ```
+- docker/run_my.sh的修改说明
+  * FONT_DIR: 字体文件目录
+  * CACHE_DIR: 缓存目录
+  * OTHER_DIR: 其他目录(可选)
+    * 示例:“-v ${HOME}/work:/work”
+
 ### 通过根目录的脚本编译
 - 请确保已经安装了**go**,**gcc**,**vcpkg**,**dotnet**
 - 以上项目都在PATH环境变量里
