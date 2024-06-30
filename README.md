@@ -4,7 +4,9 @@
 
 ASS字幕字体子集化 MKV批量提取/生成
 
-[问题反馈](https://bbs.acgrip.com/thread-9070-13-1.html)
+[问题反馈](https://bbs.acgrip.com/thread-9070-1-1.html)
+
+[next版本](https://github.com/MkvAutoSubset/MkvAutoSubset/tree/next):无需安装FontTools,自带ASS转PGS.
 
 ## 什么叫字幕字体子集化
 - 这里说的字幕特指ass(ssa)这种带有特效的文本字幕;
