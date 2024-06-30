@@ -4,7 +4,7 @@
 
 ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 
-[问题反馈](https://bbs.acgrip.com/thread-9070-13-1.html)
+[问题反馈](https://bbs.acgrip.com/thread-9070-1-1.html)
 
 ## 什么是字幕字体子集化
 - 这里说的字幕特指ass(ssa)这种带有特效的文本字幕;
