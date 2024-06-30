@@ -1,42 +1,33 @@
+FROM debian:stable-slim as builder
+
+ENV VCPKG_ROOT=/vcpkg
+ENV VCPKG_TRIPLET="x64-linux-release"
+
+RUN apt-get update && \
+    apt-get install -y curl zip unzip tar git build-essential pkg-config python3 && \
+    git clone https://github.com/microsoft/vcpkg && \
+    ${VCPKG_ROOT}/bootstrap-vcpkg.sh -disableMetrics && \
+    ${VCPKG_ROOT}/vcpkg install --triplet ${VCPKG_TRIPLET} harfbuzz[experimental-api] libass
+
+RUN curl -O https://dl.google.com/go/go1.22.4.linux-amd64.tar.gz && \
+    tar zxf go*
+ENV PATH=${PATH}:/go/bin
+
+RUN git clone https://github.com/MkvAutoSubset/MkvAutoSubset -b next && \
+    cd /MkvAutoSubset/mkvtool && \
+    go mod tidy && \
+    PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}" && \
+    H_PATH="${PATH_ROOT}/include" && \
+    L_PATH="${PATH_ROOT}/lib" && \
+    CGO_CFLAGS="-I${H_PATH} -DHB_EXPERIMENTAL_API -Os" && \
+    CGO_LDFLAGS="-L${L_PATH} -lass -lfreetype -lz -lfontconfig -lpng -lm -lbz2 -lfribidi -lharfbuzz -lharfbuzz-subset -lexpat -lbrotlidec -lbrotlicommon -static" && \
+    CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} go build -ldflags "-s -w"
+
 FROM alpine
 
-RUN apk update && \
-    apk add py3-fonttools mkvtoolnix ffmpeg \
-            cmake make gcc nasm \
-            libc-dev libpng-dev freetype-dev fribidi-dev harfbuzz-dev fontconfig-dev
-
-
-RUN wget https://api.github.com/repos/MkvAutoSubset/MkvAutoSubset/releases/latest && \
-    VERSION=$(grep tag_name latest | cut -d '"' -f 4 | cut -d 'v' -f 2) && \
-    rm latest && \
-    wget https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/v${VERSION}/mkvtool_${VERSION}_Linux_$(uname -m).tar.gz && \
-    tar -xzvf *.tar.gz && \
-    rm *.tar.gz && \
-    mv mkvtool /usr/local/bin/ && \
+COPY --from=builder /MkvAutoSubset/mkvtool/mkvtool /usr/bin
+RUN apk add ffmpeg mkvtoolnix && \
     mkdir fonts work
-
-RUN wget https://api.github.com/repos/libass/libass/releases/latest && \
-    VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
-    wget https://github.com/libass/libass/releases/download/${VERSION}/libass-${VERSION}.tar.gz && \
-    rm latest && \
-    tar -xzvf *.tar.gz && \
-    cd libass* && \
-    ./configure && \
-    make install && \
-    cd .. && \
-    rm -rf libass*
-
-RUN wget https://api.github.com/repos/Masaiki/ass2bdnxml/releases/latest && \
-    VERSION=$(grep tag_name latest | cut -d '"' -f 4) && \
-    rm latest && \
-    wget https://github.com/Masaiki/ass2bdnxml/archive/refs/tags/${VERSION}.tar.gz && \
-    tar -xzvf *.tar.gz && \
-    cd ass2bdnxml* && \
-    cmake -Bbuild -DCMAKE_BUILD_TYPE=Release . && \
-    cmake --build build && \
-    cp build/ass2bdnxml /usr/local/bin/ && \
-    cd .. && \
-    rm -rf ass2bdnxml* *.tar.gz
 
 WORKDIR work
 CMD ["sh", "-c", "[ -f ~/.mkvtool/caches/*.cache ] || mkvtool cache /fonts ; sh"]

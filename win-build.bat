@@ -11,7 +11,7 @@ set PATH_ROOT=%VCPKG_ROOT%/installed/%VCPKG_TRIPLET%
 set H_PATH=%PATH_ROOT%/include
 set L_PATH=%PATH_ROOT%/lib
 set CGO_CFLAGS=-I%H_PATH% -DHB_EXPERIMENTAL_API -Os
-set CGO_LDFLAGS=-L%L_PATH% -lharfbuzz-subset -lass -lpng -lfreetype -lharfbuzz -lfribidi -lgdi32 -lzlib -lbz2 -lbrotlidec -lbrotlicommon
+set CGO_LDFLAGS=-L%L_PATH% -lharfbuzz-subset -lass -lpng -lfreetype -lharfbuzz -lfribidi -lgdi32 -lzlib -lbz2 -lbrotlidec -lbrotlicommon -static
 
 set LDFLAGS=-s -w
 
