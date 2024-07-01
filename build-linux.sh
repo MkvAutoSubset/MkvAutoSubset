@@ -4,14 +4,16 @@ cd $(dirname "$0")
 rm -rf build > /dev/null 2>&1
 mkdir build
 
-VCPKG_TRIPLET="x64-linux-release"
-vcpkg install --triplet ${VCPKG_TRIPLET} harfbuzz[experimental-api] libass
+VCPKG_DEFAULT_TRIPLET="x64-linux-release"
+VCPKG_BUILD_TYPE="Release"
+vcpkg install  fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
+vcpkg install libass
 
-PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_TRIPLET}"
+PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
 H_PATH="${PATH_ROOT}/include"
 L_PATH="${PATH_ROOT}/lib"
 CGO_CFLAGS="-I${H_PATH} -DHB_EXPERIMENTAL_API -Os"
-CGO_LDFLAGS="-L${L_PATH} -lass -lfreetype -lz -lfontconfig -lpng -lm -lbz2 -lfribidi -lharfbuzz -lharfbuzz-subset -lexpat -lbrotlidec -lbrotlicommon -static"
+CGO_LDFLAGS="-L${L_PATH} -static -lass -lfreetype -lm -lz -lfontconfig -lpng -lfribidi -lharfbuzz -lharfbuzz-subset -lexpat"
 
 LDFLAGS="-s -w"
 
