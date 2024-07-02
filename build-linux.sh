@@ -19,7 +19,7 @@ LDFLAGS="-s -w"
 
 cd mkvtool
 go mod tidy
-CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} go build -ldflags "${LDFLAGS}" -o ../build/mkvtool
+CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} go build -ldflags "${LDFLAGS}" -o ../build/mkvtool-cli
 cd ..
 
 cd mkvlib/sdk

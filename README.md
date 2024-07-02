@@ -64,7 +64,8 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
   VCPKG_ROOT=~/vcpkg #你的vcpkg路径
   VCPKG_DEFAULT_TRIPLET="x64-linux-release" #你的vcpkg triplet三元组
   VCPKG_BUILD_TYPE="Release"
-  vcpkg install harfbuzz[experimental-api] #安装依赖
+  vcpkg install  fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
+  vcpkg install libass #安装依赖
   PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
   H_PATH="${PATH_ROOT}/include"
   L_PATH="${PATH_ROOT}/lib"

@@ -6,7 +6,8 @@ md build
 
 set VCPKG_DEFAULT_TRIPLET=x64-mingw-static
 set VCPKG_BUILD_TYPE=Release
-vcpkg install fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api] libass
+vcpkg install fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
+vcpkg install libass
 
 set PATH_ROOT=%VCPKG_ROOT%/installed/%VCPKG_DEFAULT_TRIPLET%
 set H_PATH=%PATH_ROOT%/include
