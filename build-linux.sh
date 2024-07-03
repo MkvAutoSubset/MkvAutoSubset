@@ -6,8 +6,8 @@ mkdir build
 
 VCPKG_DEFAULT_TRIPLET="x64-linux-release"
 VCPKG_BUILD_TYPE="Release"
-vcpkg install  fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
-vcpkg install libass
+${VCPKG_ROOT}/vcpkg install  fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
+${VCPKG_ROOT}/vcpkg install libass
 
 PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
 H_PATH="${PATH_ROOT}/include"
