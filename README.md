@@ -61,7 +61,7 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 - ```shell
   cd MkvAutoSubset/mkvtool
   go mod tidy
-  export VCPKG_ROOT=~/vcpkg #你的vcpkg路径
+  export VCPKG_ROOT="${HOME}/vcpkg" #你的vcpkg路径
   export VCPKG_DEFAULT_TRIPLET="x64-linux-release" #你的vcpkg triplet三元组
   export VCPKG_BUILD_TYPE="Release"
   ${VCPKG_ROOT}/vcpkg install fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]

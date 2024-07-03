@@ -4,6 +4,15 @@ cd $(dirname "$0")
 rm -rf build > /dev/null 2>&1
 mkdir build
 
+if [ -z "${VCPKG_ROOT}" ]; then
+   export VCPKG_ROOT="${HOME}/vcpkg"
+fi
+
+if [ ! -d "${VCPKG_ROOT}" ]; then
+   git clone https://github.com/microsoft/vcpkg ${VCPKG_ROOT}
+   ${VCPKG_ROOT}/bootstrap-vcpkg.sh -disableMetrics
+fi
+
 export VCPKG_DEFAULT_TRIPLET="x64-osx-release"
 export VCPKG_BUILD_TYPE="Release"
 ${VCPKG_ROOT}/vcpkg install fribidi "freetype[core,zlib,png]" "harfbuzz[core,experimental-api]"

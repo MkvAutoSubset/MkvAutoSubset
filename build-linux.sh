@@ -6,6 +6,16 @@ mkdir build
 
 export VCPKG_DEFAULT_TRIPLET="x64-linux-release"
 export VCPKG_BUILD_TYPE="Release"
+
+if [ -z "${VCPKG_ROOT}" ]; then
+   export VCPKG_ROOT="${HOME}/vcpkg"
+fi
+
+if [ ! -d "${VCPKG_ROOT}" ]; then
+   git clone https://github.com/microsoft/vcpkg ${VCPKG_ROOT}
+   ${VCPKG_ROOT}/bootstrap-vcpkg.sh -disableMetrics
+fi
+
 ${VCPKG_ROOT}/vcpkg install  fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
 ${VCPKG_ROOT}/vcpkg install libass
 

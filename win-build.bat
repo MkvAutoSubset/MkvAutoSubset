@@ -4,6 +4,15 @@ cd /d %~dp0
 rd /s/q build > NUL 2>&1
 md build
 
+if "%VCPKG_ROOT%"=="" (
+    set VCPKG_ROOT=%USERPROFILE%\vcpkg
+)
+
+if not exist %VCPKG_ROOT% (
+    git clone https://github.com/microsoft/vcpkg %VCPKG_ROOT%
+    %VCPKG_ROOT%\bootstrap-vcpkg.bat -disableMetrics
+)
+
 set VCPKG_DEFAULT_TRIPLET=x64-mingw-static
 set VCPKG_BUILD_TYPE=Release
 %VCPKG_ROOT%\vcpkg install fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
