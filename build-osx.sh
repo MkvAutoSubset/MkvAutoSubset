@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 cd $(dirname "$0")
 rm -rf build > /dev/null 2>&1
@@ -14,8 +14,12 @@ if [ ! -d "${VCPKG_ROOT}" ]; then
 fi
 
 if ! which pkg-config &> /dev/null; then
-    echo "Error: pkg-config is not installed." >&2
-    exit 1
+    if ! which brew &> /dev/null; then
+        echo "Error: brew is not installed." >&2
+        exit 1
+    else
+        brew install pkg-config
+    fi
 fi
 
 export VCPKG_DEFAULT_TRIPLET="x64-osx-release"
