@@ -1,4 +1,4 @@
-#!/usr/bin sh
+#!/usr/bin/env zsh
 
 cd $(dirname "$0")
 rm -rf build > /dev/null 2>&1
