@@ -13,6 +13,11 @@ if [ ! -d "${VCPKG_ROOT}" ]; then
    ${VCPKG_ROOT}/bootstrap-vcpkg.sh -disableMetrics
 fi
 
+if ! which pkg-config &> /dev/null; then
+    echo "Error: pkg-config is not installed." >&2
+    exit 1
+fi
+
 export VCPKG_DEFAULT_TRIPLET="x64-osx-release"
 export VCPKG_BUILD_TYPE="Release"
 ${VCPKG_ROOT}/vcpkg install fribidi "freetype[core,zlib,png]" "harfbuzz[core,experimental-api]"
