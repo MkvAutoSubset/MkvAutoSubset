@@ -5,7 +5,7 @@ rm -rf build > /dev/null 2>&1
 mkdir build
 
 export VCPKG_DEFAULT_TRIPLET="x64-osx-release"
-exprot VCPKG_BUILD_TYPE="Release"
+export VCPKG_BUILD_TYPE="Release"
 ${VCPKG_ROOT}/vcpkg install fribidi "freetype[core,zlib,png]" "harfbuzz[core,experimental-api]"
 ${VCPKG_ROOT}/vcpkg install libass
 

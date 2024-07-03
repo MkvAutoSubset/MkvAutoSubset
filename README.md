@@ -61,17 +61,17 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 - ```shell
   cd MkvAutoSubset/mkvtool
   go mod tidy
-  VCPKG_ROOT=~/vcpkg #你的vcpkg路径
-  VCPKG_DEFAULT_TRIPLET="x64-linux-release" #你的vcpkg triplet三元组
-  VCPKG_BUILD_TYPE="Release"
+  export VCPKG_ROOT=~/vcpkg #你的vcpkg路径
+  export VCPKG_DEFAULT_TRIPLET="x64-linux-release" #你的vcpkg triplet三元组
+  export VCPKG_BUILD_TYPE="Release"
   ${VCPKG_ROOT}/vcpkg install fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
   ${VCPKG_ROOT}/vcpkg install libass #安装依赖
-  PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
-  H_PATH="${PATH_ROOT}/include"
-  L_PATH="${PATH_ROOT}/lib"
-  CGO_CFLAGS="-I${H_PATH} -DHB_EXPERIMENTAL_API -Os"
-  CGO_LDFLAGS="-L${L_PATH} -static -lass -lfreetype -lm -lz -lfontconfig -lpng -lfribidi -lharfbuzz -lharfbuzz-subset -lexpat"
-  CGO_CFLAGS=${CGO_CFLAGS} CGO_LDFLAGS=${CGO_LDFLAGS} go build #编译
+  export PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
+  export H_PATH="${PATH_ROOT}/include"
+  export L_PATH="${PATH_ROOT}/lib"
+  export CGO_CFLAGS="-I${H_PATH} -DHB_EXPERIMENTAL_API -Os"
+  export CGO_LDFLAGS="-L${L_PATH} -static -lass -lfreetype -lm -lz -lfontconfig -lpng -lfribidi -lharfbuzz -lharfbuzz-subset -lexpat"
+  go build #编译
   ```
 
 ### 其他依赖 - 按需安装
