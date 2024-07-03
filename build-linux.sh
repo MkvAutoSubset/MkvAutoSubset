@@ -16,7 +16,7 @@ if [ ! -d "${VCPKG_ROOT}" ]; then
    ${VCPKG_ROOT}/bootstrap-vcpkg.sh -disableMetrics
 fi
 
-${VCPKG_ROOT}/vcpkg install  fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
+${VCPKG_ROOT}/vcpkg install fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api]
 ${VCPKG_ROOT}/vcpkg install libass
 
 export PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
