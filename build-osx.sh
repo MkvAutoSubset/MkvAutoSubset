@@ -22,7 +22,7 @@ export PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
 export H_PATH="${PATH_ROOT}/include"
 export L_PATH="${PATH_ROOT}/lib"
 export CGO_CFLAGS="-I${H_PATH} -DHB_EXPERIMENTAL_API -Os"
-export CGO_LDFLAGS="-L${L_PATH} -lass -lfreetype -lz -lfontconfig -lpng -lfribidi -lharfbuzz -lharfbuzz-subset -framework CoreText"
+export CGO_LDFLAGS="-L${L_PATH} -lass -lfreetype -lz -lpng -lfribidi -lharfbuzz -lharfbuzz-subset -framework CoreText"
 
 export LDFLAGS="-s -w"
 
