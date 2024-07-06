@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish Builder Docker image
 
 on:
   release:
