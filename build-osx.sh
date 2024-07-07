@@ -5,7 +5,7 @@ rm -rf build > /dev/null 2>&1
 mkdir build
 
 if [ -z "${VCPKG_ROOT}" ]; then
-   export VCPKG_ROOT="${HOME}/vcpkg"
+   VCPKG_ROOT="${HOME}/vcpkg"
 fi
 
 if [ ! -d "${VCPKG_ROOT}" ]; then
@@ -27,13 +27,13 @@ export VCPKG_BUILD_TYPE="Release"
 ${VCPKG_ROOT}/vcpkg install fribidi "freetype[core,zlib,png]" "harfbuzz[core,experimental-api]"
 ${VCPKG_ROOT}/vcpkg install libass
 
-export PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
-export H_PATH="${PATH_ROOT}/include"
-export L_PATH="${PATH_ROOT}/lib"
+PATH_ROOT="${VCPKG_ROOT}/installed/${VCPKG_DEFAULT_TRIPLET}"
+H_PATH="${PATH_ROOT}/include"
+L_PATH="${PATH_ROOT}/lib"
 export CGO_CFLAGS="-I${H_PATH} -DHB_EXPERIMENTAL_API -Os"
 export CGO_LDFLAGS="-L${L_PATH} -lass -lfreetype -lz -lpng -lfribidi -lharfbuzz -lharfbuzz-subset -framework CoreText"
 
-export LDFLAGS="-s -w"
+LDFLAGS="-s -w"
 
 cd mkvtool
 go mod tidy

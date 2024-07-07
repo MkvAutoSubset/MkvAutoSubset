@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 NAME="mkvtool"
 [ "$(docker images | grep ${NAME})" ] || docker build -t ${NAME} $(dirname "$0")
 FONT_DIR="/usr/share/fonts/truetype" # Change this to your font directory

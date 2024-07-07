@@ -16,7 +16,7 @@ import (
 )
 
 const appName = "MKV Tool"
-const appVer = "next"
+const appVer = "v5.5.0"
 const tTitle = appName + " " + appVer
 
 var appFN = fmt.Sprintf("%s %s %s/%s", appName, appVer, runtime.GOOS, runtime.GOARCH)
@@ -33,20 +33,20 @@ var processer = mkvlib.GetProcessorGetterInstance().GetProcessorDummyInstance()
 
 func main() {
 	setWindowTitle(tTitle)
-	//go getLatestTag()
+	go getLatestTag()
 
 	defer func() {
 		if latestTag != "" && latestTag != appVer {
-			_os := strings.ToUpper(string(runtime.GOOS[0])) + runtime.GOOS[1:]
+			_os := runtime.GOOS
+			if _os == "darwin" {
+				_os = "osx"
+			}
 			arch := runtime.GOARCH
-			if arch == "amd64" {
-				arch = "x86_64"
+			ext := ""
+			if _os == "windows" {
+				ext = ".exe"
 			}
-			ext := "tar.gz"
-			if _os == "Windows" || _os == "Darwin" {
-				ext = "zip"
-			}
-			color.Green("New version available: %s\nDownload link: https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/%s/mkvtool_%s_%s_%s.%s", latestTag, latestTag, latestTag[1:], _os, arch, ext)
+			color.Green("New version available: %s\nDownload link: https://github.com/MkvAutoSubset/MkvAutoSubset/releases/download/%s/mkvtool-%s-%s%s", latestTag, latestTag, _os, arch, ext)
 		}
 		os.Exit(ec)
 	}()
