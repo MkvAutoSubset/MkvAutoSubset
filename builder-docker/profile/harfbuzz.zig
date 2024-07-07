@@ -31,7 +31,6 @@ pub fn build(b: *std.Build) !void {
         "hb-face.cc",
         "hb-fallback-shape.cc",
         "hb-font.cc",
-        "hb-ft.cc",
         "hb-map.cc",
         "hb-number.cc",
         "hb-ot-cff1-table.cc",
@@ -141,6 +140,23 @@ pub fn build(b: *std.Build) !void {
         "hb.h",
     };
 
+    const defs = [_][]const u8{
+        "HAVE_ATEXIT",
+        "HAVE_GETPAGESIZE",
+        "HAVE_ISATTY",
+        "HAVE_MMAP",
+        "HAVE_MPROTECT",
+        "HAVE_NEWLOCALE",
+        "HAVE_PTHREAD",
+        "HAVE_SINCOSF",
+        "HAVE_STDBOOL_H",
+        "HAVE_SYSCONF",
+        "HAVE_SYS_MMAN_H",
+        "HAVE_UNISTD_H",
+        "HAVE_USELOCALE",
+        "HB_EXPERIMENTAL_API",
+    };
+
     for (hdrs) |item| {
         var path1 = std.ArrayList(u8).init(b.allocator);
         defer path1.deinit();
@@ -158,7 +174,11 @@ pub fn build(b: *std.Build) !void {
     lib1.linkLibCpp();
     b.installArtifact(lib1);
 
-    lib2.defineCMacro("HB_EXPERIMENTAL_API", "1");
+    for (defs) |item| {
+        lib1.defineCMacro(item, "1");
+        lib2.defineCMacro(item, "1");
+    }
+
     lib2.linkLibCpp();
     b.installArtifact(lib2);
 }
