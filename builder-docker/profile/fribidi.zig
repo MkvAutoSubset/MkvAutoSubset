@@ -33,15 +33,12 @@ pub fn build(b: *std.Build) !void {
         "fribidi.c",
     };
 
-    const cflags = &[_][]const u8{
-        "-std=c89",
-    };
     for (srcs) |item| {
         var path = std.ArrayList(u8).init(b.allocator);
         defer path.deinit();
         try path.appendSlice(srcPrefix);
         try path.appendSlice(item);
-        lib.addCSourceFile(.{ .file = b.path(path.items), .flags = cflags });
+        lib.addCSourceFile(.{ .file = b.path(path.items) });
     }
 
     const hdrs = &[_][]const u8{
@@ -84,7 +81,16 @@ pub fn build(b: *std.Build) !void {
     }
 
     lib.addIncludePath(b.path(srcPrefix));
+    lib.defineCMacro("HAVE_MEMMOVE", "1");
+    lib.defineCMacro("HAVE_MEMORY_H", "1");
+    lib.defineCMacro("HAVE_MEMSET", "1");
+    lib.defineCMacro("HAVE_STDLIB_H", "1");
+    lib.defineCMacro("HAVE_STRDUP", "1");
     lib.defineCMacro("HAVE_STRINGIZE", "1");
+    lib.defineCMacro("HAVE_STRINGS_H", "1");
+    lib.defineCMacro("HAVE_STRING_H", "1");
+    lib.defineCMacro("HAVE_SYS_TIMES_H", "1");
+    lib.defineCMacro("STDC_HEADERS", "1");
     lib.linkLibC();
     b.installArtifact(lib);
 }
