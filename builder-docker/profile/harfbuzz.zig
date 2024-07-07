@@ -144,16 +144,11 @@ pub fn build(b: *std.Build) !void {
         "HAVE_ATEXIT",
         "HAVE_GETPAGESIZE",
         "HAVE_ISATTY",
-        "HAVE_MMAP",
         "HAVE_MPROTECT",
         "HAVE_NEWLOCALE",
-        "HAVE_PTHREAD",
-        "HAVE_SINCOSF",
         "HAVE_STDBOOL_H",
         "HAVE_SYSCONF",
-        "HAVE_SYS_MMAN_H",
         "HAVE_UNISTD_H",
-        "HAVE_USELOCALE",
         "HB_EXPERIMENTAL_API",
     };
 

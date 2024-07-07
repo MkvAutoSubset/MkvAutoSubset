@@ -195,6 +195,7 @@
 /* end of options */
 /* settings */
 #define PNG_API_RULE 0
+#define PNG_ARM_NEON_OPT 0
 #define PNG_DEFAULT_READ_MACROS 1
 #define PNG_GAMMA_THRESHOLD_FIXED 5000
 #define PNG_IDAT_READ_SIZE PNG_ZBUF_SIZE
@@ -204,6 +205,9 @@
 #define PNG_LINKAGE_DATA extern
 #define PNG_LINKAGE_FUNCTION extern
 #define PNG_MAX_GAMMA_8 11
+#define PNG_MIPS_MMI_OPT 0
+#define PNG_MIPS_MSA_OPT 0
+#define PNG_POWERPC_VSX_OPT 0
 #define PNG_QUANTIZE_BLUE_BITS 5
 #define PNG_QUANTIZE_GREEN_BITS 5
 #define PNG_QUANTIZE_RED_BITS 5
