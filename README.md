@@ -47,6 +47,7 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 ### 通过Docker镜像编译
   - 从Dockerhub获取:
   ```shell
+  TAGNAME=next #使用next分支的镜像
   DIST_DIR="${HOME}/mkvtool_dist"  #编译结果目录
   docker pull ac79b0c6/mkvtool-builder:${TAGNAME} #拉取/更新镜像
   docker run --rm -it -v ${DIST_DIR}:/dist ac79b0c6/mkvtool-builder:${TAGNAME} #运行镜像
