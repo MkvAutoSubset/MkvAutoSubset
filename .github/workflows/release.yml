@@ -18,7 +18,7 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run --rm -it -v ${{ github.workspace }}/dist:/dist ac79b0c6/mkvtool-builder:next
+          docker run --rm -v ${{ github.workspace }}/dist:/dist ac79b0c6/mkvtool-builder:next
 
       - name: Create GitHub Release
         id: create_release
