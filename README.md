@@ -110,4 +110,4 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
 - 从 [这里](https://ffmpeg.org/download.html) 下载并安装ffmpeg
 - 保证以上两个依赖项的相关可执行文件(_mkvextract.exe_,_mkvmerge.exe_,_ffmpeg.exe_)在 **path** 环境变量里
 
-### 使用说明同[主线](https://github.com/MkvAutoSubset/MkvAutoSubset?tab=readme-ov-file#%E4%B8%80%E9%83%A8%E5%88%86%E4%B8%AD%E6%96%87%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E8%8B%B1%E6%96%87%E5%AE%8C%E6%95%B4%E7%89%88)
+### 使用说明同[主线](https://github.com/MkvAutoSubset/MkvAutoSubset/tree/master?tab=readme-ov-file#%E4%B8%80%E9%83%A8%E5%88%86%E4%B8%AD%E6%96%87%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E%E8%8B%B1%E6%96%87%E5%AE%8C%E6%95%B4%E7%89%88)
