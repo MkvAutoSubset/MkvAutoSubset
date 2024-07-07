@@ -24,7 +24,7 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
   - MKVToolNix:涉及抽取/混流操作时,依然需要
   - FFmpeg:涉及生成测试视频时,依然需要
 - 丧失了方便地跨平台编译的能力
-- 目前只自动化提供Windows,macOS,Linux三个平台的amd64及arm64可架构的执行文件
+- 目前只自动化提供Windows,macOS,Linux三个平台的amd64及arm64架构的执行文件
 - 其他平台请自行编译
 
 ### Docker镜像使用说明
