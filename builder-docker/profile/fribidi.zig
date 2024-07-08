@@ -10,8 +10,6 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
-    const srcPrefix = "lib/";
-
     const srcs = &[_][]const u8{
         "fribidi-arabic.c",
         "fribidi-bidi-types.c",
@@ -32,14 +30,6 @@ pub fn build(b: *std.Build) !void {
         "fribidi-shape.c",
         "fribidi.c",
     };
-
-    for (srcs) |item| {
-        var path = std.ArrayList(u8).init(b.allocator);
-        defer path.deinit();
-        try path.appendSlice(srcPrefix);
-        try path.appendSlice(item);
-        lib.addCSourceFile(.{ .file = b.path(path.items) });
-    }
 
     const hdrs = &[_][]const u8{
         "fribidi-arabic.h",
@@ -66,21 +56,16 @@ pub fn build(b: *std.Build) !void {
         "fribidi.h",
     };
 
+    const _fmt = "lib/{s}";
+
+    for (srcs) |item| {
+        lib.addCSourceFile(.{ .file = b.path(b.fmt(_fmt, .{item})) });
+    }
     for (hdrs) |item| {
-        var path1 = std.ArrayList(u8).init(b.allocator);
-        defer path1.deinit();
-        try path1.appendSlice(srcPrefix);
-        try path1.appendSlice(item);
-
-        var path2 = std.ArrayList(u8).init(b.allocator);
-        defer path2.deinit();
-        try path2.appendSlice("fribidi/");
-        try path2.appendSlice(item);
-
-        lib.installHeader(b.path(path1.items), path2.items);
+        lib.installHeader(b.path(b.fmt(_fmt, .{item})), b.fmt("fribidi/{s}", .{item}));
     }
 
-    lib.addIncludePath(b.path(srcPrefix));
+    lib.addIncludePath(b.path("lib"));
     lib.defineCMacro("HAVE_MEMMOVE", "1");
     lib.defineCMacro("HAVE_MEMORY_H", "1");
     lib.defineCMacro("HAVE_MEMSET", "1");

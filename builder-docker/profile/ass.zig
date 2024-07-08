@@ -39,9 +39,9 @@ pub fn build(b: *std.Build) !void {
     };
 
     const libs = &[_][]const u8{
-        "/freetype",
-        "/fribidi",
-        "/harfbuzz",
+        "freetype",
+        "fribidi",
+        "harfbuzz",
     };
 
     for (srcs) |item| {
@@ -54,11 +54,7 @@ pub fn build(b: *std.Build) !void {
     if (i) |val| {
         lib.addIncludePath(b.path(val));
         for (libs) |item| {
-            var path = std.ArrayList(u8).init(b.allocator);
-            defer path.deinit();
-            try path.appendSlice(val);
-            try path.appendSlice(item);
-            lib.addIncludePath(b.path(path.items));
+            lib.addIncludePath(b.path(b.fmt("{s}/{s}", .{ val, item })));
         }
     }
 

@@ -15,8 +15,6 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
-    const srcPrefix = "src/";
-
     const srcs1 = &[_][]const u8{
         "OT/Var/VARC/VARC.cc",
         "hb-aat-layout.cc",
@@ -90,20 +88,6 @@ pub fn build(b: *std.Build) !void {
         "hb-subset.cc",
     };
 
-    for (srcs1) |item| {
-        var path = std.ArrayList(u8).init(b.allocator);
-        defer path.deinit();
-        try path.appendSlice(srcPrefix);
-        try path.appendSlice(item);
-        lib1.addCSourceFile(.{ .file = b.path(path.items) });
-    }
-    for (srcs2) |item| {
-        var path = std.ArrayList(u8).init(b.allocator);
-        defer path.deinit();
-        try path.appendSlice(srcPrefix);
-        try path.appendSlice(item);
-        lib2.addCSourceFile(.{ .file = b.path(path.items) });
-    }
     const hdrs = &[_][]const u8{
         "hb-aat-layout.h",
         "hb-aat.h",
@@ -152,18 +136,17 @@ pub fn build(b: *std.Build) !void {
         "HB_EXPERIMENTAL_API",
     };
 
+    const _fmt = "src/{s}";
+
+    for (srcs1) |item| {
+        lib1.addCSourceFile(.{ .file = b.path(b.fmt(_fmt, .{item})) });
+    }
+    for (srcs2) |item| {
+        lib2.addCSourceFile(.{ .file = b.path(b.fmt(_fmt, .{item})) });
+    }
+
     for (hdrs) |item| {
-        var path1 = std.ArrayList(u8).init(b.allocator);
-        defer path1.deinit();
-        try path1.appendSlice(srcPrefix);
-        try path1.appendSlice(item);
-
-        var path2 = std.ArrayList(u8).init(b.allocator);
-        defer path2.deinit();
-        try path2.appendSlice("harfbuzz/");
-        try path2.appendSlice(item);
-
-        lib1.installHeader(b.path(path1.items), path2.items);
+        lib1.installHeader(b.path(b.fmt(_fmt, .{item})), b.fmt("harfbuzz/{s}", .{item}));
     }
 
     lib1.linkLibCpp();
