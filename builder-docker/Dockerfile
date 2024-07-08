@@ -57,7 +57,9 @@ FROM nemirtingas/osxcross_vcpkg:SDK12.1_clang17
 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /vcpkg
 
+COPY --from=builder /compiler /compiler
 COPY --from=builder /deps /deps
 COPY --from=builder /script/build.sh /
+ENV PATH=${PATH}:/compiler/go/bin:/compiler/zig
 
 CMD ["/build.sh"]
