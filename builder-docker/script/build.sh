@@ -47,7 +47,7 @@ for ARCH in $ARCH_LIST; do
       export CC="zig cc -target $ZIG_TARGET"
     fi
 
-    export CGO_CFLAGS="-Os -I/deps/$ZIG_TARGET/include -DHB_EXPERIMENTAL_API"
+    export CGO_CFLAGS="-O3 -I/deps/$ZIG_TARGET/include -DHB_EXPERIMENTAL_API"
     export CGO_LDFLAGS="-L/deps/$ZIG_TARGET/lib -lstdc++ -lfribidi -lzlib -lfreetype -lpng -lharfbuzz -lharfbuzz-subset -lass"
 
     OUTFILE="/dist/mkvtool-$OS-$GOARCH"

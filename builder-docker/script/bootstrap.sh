@@ -9,7 +9,7 @@ for ARCH in $ARCH_LIST; do
 
     BUILD_ROOT="/deps/${ZIG_TARGET}"
 
-    ZIG="zig build -Dtarget=${ZIG_TARGET} -Doptimize=ReleaseSmall --prefix ${BUILD_ROOT} --build-file"
+    ZIG="zig build -Dtarget=${ZIG_TARGET} -Doptimize=ReleaseFast --prefix ${BUILD_ROOT} --build-file"
 
     ${ZIG} /package/fribidi-*/build.zig
     ${ZIG} /package/zlib-*/build.zig
