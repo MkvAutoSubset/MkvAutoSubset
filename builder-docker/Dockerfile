@@ -56,6 +56,6 @@ RUN chmod +x /script/build.sh
 FROM nemirtingas/osxcross_vcpkg:SDK12.1_clang17
 
 COPY --from=builder /deps /
-COPY --from=builder /cript/build.sh /
+COPY --from=builder /script/build.sh /
 
 CMD ["/build.sh"]
