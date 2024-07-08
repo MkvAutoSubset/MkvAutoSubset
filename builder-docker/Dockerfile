@@ -55,7 +55,9 @@ RUN chmod +x /script/build.sh
 
 FROM nemirtingas/osxcross_vcpkg:SDK12.1_clang17
 
-COPY --from=builder /deps /
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /vcpkg
+
+COPY --from=builder /deps /deps
 COPY --from=builder /script/build.sh /
 
 CMD ["/build.sh"]
