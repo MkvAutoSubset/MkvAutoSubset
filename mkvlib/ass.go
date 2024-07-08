@@ -2,6 +2,7 @@ package mkvlib
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib/c"
 	"github.com/MkvAutoSubset/MkvAutoSubset/mkvlib/parser"
@@ -563,6 +564,9 @@ func (self *assProcessor) reMap() {
 	m := make(map[string]*fontInfo)
 	_n := make(map[string]bool)
 	for k, v := range self.m {
+		if v.file == "" {
+			continue
+		}
 		_k := strings.Split(k, "^")[0]
 		if _, ok := m[v.file]; !ok {
 			m[v.file] = v
@@ -620,7 +624,7 @@ func (self *assProcessor) createFontSubset(font *fontInfo) bool {
 func (self *assProcessor) createFontsSubset() bool {
 	self.reMap()
 	err := os.RemoveAll(self.output)
-	if !(err == nil || err == os.ErrNotExist) {
+	if !(err == nil || errors.Is(err, os.ErrNotExist)) {
 		printLog(self.lcb, logError, "Failed to clean the output folder.")
 		return false
 	}
@@ -788,10 +792,10 @@ func (self *assProcessor) createFontsCache(output string) []string {
 func (self *assProcessor) copyFontsFromCache() bool {
 	ec := 0
 	if self.parse() {
-		l := len(self.m)
 		i := 0
 		self.matchFonts()
 		self.reMap()
+		l := len(self.m)
 		for k, v := range self.m {
 			if v.file != "" {
 				_, fn, _, _ := splitPath(v.file)
