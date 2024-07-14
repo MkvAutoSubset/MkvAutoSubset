@@ -31,7 +31,7 @@
 - ```c
   void Cache(char* ccs);
   //设置字体缓存(应在执行工作流之前调用)
-  //p: 包含缓存文件路径的json化文本
+  //ccs: 包含缓存文件路径数组的json格式文本
   ```
 - ```c
   char* CreateFontsCache(char* dir, char* output, logCallback lcb);
@@ -165,14 +165,11 @@
   //o: 是否跳过
   ```
 - ```c
-
-- ```c
   void Check(bool check, bool strict);
   //启用检查模式(影响包含子集化操作的工作流)
   //check: 是否启用检查模式
   //strict: 是否启用严格模式
   ```
-
 - ```c
   void A2P(bool a2p, bool apc, char* pr, char* pf);
   //启用ass转pgs(应在执行工作流之前调用)
