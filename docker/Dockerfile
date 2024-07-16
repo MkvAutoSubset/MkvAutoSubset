@@ -28,7 +28,7 @@ RUN git clone https://github.com/MkvAutoSubset/MkvAutoSubset -b next && \
 FROM alpine
 
 COPY --from=builder /MkvAutoSubset/mkvtool/mkvtool /usr/bin
-RUN apk add ffmpeg mkvtoolnix && \
+RUN apk add --no-cache ffmpeg mkvtoolnix && \
     mkdir fonts work
 
 WORKDIR work

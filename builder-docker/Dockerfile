@@ -1,4 +1,4 @@
-FROM nemirtingas/osxcross_vcpkg:SDK12.1_clang17 as builder
+FROM alpine AS builder
 
 ADD https://go.dev/dl/go1.22.5.linux-amd64.tar.gz /compiler/
 ADD https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz /compiler/
@@ -53,13 +53,16 @@ RUN chmod +x /script/bootstrap.sh && \
 COPY script/build.sh /script/
 RUN chmod +x /script/build.sh
 
-FROM nemirtingas/osxcross_vcpkg:SDK12.1_clang17
+FROM crazymax/osxcross:12.3-alpine AS osxcross
 
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /vcpkg
+FROM alpine
 
+COPY --from=osxcross /osxcross /osxcross
 COPY --from=builder /compiler /compiler
 COPY --from=builder /deps /deps
 COPY --from=builder /script/build.sh /
-ENV PATH=${PATH}:/compiler/go/bin:/compiler/zig
+ENV PATH=${PATH}:/compiler/go/bin:/compiler/zig:/osxcross/bin
+ENV LD_LIBRARY_PATH=/osxcross/lib
+RUN apk add --no-cache clang
 
 CMD ["/build.sh"]

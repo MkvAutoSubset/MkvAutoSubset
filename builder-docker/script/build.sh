@@ -14,6 +14,8 @@ convert_arch() {
   esac
 }
 
+clear
+
 echo "Initializing..."
 
 rm -rf /dist/* > /dev/null
