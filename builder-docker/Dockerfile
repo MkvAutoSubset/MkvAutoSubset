@@ -63,6 +63,6 @@ COPY --from=builder /deps /deps
 COPY --from=builder /script/build.sh /
 ENV PATH=${PATH}:/compiler/go/bin:/compiler/zig:/osxcross/bin
 ENV LD_LIBRARY_PATH=/osxcross/lib
-RUN apk add --no-cache clang
+RUN apk add --no-cache clang zip
 
 CMD ["/build.sh"]
