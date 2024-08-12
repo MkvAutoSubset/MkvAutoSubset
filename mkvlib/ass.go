@@ -568,14 +568,15 @@ func (self *assProcessor) reMap() {
 			continue
 		}
 		_k := strings.Split(k, "^")[0]
-		if _, ok := m[v.file]; !ok {
-			m[v.file] = v
-			m[v.file].oldNames = []string{_k}
+		_f := fmt.Sprintf("%s.%d", v.file, v.index)
+		if _, ok := m[_f]; !ok {
+			m[_f] = v
+			m[_f].oldNames = []string{_k}
 			_n[_k] = true
 		} else {
-			m[v.file].runes = append(m[v.file].runes, v.runes...)
+			m[_f].runes = append(m[_f].runes, v.runes...)
 			if _, ok = _n[_k]; !ok {
-				m[v.file].oldNames = append(m[v.file].oldNames, _k)
+				m[_f].oldNames = append(m[_f].oldNames, _k)
 				_n[_k] = true
 			}
 		}
@@ -589,7 +590,7 @@ func (self *assProcessor) reMap() {
 				chars = append(chars, _v)
 			}
 		}
-		m[v.file].runes = chars
+		v.runes = chars
 		printLog(self.lcb, logInfo, `Font selected:[%s] -> "%s"[%d]`, strings.Join(v.oldNames, ","), v.file, v.index)
 	}
 	self.m = m
