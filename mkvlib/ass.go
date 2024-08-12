@@ -22,6 +22,7 @@ import (
 type fontInfo struct {
 	file        string
 	runes       []rune
+	family      string
 	index       int
 	matchedName string
 	oldNames    []string
@@ -459,6 +460,7 @@ func (self *assProcessor) matchFonts() []string {
 							self.fg[n] = _n
 						}
 						self.m[k].newName = _n
+						self.m[k].family = _k[1]
 						break
 					}
 				}
@@ -477,6 +479,7 @@ func (self *assProcessor) matchFonts() []string {
 					self.fg[n] = _n
 				}
 				self.m[k].newName = _n
+				self.m[k].family = _k[1]
 			}
 		}
 	}
@@ -591,7 +594,7 @@ func (self *assProcessor) reMap() {
 			}
 		}
 		v.runes = chars
-		printLog(self.lcb, logInfo, `Font selected:[%s] -> "%s"[%d]`, strings.Join(v.oldNames, ","), v.file, v.index)
+		printLog(self.lcb, logInfo, `Font selected:[%s]^%s -> "%s"[%d]`, strings.Join(v.oldNames, ","), v.family, v.file, v.index)
 	}
 	self.m = m
 }
