@@ -22,7 +22,7 @@ bool ass2pgs(char *ass, const char *resolution, const char *rate, char *fontdir,
 
     // Set constant arguments
     argv[0] = NULL;
-    argv[1] = "-a1";
+    argv[1] = "-a0";
     argv[2] = "-p1";
     argv[3] = "-z0";
     argv[4] = "-u0";
