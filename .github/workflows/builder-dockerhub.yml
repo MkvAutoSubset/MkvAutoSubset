@@ -1,9 +1,9 @@
 name: Publish Builder Docker image
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   push_to_registry:
