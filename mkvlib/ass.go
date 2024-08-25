@@ -364,7 +364,6 @@ func (self *assProcessor) getFontsName(files []string) map[string][][]map[string
 
 func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	_str := ""
-	_runes := make([]rune, 0)
 	_f, err := os.Open(f.file)
 	if err == nil {
 		defer func() { _ = _f.Close() }()
@@ -379,7 +378,6 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 			} else {
 				_font, _ = sfnt.Parse(data)
 			}
-			_m := make(map[rune]bool)
 			if _font != nil {
 				for _, r := range f.runes {
 					if r == '\u00a0' || r == '\u0009' {
@@ -387,14 +385,7 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 					}
 					n, _ := _font.GlyphIndex(nil, r)
 					if n == 0 {
-						if r == '\u0020' {
-							if !_m[r] {
-								_m[r] = true
-								_runes = append(_runes, r)
-							}
-						} else {
-							_str += string(r)
-						}
+						_str += string(r)
 					}
 				}
 			} else {
@@ -410,17 +401,9 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 	}
 	if _str != "" {
 		_str = stringDeduplication(_str)
-		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing normal char(s): "%s"`, h, i, f.matchedName, f.file, f.index, _str)
+		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing char(s): "%s"`, h, i, f.matchedName, f.file, f.index, _str)
 	}
-	if len(_runes) > 0 {
-		_str = ""
-		for _, _rune := range _runes {
-			_str += fmt.Sprintf(`,0x%x`, _rune)
-		}
-		_str = _str[1:]
-		printLog(self.lcb, logWarning, `{%s%02d}Font [%s] -> "%s"[%d] missing special char(s): "%s"`, h, i, f.matchedName, f.file, f.index, _str)
-	}
-	return _str == "" && len(_runes) == 0
+	return _str == ""
 }
 
 func (self *assProcessor) matchFonts() []string {
