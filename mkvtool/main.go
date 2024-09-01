@@ -297,7 +297,7 @@ func makeCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&_l, "subtitle-language", "l", "chi", "Specify the subtitle language.")
 	cmd.Flags().StringVarP(&_t, "subtitle-title", "t", "", "Specify the subtitle title.")
 	cmd.Flags().BoolVarP(&_mks, "enable-mks-output", "m", false, "Enable mks output.")
-	cmd.Flags().BoolVarP(&_no, "Disable-overwrite", "n", false, "Disable file overwrite.")
+	cmd.Flags().BoolVarP(&_no, "disable-overwrite", "n", false, "Disable file overwrite.")
 
 	return cmd
 }
@@ -341,7 +341,7 @@ func createCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&_t, "subtitle-title", "t", "", "Specify the subtitle title.")
 	cmd.Flags().BoolVarP(&_c, "clean", "c", false, "Clean original file subtitles and fonts.")
 	cmd.Flags().BoolVarP(&_mks, "enable-mks-output", "m", false, "Enable mks output.")
-	cmd.Flags().BoolVarP(&_no, "Disable-overwrite", "n", false, "Disable file overwrite.")
+	cmd.Flags().BoolVarP(&_no, "disable-overwrite", "n", false, "Disable file overwrite.")
 
 	return cmd
 }
