@@ -86,14 +86,24 @@ func (self *assProcessor) getLength(p string) time.Duration {
 
 func restoreSubsetted(str string) string {
 	reg := regexp.MustCompile(`; Font [Ss]ubset: (\w+) - ([\S ]+)`)
+	x := 1
+	y := 2
+	s := "; Font subset restore: ${1} - ${2}"
+	if strings.Contains(str, "[Assfonts Rename Info]") {
+		str = strings.Replace(str, "[Assfonts Rename Info]", "[Assfonts Rename Restore Info]", 1)
+		reg = regexp.MustCompile(`([\S ]+) ---- (\w+)`)
+		x = 2
+		y = 1
+		s = `${2} - ${1}`
+	}
 	for _, v := range reg.FindAllStringSubmatch(str, -1) {
 		if len(v) > 2 {
-			_reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, v[1]))
+			_reg, _ := regexp.Compile(fmt.Sprintf(`(Style:[^,\r\n]+,|\\fn)(@?)%s([,\\\}])`, v[x]))
 			if _reg.MatchString(str) {
-				r := fmt.Sprintf("${1}${2}%s${3}", v[2])
+				r := fmt.Sprintf("${1}${2}%s${3}", v[y])
 				str = _reg.ReplaceAllString(str, r)
-				str = reg.ReplaceAllString(str, "; Font subset restore: ${1} - ${2}")
-				printLog(nil, logWarning, `Font subset restore: "%s" -> "%s".`, v[1], v[2])
+				str = reg.ReplaceAllString(str, s)
+				printLog(nil, logWarning, `Font subset restore: "%s" -> "%s".`, v[x], v[y])
 			}
 		}
 	}
