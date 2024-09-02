@@ -34,7 +34,7 @@ ASS字幕字体子集化 ASS转PGS MKV批量提取/生成
   CACHE_DIR="${HOME}/.mkvtool/caches"  #缓存目录
   OTHER_DIR="" #其他目录(可选,示例见下节.)
   docker pull ac79b0c6/mkvtool #拉取/更新镜像
-  docker run --rm -it -v ${FONT_DIR}:/fonts -v ${CACHE_DIR}:/root/.mkvtool/caches ${OTHER_DIR} ac79b0c6/mkvtool:${TAGNAME} #运行镜像
+  docker run --rm -it -v ${FONT_DIR}:/fonts -v ${CACHE_DIR}:/root/.mkvtool/caches ${OTHER_DIR} ac79b0c6/mkvtool #运行镜像
   ```
 - 手动构建&运行
   ```shell
