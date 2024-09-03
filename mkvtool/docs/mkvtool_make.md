@@ -13,7 +13,7 @@ mkvtool make <video-dir> [data-dir] [output-dir] [flags]
 ### Options
 
 ```
-  -n, --Disable-overwrite          Disable file overwrite.
+  -n, --disable-overwrite          Disable file overwrite.
   -m, --enable-mks-output          Enable mks output.
   -h, --help                       help for make
   -l, --subtitle-language string   Specify the subtitle language. (default "chi")

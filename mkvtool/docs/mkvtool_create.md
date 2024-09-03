@@ -13,7 +13,7 @@ mkvtool create <input-dir> [flags]
 ### Options
 
 ```
-  -n, --Disable-overwrite          Disable file overwrite.
+  -n, --disable-overwrite          Disable file overwrite.
   -c, --clean                      Clean original file subtitles and fonts.
   -m, --enable-mks-output          Enable mks output.
   -f, --font-sub-dir string        Font sub dir. (default "f")
