@@ -11,7 +11,7 @@ RUN apt-get update && \
     ${VCPKG_ROOT}/vcpkg install fribidi freetype[core,zlib,png] harfbuzz[core,experimental-api] && \
     ${VCPKG_ROOT}/vcpkg install libass
 
-RUN curl -O https://dl.google.com/go/go1.22.4.linux-amd64.tar.gz && \
+RUN curl -O https://dl.google.com/go/go1.23.1.linux-amd64.tar.gz && \
     tar zxf go*
 ENV PATH=${PATH}:/go/bin
 
