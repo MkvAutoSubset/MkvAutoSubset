@@ -1,6 +1,6 @@
 FROM alpine AS builder
 
-ADD https://go.dev/dl/go1.22.5.linux-amd64.tar.gz /compiler/
+ADD https://go.dev/dl/go1.23.1.linux-amd64.tar.gz /compiler/
 ADD https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz /compiler/
 
 RUN cd /compiler && \
@@ -12,12 +12,12 @@ RUN cd /compiler && \
 
 ENV PATH=${PATH}:/compiler/go/bin:/compiler/zig
 
-ADD https://download.savannah.gnu.org/releases/freetype/freetype-2.13.2.tar.xz /package/
+ADD https://download.savannah.gnu.org/releases/freetype/freetype-2.13.3.tar.xz /package/
 ADD https://github.com/fribidi/fribidi/releases/download/v1.0.15/fribidi-1.0.15.tar.xz /package/
-ADD https://github.com/harfbuzz/harfbuzz/releases/download/9.0.0/harfbuzz-9.0.0.tar.xz /package/
+ADD https://github.com/harfbuzz/harfbuzz/releases/download/10.0.1/harfbuzz-10.0.1.tar.xz /package/
 ADD https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.xz /package/
 ADD https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.xz /package/
-ADD https://github.com/pnggroup/libpng/archive/refs/tags/v1.6.43.tar.gz /package/
+ADD https://github.com/pnggroup/libpng/archive/refs/tags/v1.6.44.tar.gz /package/
 
 RUN cd /package && \
     tar Jxf freetype-* && \
