@@ -591,6 +591,26 @@ func (self *assProcessor) reMap() {
 		v.runes = chars
 		printLog(self.lcb, logInfo, `Font selected:[%s]^%s -> "%s"[%d]`, strings.Join(v.oldNames, ","), v.family, v.file, v.index)
 	}
+	oldNameMap := make(map[string][]string)
+	newNameMap := make(map[string]string)
+	matchedNameMap := make(map[string]string)
+	for file, font := range m {
+		for _, name := range font.oldNames {
+			oldNameMap[name] = append(oldNameMap[name], file)
+			newNameMap[name] = font.newName
+			matchedNameMap[name] = font.matchedName
+		}
+	}
+	uniqueMap := make(map[string]int)
+	for name, files := range oldNameMap {
+		for _, file := range files {
+			if uniqueMap[file] < len(files) {
+				m[file].matchedName = matchedNameMap[name]
+				m[file].newName = newNameMap[name]
+				uniqueMap[file] = len(files)
+			}
+		}
+	}
 	self.m = m
 }
 
