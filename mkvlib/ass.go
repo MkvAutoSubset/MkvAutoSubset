@@ -568,11 +568,13 @@ func (self *assProcessor) reMap() {
 		if _, ok := m[_f]; !ok {
 			m[_f] = v
 			m[_f].oldNames = []string{_k}
+			_k = fmt.Sprintf("%s^%s", _k, v.family)
 			_n[_k] = true
 		} else {
 			m[_f].runes = append(m[_f].runes, v.runes...)
 			if _, ok = _n[_k]; !ok {
 				m[_f].oldNames = append(m[_f].oldNames, _k)
+				_k = fmt.Sprintf("%s^%s", _k, v.family)
 				_n[_k] = true
 			}
 		}
@@ -653,6 +655,9 @@ func (self *assProcessor) replaceFontNameInAss() bool {
 			for f, s := range self.subtitles {
 				if m[f] == nil {
 					m[f] = make(map[string]bool)
+				}
+				if !self.rename {
+					v.newName = v.matchedName
 				}
 				for _, _v := range v.oldNames {
 					n := regexp.QuoteMeta(_v)
