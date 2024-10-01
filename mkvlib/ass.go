@@ -611,6 +611,11 @@ func (self *assProcessor) reMap() {
 			}
 		}
 	}
+	for _, font := range m {
+		if len(font.oldNames) > 1 {
+			printLog(self.lcb, logSWarning, `These font names [%s] correspond to the same font file. please ensure compliance with ass standards.`, strings.Join(font.oldNames, ","))
+		}
+	}
 	self.m = m
 }
 
