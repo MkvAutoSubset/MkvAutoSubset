@@ -578,15 +578,21 @@ func (self *assProcessor) reMap() {
 	uniqueMap := make(map[string]int)
 	for name, files := range fontNameMap {
 		for _, file := range files {
-			if uniqueMap[file] < len(files) {
-				m[file].oldNames = append(m[file].oldNames, m[file].matchedName)
-				m[file].matchedName = name
-				newName := self.newNames[name]
+			count := len(files)
+			if uniqueMap[file] < count {
+				font := m[file]
+				_name := font.matchedName
+				if count > 1 {
+					font.oldNames = append(font.oldNames, _name)
+					font.matchedName = name
+					_name = name
+				}
+				newName := self.newNames[_name]
 				if newName == "" {
 					newName = randomStr(8)
-					self.newNames[name] = newName
+					self.newNames[_name] = newName
 				}
-				m[file].newName = newName
+				font.newName = newName
 				uniqueMap[file] = len(files)
 			}
 		}
