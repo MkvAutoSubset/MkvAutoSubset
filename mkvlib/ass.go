@@ -567,20 +567,10 @@ func (self *assProcessor) reMap() {
 			m[_f].oldNames = append(m[_f].oldNames, _k)
 		}
 	}
-	for _, v := range m {
-		_m := make(map[rune]bool)
-		chars := make([]rune, 0)
-		for _, _v := range v.runes {
-			if _, ok := _m[_v]; !ok {
-				_m[_v] = true
-				chars = append(chars, _v)
-			}
-		}
-		v.runes = chars
-		printLog(self.lcb, logInfo, `Font selected:[%s]^%s -> "%s"[%d]`, strings.Join(v.oldNames, ","), v.family, v.file, v.index)
-	}
 	fontNameMap := make(map[string][]string)
 	for file, font := range m {
+		font.oldNames = stringArrayDeduplication(font.oldNames)
+		printLog(self.lcb, logInfo, `Font selected:[%s]^%s -> "%s"[%d]`, strings.Join(font.oldNames, ","), font.family, font.file, font.index)
 		for _, name := range font.fontNames {
 			fontNameMap[name] = append(fontNameMap[name], file)
 		}
@@ -863,7 +853,9 @@ func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string, 
 	i := -1
 	_count := 0
 	_k := strings.Split(k, "^")
-	otf := ""
+	otfFile := ""
+	otfName := ""
+	otfNames := make([]string, 0)
 	n := ""
 	names := make([]string, 0)
 	for _, v := range self.cache {
@@ -894,16 +886,20 @@ func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string, 
 		}
 		_, _, e, _ := splitPath(ok)
 		e = strings.ToLower(e)
-		if e == ".otf" && otf == "" {
-			otf = ok
+		if e == ".otf" && otfFile == "" {
+			otfFile = ok
+			otfName = n
+			otfNames = names
 			ok = ""
 		}
 		if ok != "" {
 			break
 		}
 	}
-	if ok == "" && otf != "" {
-		ok = otf
+	if ok == "" && otfFile != "" {
+		ok = otfFile
+		n = otfName
+		names = otfNames
 		i = 0
 	}
 	if _, err := os.Stat(ok); err != nil {

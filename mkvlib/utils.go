@@ -192,16 +192,12 @@ func findFonts(dir string) []string {
 
 func stringDeduplication(str string) string {
 	_s := ""
-	_m := make(map[rune]int)
+	_m := make(map[rune]bool)
 	_rs := []rune(str)
-	for i, r := range _rs {
+	for _, r := range _rs {
 		if _, ok := _m[r]; !ok {
-			_m[r] = i
-		}
-	}
-	for i, v := range _rs {
-		if _m[v] == i {
-			_s += string(_rs[i])
+			_m[r] = true
+			_s += string(r)
 		}
 	}
 	return _s
@@ -242,4 +238,16 @@ func toUTF8(data []byte) string {
 		}
 	}
 	return string(data)
+}
+
+func stringArrayDeduplication(arr []string) []string {
+	_m := make(map[string]bool)
+	_a := make([]string, 0)
+	for _, v := range arr {
+		if _, ok := _m[v]; !ok {
+			_m[v] = true
+			_a = append(_a, v)
+		}
+	}
+	return _a
 }
