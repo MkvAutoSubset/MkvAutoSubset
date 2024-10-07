@@ -20,14 +20,14 @@ import (
 )
 
 type fontInfo struct {
-	file        string
-	runes       []rune
-	family      string
-	index       int
-	matchedName string
-	oldNames    []string
-	newName     string
-	fontNames   []string
+	file         string
+	runes        []rune
+	family       string
+	index        int
+	matchedName  string
+	oldNames     []string
+	newName      string
+	matchedNames []string
 }
 
 type fontCache struct {
@@ -51,7 +51,6 @@ type assProcessor struct {
 	subtitles map[string]string
 	lcb       logCallback
 	cache     []cacheInfo
-	newNames  map[string]string
 	seps      []string
 	rename    bool
 	check     bool
@@ -418,7 +417,6 @@ func (self *assProcessor) checkFontMissing(f *fontInfo, i int, c bool) bool {
 }
 
 func (self *assProcessor) matchFonts() []string {
-	self.newNames = make(map[string]string)
 	fonts := findFonts(self._fonts)
 	m := self.getFontsName(fonts)
 	_count := make(map[string]int)
@@ -436,11 +434,10 @@ func (self *assProcessor) matchFonts() []string {
 			}
 			for __k, v := range m {
 				for ___k, _v := range v {
-					if n, names := self.matchFontName(_v, _k, fb == 2); n != "" {
+					if n := self.matchFontName(_v, _k, fb == 2); n != "" {
 						self.m[k].file = __k
 						self.m[k].index = ___k
 						self.m[k].matchedName = n
-						self.m[k].fontNames = names
 						if self.check {
 							_count[n]++
 							if !self.checkFontMissing(self.m[k], _count[_k[0]], false) && self.strict {
@@ -460,10 +457,9 @@ func (self *assProcessor) matchFonts() []string {
 			if self.m[k].file != "" {
 				continue
 			}
-			if f, i, n, names := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k, fb == 2); f != "" {
+			if f, i, n := self.matchCache(fmt.Sprintf("%s^%s", _k[0], _k[1]), k, fb == 2); f != "" {
 				self.m[k].file, self.m[k].index, self.m[k].matchedName = f, i, n
 				self.m[k].family = _k[1]
-				self.m[k].fontNames = names
 			}
 		}
 	}
@@ -493,11 +489,7 @@ func (self *assProcessor) fontNameToMap(m []map[string]bool) map[string]map[stri
 	return _m
 }
 
-func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool) (string, []string) {
-	fontNames := make([]string, 0)
-	for name, _ := range m[0] {
-		fontNames = append(fontNames, name)
-	}
+func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool) string {
 	names := make(map[string]string)
 	_name := strings.TrimSpace(_k[0])
 	_family := _k[1]
@@ -517,11 +509,11 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 		for family, _ := range m[1] {
 			if name != "" && family != "" {
 				if names[name] == family {
-					return name, fontNames
+					return name
 				}
 				if b && names[strings.ToLower(name)] == family {
 					printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s^%s]`, _name, _family, name, family)
-					return name, fontNames
+					return name
 				}
 			}
 		}
@@ -533,7 +525,7 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 						continue
 					}
 					if family == "Regular" {
-						return "", nil
+						return ""
 					}
 					families = append(families, family)
 				}
@@ -545,10 +537,10 @@ func (self *assProcessor) matchFontName(m []map[string]bool, _k []string, b bool
 			} else {
 				printLog(self.lcb, logSWarning, `Font bottom fallback:[%s^%s] -> [%s]`, _name, _family, name)
 			}
-			return name, fontNames
+			return name
 		}
 	}
-	return "", nil
+	return ""
 }
 
 func (self *assProcessor) reMap() {
@@ -562,23 +554,27 @@ func (self *assProcessor) reMap() {
 		if _, ok := m[_f]; !ok {
 			m[_f] = v
 			m[_f].oldNames = []string{_k}
+			m[_f].matchedNames = []string{v.matchedName}
 		} else {
 			m[_f].runes = append(m[_f].runes, v.runes...)
 			m[_f].oldNames = append(m[_f].oldNames, _k)
+			m[_f].matchedNames = append(m[_f].matchedNames, v.matchedName)
 		}
 	}
 	fontNameMap := make(map[string][]string)
 	for file, font := range m {
 		font.oldNames = stringArrayDeduplication(font.oldNames)
+		font.matchedNames = stringArrayDeduplication(font.matchedNames)
 		printLog(self.lcb, logInfo, `Font selected:[%s]^%s -> "%s"[%d]`, strings.Join(font.oldNames, ","), font.family, font.file, font.index)
-		for _, name := range font.fontNames {
+		for _, name := range font.matchedNames {
 			fontNameMap[name] = append(fontNameMap[name], file)
 		}
 	}
 	uniqueMap := make(map[string]int)
+	newNames := make(map[string]string)
 	for name, files := range fontNameMap {
+		count := len(files)
 		for _, file := range files {
-			count := len(files)
 			if uniqueMap[file] < count {
 				font := m[file]
 				_name := font.matchedName
@@ -587,13 +583,13 @@ func (self *assProcessor) reMap() {
 					font.matchedName = name
 					_name = name
 				}
-				newName := self.newNames[_name]
+				newName := newNames[_name]
 				if newName == "" {
 					newName = randomStr(8)
-					self.newNames[_name] = newName
+					newNames[_name] = newName
 				}
 				font.newName = newName
-				uniqueMap[file] = len(files)
+				uniqueMap[file] = count
 			}
 		}
 	}
@@ -854,19 +850,17 @@ func (self *assProcessor) loadCache(ccs []string) {
 	}
 }
 
-func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string, []string) {
+func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string) {
 	ok := ""
 	i := -1
 	_count := 0
 	_k := strings.Split(k, "^")
 	otfFile := ""
 	otfName := ""
-	otfNames := make([]string, 0)
 	n := ""
-	names := make([]string, 0)
 	for _, v := range self.cache {
 		for q, list := range v.Names {
-			if n, names = self.matchFontName(list, _k, b); n != "" {
+			if n = self.matchFontName(list, _k, b); n != "" {
 				ok = v.File
 				i = q
 				if self.check {
@@ -895,7 +889,6 @@ func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string, 
 		if e == ".otf" && otfFile == "" {
 			otfFile = ok
 			otfName = n
-			otfNames = names
 			ok = ""
 		}
 		if ok != "" {
@@ -905,11 +898,10 @@ func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string, 
 	if ok == "" && otfFile != "" {
 		ok = otfFile
 		n = otfName
-		names = otfNames
 		i = 0
 	}
 	if _, err := os.Stat(ok); err != nil {
 		ok = ""
 	}
-	return ok, i, n, names
+	return ok, i, n
 }
