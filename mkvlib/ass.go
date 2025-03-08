@@ -858,6 +858,9 @@ func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string) 
 	for _, v := range self.cache {
 		for q, list := range v.Names {
 			if n = self.matchFontName(list, _k, b); n != "" {
+				if _, err := os.Stat(v.File); err != nil {
+					continue
+				}
 				ok = v.File
 				i = q
 				if self.check {
@@ -896,9 +899,6 @@ func (self *assProcessor) matchCache(k, o string, b bool) (string, int, string) 
 		ok = otfFile
 		n = otfName
 		i = 0
-	}
-	if _, err := os.Stat(ok); err != nil {
-		ok = ""
 	}
 	return ok, i, n
 }
