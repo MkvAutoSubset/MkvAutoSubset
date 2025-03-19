@@ -22,7 +22,7 @@ def version():
 
 def initInstance(lcb):
     call = lib.InitInstance
-    call(_lcb(lcb)
+    call(_lcb(lcb))
 
 
 def getMKVInfo(file):
@@ -89,7 +89,7 @@ def createTestVideo(asses, s, fontdir, enc, burn, lcb):
     call(_files.encode(), s.encode(), fontdir.encode(), enc.encode(), burn, _lcb(lcb))
 
 def ass2pgs(asses, resolution, frameRate, fontdir, output):
-    call = lib.Ass2Pgs()
+    call = lib.Ass2Pgs
     _files = dumps(asses)
     call(_files.encode(), resolution.encode(), frameRate.encode(), fontdir.encode(), output.encode())
 
