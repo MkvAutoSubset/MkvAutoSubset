@@ -22,7 +22,7 @@ func _lcb(lcb C.logCallback) func(byte, string) {
 
 //export InitInstance
 func InitInstance(lcb C.logCallback) {
-	getter.InitProcessorInstance(_lcb(lcb))
+	processor = getter.InitProcessorInstance(_lcb(lcb))
 }
 
 //export GetMKVInfo
